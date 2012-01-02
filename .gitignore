@@ -1,4 +1,7 @@
 .hgignore
 3rdparty/*
-.download
+.downloaded
+.hg/*
+*~
+
 
