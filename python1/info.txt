@@ -1,0 +1,7 @@
+macでemacs python環境 - hidecheckの日記
+http://d.hatena.ne.jp/hidecheck/20110205/1296922662
+emacs の python 開発環境を整える - フリーフォーム フリークアウト
+http://d.hatena.ne.jp/cou929_la/20110525/1306321857
+~/.emacsへの雑多な設定
+http://www.cozmixng.org/~kou/emacs/dot_emacs
+
