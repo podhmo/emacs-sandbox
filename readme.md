@@ -1,7 +1,15 @@
 # emacs sandbox
 
 
-## test run
+## requirement
+
+- readlink
+- wget
+- (emacs)
+
+## how to use
+
+### test run
 
 ```sh
 make run
@@ -11,7 +19,7 @@ make run
 ENV=dummy make run
 ```
 
-## install
+### install
 
 ```sh
 make install
