@@ -5,3 +5,7 @@ http://d.hatena.ne.jp/cou929_la/20110525/1306321857
 ~/.emacsへの雑多な設定
 http://www.cozmixng.org/~kou/emacs/dot_emacs
 
+## todo
+auto-complete と pycomplete で賢い補完 - わからん
+http://d.hatena.ne.jp/kitokitoki/20100828/p2
+
