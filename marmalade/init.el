@@ -8,7 +8,7 @@
 (defmacro comment (&rest body)
   nil)
 
-(defmacro* require-if-not-fetch (package &key (filename nil) (noerror t) (installed-package nil))
+(defmacro* require-and-fetch-if-not (package &key (filename nil) (noerror t) (installed-package nil))
   (let ((pname (gensym)))
     `(unless (require ,package ,filename t)
        (let ((,pname (or ,installed-package ,package)))
