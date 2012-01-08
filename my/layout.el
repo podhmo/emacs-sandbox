@@ -1,3 +1,20 @@
+;; named-progn
+(defface named-progn-name-face
+  '((t
+     (:foreground "gainsboro"
+                  :background "dim grey"
+                  :italic t
+                  :bold t)))
+  "Style of selected item in *Completions* buffer")
+
+(defvar named-progn-name-face 'named-progn-name-face)
+
+(dolist (mode '(lisp-interaction-mode emacs-lisp-mode))
+  (font-lock-add-keywords 
+   mode
+   `((,(format "(%s.*$" "named-progn") 0 named-progn-name-face append)
+     (,(format "(%s" "comment") 0 named-progn-name-face append))))
+
 ;; eye candy
 (menu-bar-mode -1)
 (tool-bar-mode -1)

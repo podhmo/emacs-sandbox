@@ -55,7 +55,7 @@
 
 ;;show line number
 (require 'linum)
-(global-linum-mode)
+(global-linum-mode t)
 
 ;;tramp
 (require 'tramp)

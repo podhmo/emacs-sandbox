@@ -53,4 +53,3 @@
 
   ;; flymake
   (py:setup-flymake-cmd "pyflakes"))
-

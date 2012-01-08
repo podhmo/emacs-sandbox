@@ -1,28 +1,44 @@
-(defun define-many-keys (key-map key-table)
-  (loop for (key . cmd) in key-table
-	do (define-key key-map (read-kbd-macro key) cmd)))
+(named-progn keyboad-settinsg
+  (defun define-many-keys (key-map key-table)
+    (loop for (key . cmd) in key-table
+          do (define-key key-map (read-kbd-macro key) cmd)))
 
-(setq global-individual-key-mapping
-      '(("C-c C-l" . eval-buffer)
-        ("C-c C-f" . ffap)
-        ("C-c q" . comment-region)
-        ("C-c Q" . uncomment-region)))
+  (setq global-individual-key-mapping
+        '(("C-c C-l" . eval-buffer)
+          ("C-c C-f" . ffap)
+          ("C-c C-e" . eval-defun) ;;
+          ("C-c j" . dabbrev-expand)
+          ("C-c C-j" . dabbrev-expand) ;;
+          ("C-c q" . comment-region)
+          ("C-c Q" . uncomment-region)
+          
+          ("C-c x" . (lambda () (interactive) (find-file (concat (current-directory) "/init.el"))))
+          ("C-j S" . elscreen-shell/next-screen)
 
-(define-many-keys (current-global-map) global-individual-key-mapping)
+          ("C-;" . elscreen-previous)
+          ("C-:" . elscreen-next)))
 
-(ffap-bindings) ;; url also enable in C-x C-f
+  (ffap-bindings) ;; url also enable when typed C-x C-f
+  (define-many-keys (current-global-map) global-individual-key-mapping))
 
+(defun elscreen-shell/next-screen () (interactive)
+  (let1 dir (current-directory)
+    (elscreen-create)
+    (shell)
+    (comint-simple-send (get-buffer-process dir)
+                        (concat "cd " dir))
+    (goto-char (point-max))))
 
 ;; from: https://github.com/wakaran/config/blob/master/dot.emacs.d.server/init/90-last-setting.el
 
 ;;;; shell-modeで上下でヒストリ補完
 ;; C-p/C-nでヒストリを辿る (デフォルトでもM-p, M-nで出来る)
 (add-hook 'shell-mode-hook
-   (function (lambda ()
-      (define-key shell-mode-map [up] 'comint-previous-input)
-      (define-key shell-mode-map [down] 'comint-next-input)
-      (define-key shell-mode-map "\C-p" 'comint-previous-input)
-      (define-key shell-mode-map "\C-n" 'comint-next-input))))
+          (function (lambda ()
+                      (define-key shell-mode-map [up] 'comint-previous-input)
+                      (define-key shell-mode-map [down] 'comint-next-input)
+                      (define-key shell-mode-map "\C-p" 'comint-previous-input)
+                      (define-key shell-mode-map "\C-n" 'comint-next-input))))
 
 ;; kill-ring に同じ内容の文字列を複数入れない
 ;; kill-ring-save 等した時にその内容が既に kill-ring にある場合、その文字列が kill-ring の先頭に 1 つにまとめられます
@@ -51,4 +67,3 @@
             (save-excursion
               (goto-char (point-max))
               (delete-blank-lines))))
-
