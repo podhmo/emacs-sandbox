@@ -10,9 +10,10 @@
 
 (defmacro* require-and-fetch-if-not (package &key (filename nil) (noerror t) (installed-package nil))
   (let ((pname (gensym)))
-    `(unless (require ,package ,filename t)
-       (let ((,pname (or ,installed-package ,package)))
-	 (package-install ,pname)))))
+    `(or (require ,package ,filename t)
+         (let ((,pname (or ,installed-package ,package)))
+           (package-install ,pname)
+           (require ,package ,filename t)))))
 ;;
 
 (add-to-list 'load-path (current-directory))
@@ -29,4 +30,3 @@
   (package-refresh-contents))
 
 ;; (package-list-packages)
-(require 'uniquify)

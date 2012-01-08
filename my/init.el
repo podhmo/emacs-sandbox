@@ -16,7 +16,8 @@
   (let ((pname (gensym)))
     `(or (require ,package ,filename t)
          (let ((,pname (or ,installed-package ,package)))
-           (package-install ,pname)))))
+           (package-install ,pname)
+           (require ,package ,filename t)))))
 ;;
 (add-hook 'after-init-hook
           (lambda ()
@@ -77,11 +78,13 @@
     (global-j-define-key))
   (defadvice switch-to-buffer (after kill-Cj  activate)
     (global-j-define-key))
+
   (defvar ctl-j-map (make-keymap))
   (global-set-key (kbd "C-j") ctl-j-map)
   (setq elscreen-prefix-key (kbd "C-j"))
+
   (elscreen-start)
-)
+  )
 
 (require-and-fetch-if-not 'autopair)
 ;; (named-progn anything
