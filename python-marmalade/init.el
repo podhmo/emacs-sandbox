@@ -29,3 +29,5 @@
 (package-initialize)
 
 ;; (package-list-packages)
+(require-if-not-fetch 'python-mode)
+(find-file (concat (current-directory) "init.el"))
