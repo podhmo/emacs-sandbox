@@ -8,6 +8,14 @@
 (display-time-mode t)
 (transient-mark-mode t)
 
+(setq search-highlight t)
+(setq query-replace-highlight t) 
+
+(auto-image-file-mode t)
+(setq resize-mini-windows t) 
+
+(add-hook 'shell-mode-hook
+          'ansi-color-for-comint-mode-on)
 
 ;; indent
 (setq default-tab-width 4)

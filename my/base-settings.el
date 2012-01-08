@@ -63,7 +63,3 @@
 ;; lang
 (setq initial-major-mode 'emacs-lisp-mode)
 
-
-;; key settings
-(global-set-key "\C-c\C-l" 'eval-buffer)
-

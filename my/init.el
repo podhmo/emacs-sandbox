@@ -21,18 +21,20 @@
 ;; my-base setting
 (load "util")
 (load "base-settings")
-(load "layout")
 (load "daily-commands")
+(load "layout")
+(load "human-interfaces")
+
 
 ;; marmalade
 (require 'package)
 (setq package-user-dir (concat (current-directory) "/3rdparty"))
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
-
 ;; get available packages
+(package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
-(package-initialize)
+
 
 ;;;;;;;;; ;;
 ;;; emacsclient サーバを起動

@@ -24,9 +24,9 @@
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
 
 ;; get available packages
+(package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
-(package-initialize)
 
 ;; (package-list-packages)
 (require-and-fetch-if-not 'python-mode)
