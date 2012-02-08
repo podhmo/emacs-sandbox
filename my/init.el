@@ -86,17 +86,58 @@
   (elscreen-start)
   )
 
-(require-and-fetch-if-not 'autopair)
-;; (named-progn anything
-;;   (require-and-fetch-if-not 
-
-(named-progn python
-  (defun my:python-setup ()
-    (autopair-on))
-
-  (require-and-fetch-if-not 'python-mode)
-  (add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
-  (add-hook 'python-mode-hook 'my:python-setup)
+(named-progn editing
+  (require-and-fetch-if-not 'autopair)
+  (require-and-fetch-if-not 'paredit)
   )
 
+(named-progn eye-candy
+  (require 'eldoc)
+  (setq eldoc-argument-case 'downcase)
+
+  (defadvice  eldoc-get-fnsym-args-string
+    (around eldoc-named-progn-display-section (sym &optional index) activate)
+    (cond ((eq sym 'named-progn)
+           (let ((section-name
+                  (save-excursion
+                    (eldoc-beginning-of-sexp)
+                   (goto-char (scan-sexps (point) 1))
+                   (skip-syntax-forward "^w_")
+                   (thing-at-point 'symbol))))
+             (message "named-progn -- %s --" section-name)))
+            (t ad-do-it)))
+  )
+
+
+
+
+                    
+(named-progn programming-languages
+  (named-progn emacs-lisp
+    (defun my:emacs-lisp-setup ()
+      (define-many-keys emacs-lisp-mode-map
+        '(("C-c C-j" . lisp-complete-symbol)
+          ))
+      (turn-on-eldoc-mode)
+      (eldoc-add-command
+       'paredit-backward-delete
+       'paredit-close-round)
+      
+      (paredit-mode +1))
+    
+    (add-hook 'emacs-lisp-mode-hook 'my:emacs-lisp-setup))
+  ;;(require 'paredit)
+
+  ;; (named-progn anything
+  ;;   (require-and-fetch-if-not 
+
+  (named-progn python
+    (defun my:python-setup ()
+      (autopair-on))
+    
+    (require-and-fetch-if-not 'python-mode)
+    (add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
+    (add-hook 'python-mode-hook 'my:python-setup)
+    )
+  )
 (run-hook-with-args 'after-init-hook)
