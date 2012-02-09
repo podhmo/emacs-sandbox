@@ -101,17 +101,53 @@
            (let ((section-name
                   (save-excursion
                     (eldoc-beginning-of-sexp)
-                   (goto-char (scan-sexps (point) 1))
-                   (skip-syntax-forward "^w_")
-                   (thing-at-point 'symbol))))
+                    (goto-char (scan-sexps (point) 1))
+                    (skip-syntax-forward "^w_")
+                    (thing-at-point 'symbol))))
              (message "named-progn -- %s --" section-name)))
-            (t ad-do-it)))
+          (t ad-do-it)))
   )
 
+(defvar junks-directory-path "~/junks")
+(defvar junks-directory-force-create-p t)
 
+(defun junks-create-directory-if-force (force-p)
+  (unless (and forcep
+               (file-exists-p junks-directory-path) 
+               (file-directory-p junks-directory-path))
+    (make-directory junks-directory-path)))
 
+(defun junks-insert-content (strings)
+  (save-excursion
+    (goto-char (point-max))
+    (insert "\n\n")
+    (dolist (s strings)
+      (insert s "\n"))))
 
-                    
+(defun move-junks (&rest contents) 
+  (let* ((timestamp (format-time-string "%Y-%m-%d" (current-time)))
+         (fname (format "%s/junks.%s" junks-directory-path timestamp)))
+    (junks-create-directory-if-force  junks-directory-force-create-p)
+    (with-current-buffer (find-file-noselect fname)
+      (junks-insert-content contents))))
+
+(defun move-junks-region (beg end comment) (interactive "r\nscomment:")
+  (move-junks
+   comment
+   (delete-and-extract-region beg end)))
+
+(named-progn anything
+  (require-and-fetch-if-not 'anything)
+  (require-and-fetch-if-not 'anything-config)
+  (define-many-keys global-map
+    '(("<hiragana-katakana>" . anything)
+      ("C-c C-;" . anything-occur)
+      ("M-x" . anything-M-x)
+      ("C-x b" . anything-buffers+)
+      ("M-y" . anything-show-kill-ring)
+      ))    
+  )  
+
 (named-progn programming-languages
   (named-progn emacs-lisp
     (defun my:emacs-lisp-setup ()
@@ -127,9 +163,6 @@
     
     (add-hook 'emacs-lisp-mode-hook 'my:emacs-lisp-setup))
   ;;(require 'paredit)
-
-  ;; (named-progn anything
-  ;;   (require-and-fetch-if-not 
 
   (named-progn python
     (defun my:python-setup ()
