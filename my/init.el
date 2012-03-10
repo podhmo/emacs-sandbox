@@ -1,5 +1,7 @@
 (require 'cl)
 ;; utility
+(setq debug-on-error nil)
+
 (defun current-directory ()
   (if load-file-name
       (file-name-directory load-file-name)
@@ -135,6 +137,17 @@
   )
 
 (named-progn programming-languages
+  (named-progn font-lock-language-plugin
+    ;; (defmacro language:define-plugin (name args &rest body)
+    ;;   (declare (indent 2))
+    ;;   `(defun* ,name ,args 
+    ;;      (add-to-list 'language:activated-plugins ',name)
+    ;;      ,@body))
+    (font-lock-add-keywords
+     'emacs-lisp-mode 
+     '(("(\\([^\t ]*?:define-plugin\\) " (1 font-lock-keyword-face) 
+        ("[^\t ]+?" nil nil (0 font-lock-function-name-face))))))
+  
   (named-progn emacs-lisp
     (defun my:emacs-lisp-setup ()
       (define-many-keys emacs-lisp-mode-map
@@ -149,14 +162,20 @@
     (add-hook 'emacs-lisp-mode-hook 'my:emacs-lisp-setup))
   ;;(require 'paredit)
 
-  (named-progn python
+  (named-progn python 
+    (load "language.python")
+
+    (named-progn activate-plugin
+      (python:auto-mode-alist-plugin)
+      (python:flymake-plugin)
+      (python:autopair-plugin)
+      (python:strict-indent-plugin)
+      ;; (python:flymake-eldoc/current-position-plugin) ;;buggy
+      )
+
     (defun my:python-setup ()
-      (autopair-on))
-    
-    (require-and-fetch-if-not 'python-mode)
-    (add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
-    (add-hook 'python-mode-hook 'my:python-setup)
-    )
+      (run-hook-with-args-until-failure 'python:plugin-mode-hook))
+    (add-hook 'python-mode-hook 'my:python-setup))
   )
 
 (run-hook-with-args 'after-init-hook)
