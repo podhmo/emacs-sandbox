@@ -1,8 +1,4 @@
 (named-progn keyboad-settinsg
-  (defun define-many-keys (key-map key-table)
-    (loop for (key . cmd) in key-table
-          do (define-key key-map (read-kbd-macro key) cmd)))
-
   (setq global-individual-key-mapping
         '(("C-c C-l" . eval-buffer)
           ("C-c C-f" . ffap)

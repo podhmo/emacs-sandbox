@@ -18,6 +18,11 @@
          (let ((,pname (or ,installed-package ,package)))
            (package-install ,pname)
            (require ,package ,filename t)))))
+
+(defun define-many-keys (key-map key-table)
+  (loop for (key . cmd) in key-table
+        do (define-key key-map (read-kbd-macro key) cmd)))
+
 ;;
 (add-hook 'after-init-hook
           (lambda ()
@@ -139,9 +144,39 @@
 (named-progn anything
   (require-and-fetch-if-not 'anything)
   (require-and-fetch-if-not 'anything-config)
+  (require 'outline)
+  (defadvice anything-next-line (after execute-persistent-action disable)
+    (unless (or (anything-get-previous-header-pos)
+                (anything-get-next-header-pos))
+      (call-interactively 'anything-execute-persistent-action)))
+
+  (defadvice anything-previous-line (after execute-persistent-action disable)
+    (unless (or (anything-get-previous-header-pos)
+                (anything-get-next-header-pos))
+      (call-interactively 'anything-execute-persistent-action)))
+
+  (defmacro with-anything-line-move-advice (advice-name action)
+    `(progn
+       (ad-enable-advice 'anything-next-line 'after ',advice-name)
+       (ad-activate 'anything-next-line)
+       (ad-enable-advice 'anything-previous-line 'after ',advice-name)
+       (ad-activate 'anything-previous-line)
+       (flet ((message (&rest args)))
+         (unwind-protect
+             ,action
+           (progn (ad-deactivate 'anything-previous-line)
+                  (ad-deactivate 'anything-next-line))))))
+
+  (defun anything-occur* () 
+    "Preconfigured Anything for Occur source."
+    (interactive)
+    (with-anything-line-move-advice 
+     execute-persistent-action
+     (anything-occur)))
+
   (define-many-keys global-map
     '(("<hiragana-katakana>" . anything)
-      ("C-c C-;" . anything-occur)
+      ("C-c C-;" . anything-occur*)
       ("M-x" . anything-M-x)
       ("C-x b" . anything-buffers+)
       ("M-y" . anything-show-kill-ring)
