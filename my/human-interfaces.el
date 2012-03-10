@@ -72,11 +72,22 @@ so. c-u 3 follow-with-n-window, then a frame splitted 3window
               (goto-char (point-max))
               (delete-blank-lines))))
 
+(named-progn popwin
+  (require-and-fetch-if-not 'popwin)
+  (setq display-buffer-function 'popwin:display-buffer)
+  ;; why this is need?
+  (defadvice called-interactively-p (before print (&rest args) activate)
+    nil)
+  )
+
+
 ;;; my own
 (named-progn anything
   (require-and-fetch-if-not 'anything)
   (require-and-fetch-if-not 'anything-config)
   (require-and-fetch-if-not 'anything-match-plugin)
+
+  (setq anything-execute-action-at-once-if-one t)
 
   (require 'outline)
   (defadvice anything-next-line (after execute-persistent-action disable)
@@ -118,18 +129,27 @@ so. c-u 3 follow-with-n-window, then a frame splitted 3window
        execute-persistent-action
        (anything-bm-list)))
     )
+  (named-progn popwin
+    (when (boundp 'popwin:special-display-config)
+      (setq anything-samewindow nil)
+      (add-to-list 'popwin:special-display-config '("*anything*" :height 20))))
 
-  ;; key settings
-  (add-hook 'on-after-keybord-setup
-            (lambda ()
-              (define-many-keys global-map
-                '(("<hiragana-katakana>" . anything)
-                  ("C-c C-;" . anything-occur*)
-                  ("M-x" . anything-M-x)
-                  ("C-x b" . anything-buffers+)
-                  ("M-y" . anything-show-kill-ring)
-
-                  ("C-j C-j" . anything-bm-list*)
-                  ("C-j j" . bm-toggle)
-                  ))))
+  (named-progn key-settings/anything
+    (add-hook 'on-after-keybord-setup
+              (lambda ()
+                (define-many-keys global-map
+                  '(("<hiragana-katakana>" . anything)
+                    ("C-c C-;" . anything-occur*)
+                    ("M-x" . anything-M-x)
+                    ("C-x b" . anything-buffers+)
+                    ("M-y" . anything-show-kill-ring)
+                    
+                    ("C-j C-j" . anything-bm-list*)
+                    ("C-j j" . bm-toggle)
+                    ))))
+    )
   )  
+
+(named-progn scroll-buffer
+  (require-and-fetch-if-not 'deferred)
+)

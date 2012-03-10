@@ -146,14 +146,6 @@
   )
 
 (named-progn eye-candy
-  (named-progn popwin
-    (require-and-fetch-if-not 'popwin)
-    (setq display-buffer-function 'popwin:display-buffer)
-    ;; why this is need?
-    (defadvice called-interactively-p (before print (&rest args) activate)
-      nil)
-    )
-
   (named-progn eldoc
     (require 'eldoc)
     (setq eldoc-argument-case 'downcase)
