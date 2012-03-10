@@ -52,6 +52,12 @@
 
 
 ;;; my own
+(named-progn redo
+  (require-and-fetch-if-not 'redo+)
+  (define-many-keys (current-global-map)
+    '(("C-." . redo)
+      ("C-/" . undo)))
+  )
 
 (named-progn elscreen
   (require-and-fetch-if-not 'elscreen)
@@ -163,9 +169,30 @@
     )
   )  
 
-(named-progn scroll-buffer ;; todo:add
-  (require-and-fetch-if-not 'deferred)
-  )
+;; (named-progn scroll-buffer 
+;;   (require-and-fetch-if-not 'deferred)
+;;   (require 'inertial-scroll)
+;;   (setq inertias-initial-velocity 50)
+;;   (setq inertias-friction 120)
+;;   (setq inertias-update-time 50)
+;;   (setq inertias-rest-coef 0)
+;;   (setq inertias-global-minor-mode-map 
+;;         (inertias-define-keymap
+;;        '(
+;;          ;; Mouse wheel scrolling
+;;          ("<wheel-up>"   . inertias-down-wheel)
+;;          ("<wheel-down>" . inertias-up-wheel)
+;;          ("<mouse-4>"    . inertias-down-wheel)
+;;          ("<mouse-5>"    . inertias-up-wheel)
+;;          ;; Scroll keys
+;;          ("<next>"  . inertias-up)
+;;          ("<prior>" . inertias-down)
+;;          ("C-v"     . inertias-up)
+;;          ("M-v"     . inertias-down)
+;;          ) inertias-prefix-key))
+;;   (setq inertias-rebound-flash nil)
+;;   (inertias-global-minor-mode 1)
+;;   )
 
 (named-progn viewer-mode-settings
   (named-progn for-buffer-file-permission
@@ -199,6 +226,8 @@
             ("l" . forward-word)
             ("j" . next-line)
             ("k" . previous-line)
+            ;; ("j" . inertias-up)
+            ;; ("k" . inertias-down)
             ("^" . move-beginning-of-line)
             ("$" . move-end-of-line)
             ("(" . point-undo)
