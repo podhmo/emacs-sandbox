@@ -1,7 +1,12 @@
 #!/bin/bash
 
+dl_and_compile(){
+    wget $1 -O $2 && emacs -batch -f batch-byte-compile $2
+}
+
 mkdir -p 3rdparty
 pushd 3rdparty
-
 wget -nc http://repo.or.cz/w/emacs.git/blob_plain/1a0a666f941c99882093d7bd08ced15033bc3f0c:/lisp/emacs-lisp/package.el
+test $? = 0 && dl_and_compile http://www.emacswiki.org/emacs/download/key-chord.el key-chord.el 
 popd
+test $? = 0 && touch .downloaded

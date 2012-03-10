@@ -69,7 +69,7 @@
     (run-hook-with-args-until-failure
      'on-before-keybord-setup)
 
-    (named-progn global-key-settings
+    (named-progn global-key-settings ;; or human-interfaces.el
       (setq global-individual-key-mapping
             '(("C-c C-l" . eval-buffer)
               ("M-r" . replace-string)
@@ -121,47 +121,6 @@
   (unless package-archive-contents
     (package-refresh-contents))
   ;; (package-list-packages)
-  )
-
-(named-progn elscreen
-  (require-and-fetch-if-not 'elscreen)
-
-  (defun global-j-define-key (&optional kmap)
-    (and-let* ((kmap (or kmap (current-local-map))))
-      (define-key kmap "\C-j" nil))) ;; experimental
-
-  (add-hook 'on-before-keybord-setup
-            (lambda ()
-              (defadvice elscreen-goto (after kill-Cj  activate)
-                (global-j-define-key))
-              (defadvice switch-to-buffer (after kill-Cj  activate)
-                (global-j-define-key))
-              (setq elscreen-prefix-key (kbd "C-j"))
-              (elscreen-start)))
-  )
-
-(named-progn editing
-  (require-and-fetch-if-not 'autopair)
-  ;; (require-and-fetch-if-not 'paredit)
-  )
-
-(named-progn eye-candy
-  (named-progn eldoc
-    (require 'eldoc)
-    (setq eldoc-argument-case 'downcase)
-    
-    (defadvice  eldoc-get-fnsym-args-string
-      (around eldoc-named-progn-display-section (sym &optional index) activate)
-      (cond ((eq sym 'named-progn)
-             (let ((section-name
-                    (save-excursion
-                      (eldoc-beginning-of-sexp)
-                      (goto-char (scan-sexps (point) 1))
-                      (skip-syntax-forward "^w_")
-                      (thing-at-point 'symbol))))
-               (message "named-progn -- %s --" section-name)))
-            (t ad-do-it)))
-    )
   )
 
 (named-progn treat-dumped-junks

@@ -1,3 +1,10 @@
+(named-progn key-chord
+  (require 'key-chord) ;; key-chord downlod via wget(my/download)
+  (setq key-chord-two-keys-delay 0.04)
+  (key-chord-mode 1)
+)
+
+
 (named-progn convinience-command
   (defun elscreen-shell/next-screen () (interactive)
     "create shell buffer with current directory as pwd"
@@ -84,6 +91,49 @@ so. c-u 3 follow-with-n-window, then a frame splitted 3window
 
 
 ;;; my own
+
+(named-progn elscreen
+  (require-and-fetch-if-not 'elscreen)
+
+  (defun global-j-define-key (&optional kmap)
+    (and-let* ((kmap (or kmap (current-local-map))))
+      (define-key kmap "\C-j" nil))) ;; experimental
+
+  (add-hook 'on-before-keybord-setup
+            (lambda ()
+              (defadvice elscreen-goto (after kill-Cj  activate)
+                (global-j-define-key))
+              (defadvice switch-to-buffer (after kill-Cj  activate)
+                (global-j-define-key))
+              (setq elscreen-prefix-key (kbd "C-j"))
+              (elscreen-start)))
+  )
+
+(named-progn editing
+  (require-and-fetch-if-not 'autopair)
+  ;; (require-and-fetch-if-not 'paredit)
+  )
+
+(named-progn eye-candy
+  (named-progn eldoc
+    (require 'eldoc)
+    (setq eldoc-argument-case 'downcase)
+    
+    (defadvice  eldoc-get-fnsym-args-string
+      (around eldoc-named-progn-display-section (sym &optional index) activate)
+      (cond ((eq sym 'named-progn)
+             (let ((section-name
+                    (save-excursion
+                      (eldoc-beginning-of-sexp)
+                      (goto-char (scan-sexps (point) 1))
+                      (skip-syntax-forward "^w_")
+                      (thing-at-point 'symbol))))
+               (message "named-progn -- %s --" section-name)))
+            (t ad-do-it)))
+    )
+  )
+
+
 (named-progn anything
   (require-and-fetch-if-not 'anything)
   (require-and-fetch-if-not 'anything-config)
@@ -152,6 +202,68 @@ so. c-u 3 follow-with-n-window, then a frame splitted 3window
     )
   )  
 
-(named-progn scroll-buffer
+(named-progn scroll-buffer ;; todo:add
   (require-and-fetch-if-not 'deferred)
   )
+
+(named-progn viewer-mode-settings
+  (named-progn for-buffer-file-permission
+    (setq view-read-only t)
+    (defadvice find-file
+      (around find-file-switch-to-view-file (file &optional wild) activate)
+      (if (and (not (file-writable-p file))
+               (not (file-directory-p file)))
+          (view-file file)
+        ad-do-it))
+    
+    (defvar view-mode-force-exit nil)
+    (defmacro do-not-exit-view-mode-unless-writable-advice (f)
+      `(defadvice ,f (around do-not-exit-view-mode-unless-writable activate)
+         (if (and (buffer-file-name)
+                  (not view-mode-force-exit)
+                  (not (file-writable-p (buffer-file-name))))
+             (message "File is unwritable, so stay in view-mode.")
+           ad-do-it)))
+    (do-not-exit-view-mode-unless-writable-advice view-mode-exit)
+    (do-not-exit-view-mode-unless-writable-advice view-mode-disable))
+
+  (named-progn keybord-settings/viewer-mode
+    (defmacro funcall&viewer-mode (func) ;;slack-off
+      `(lambda () (interactive) ,func (view-mode-enable)))
+
+    (setq pager-keysettings
+          `( ;; vi-like
+            ("/" . re-search-forward)
+            ("h" . backward-word)
+            ("l" . forward-word)
+            ("j" . next-line)
+            ("k" . previous-line)
+            ("^" . move-beginning-of-line)
+            ("$" . move-end-of-line)
+            ("(" . point-undo)
+            (")" . point-redo)
+            ("i" . ,(funcall&viewer-mode (other-window -1)))
+            ("o" . ,(funcall&viewer-mode (other-window 1)))
+            ;; convinience
+            (";" . ,(funcall&viewer-mode (elscreen-previous)))
+            (":" . ,(funcall&viewer-mode (elscreen-next)))
+            (" " . View-scroll-half-page-forward)
+            ("b" . View-scroll-half-page-backward)
+            ("C-j" . nil)
+            ;; vim like
+            ("g" . beginning-of-buffer)
+            ("G" . end-of-buffer)
+            ;; langhelp-like
+            ("c" . scroll-other-window-down)
+            ("v" . scroll-other-window)
+            ;; manipurate other frame
+            ("a" . help-go-back-from-anywhere)
+            ("s" . help-go-forward-from-anywhere)
+            ))
+    (add-hook 'view-mode-hook
+              (lambda ()
+                (define-many-keys view-mode-map pager-keysettings)))
+    
+    (named-progn key-chord
+      (key-chord-define-global "jk" 'view-mode))
+    ))
