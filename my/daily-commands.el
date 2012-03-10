@@ -39,3 +39,34 @@ so. c-u 3 follow-with-n-window, then a frame splitted 3window
           (select-window w)
           (switch-to-buffer cur-buf)))
       (turn-on-follow-mode))))
+
+
+(named-progn treat-dumped-junks
+  (defvar junks-directory-path "~/junks")
+  (defvar junks-directory-force-create-p t)
+
+  (defun junks-create-directory-if-force (force-p)
+    (unless (and forcep
+                 (file-exists-p junks-directory-path) 
+                 (file-directory-p junks-directory-path))
+      (make-directory junks-directory-path)))
+
+  (defun junks-insert-content (strings)
+    (save-excursion
+      (goto-char (point-max))
+      (insert "\n\n")
+      (dolist (s strings)
+        (insert s "\n"))))
+
+  (defun move-junks (&rest contents) 
+    (let* ((timestamp (format-time-string "%Y-%m-%d" (current-time)))
+           (fname (format "%s/junks.%s" junks-directory-path timestamp)))
+      (junks-create-directory-if-force  junks-directory-force-create-p)
+      (with-current-buffer (find-file-noselect fname)
+        (junks-insert-content contents))))
+
+  (defun move-junks-region (beg end comment) (interactive "r\nscomment:")
+    (move-junks
+     comment
+     (delete-and-extract-region beg end)))
+  )
