@@ -1,9 +1,3 @@
-(named-progn key-chord
-  (require 'key-chord) ;; key-chord downlod via wget(my/download)
-  (setq key-chord-two-keys-delay 0.04)
-  (key-chord-mode 1)
-)
-
 ;; from: https://github.com/wakaran/config/blob/master/dot.emacs.d.server/init/90-last-setting.el
 (named-progn shell-settings
 ;;;; shell-modeで上下でヒストリ補完
@@ -230,7 +224,5 @@
     (add-hook 'view-mode-hook
               (lambda ()
                 (define-many-keys view-mode-map pager-keysettings)))
-    
-    (named-progn key-chord
-      (key-chord-define-global "jk" 'view-mode))
+   
     ))

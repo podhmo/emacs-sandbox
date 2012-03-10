@@ -47,6 +47,12 @@
             (lambda () 
               (auto-save-buffers-start 0.5))))
 
+(named-progn key-chord
+  (require 'key-chord) ;; key-chord downlod via wget(my/download)
+  (setq key-chord-two-keys-delay 0.04)
+  (key-chord-mode 1)
+)
+
 (named-progn keyboad-settings
   (defvar on-after-keybord-setup (list))
   (defvar on-before-keybord-setup (list))
@@ -90,6 +96,10 @@
       (define-many-keys (current-global-map) global-individual-key-mapping))
 
     (ffap-bindings) ;; url also enable when typed C-x C-f
+
+    (named-progn key-chord
+      (key-chord-define-global "jk" 'view-mode)
+      (key-chord-define-global "po" 'org-remember))
 
     ;; occur after settings hook
     (run-hook-with-args-until-failure
