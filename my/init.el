@@ -142,24 +142,34 @@
 
 (named-progn editing
   (require-and-fetch-if-not 'autopair)
-  (require-and-fetch-if-not 'paredit)
+  ;; (require-and-fetch-if-not 'paredit)
   )
 
 (named-progn eye-candy
-  (require 'eldoc)
-  (setq eldoc-argument-case 'downcase)
+  (named-progn popwin
+    (require-and-fetch-if-not 'popwin)
+    (setq display-buffer-function 'popwin:display-buffer)
+    ;; why this is need?
+    (defadvice called-interactively-p (before print (&rest args) activate)
+      nil)
+    )
 
-  (defadvice  eldoc-get-fnsym-args-string
-    (around eldoc-named-progn-display-section (sym &optional index) activate)
-    (cond ((eq sym 'named-progn)
-           (let ((section-name
-                  (save-excursion
-                    (eldoc-beginning-of-sexp)
-                    (goto-char (scan-sexps (point) 1))
-                    (skip-syntax-forward "^w_")
-                    (thing-at-point 'symbol))))
-             (message "named-progn -- %s --" section-name)))
-          (t ad-do-it)))
+  (named-progn eldoc
+    (require 'eldoc)
+    (setq eldoc-argument-case 'downcase)
+    
+    (defadvice  eldoc-get-fnsym-args-string
+      (around eldoc-named-progn-display-section (sym &optional index) activate)
+      (cond ((eq sym 'named-progn)
+             (let ((section-name
+                    (save-excursion
+                      (eldoc-beginning-of-sexp)
+                      (goto-char (scan-sexps (point) 1))
+                      (skip-syntax-forward "^w_")
+                      (thing-at-point 'symbol))))
+               (message "named-progn -- %s --" section-name)))
+            (t ad-do-it)))
+    )
   )
 
 (named-progn treat-dumped-junks
@@ -216,4 +226,5 @@
     (add-hook 'python-mode-hook 'my:python-setup)
     )
   )
+
 (run-hook-with-args 'after-init-hook)

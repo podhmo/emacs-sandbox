@@ -10,10 +10,6 @@
 (setq enable-recursive-minibuffers t)
 (setq large-file-warning-threshold (* 25 1024 1024))
 
-(defadvice abort-recursive-edit (before minibuffer-save activate)
-  (when (eq (selected-window) (active-minibuffer-window))
-    (add-to-history minibuffer-history-variable (minibuffer-contents))))
-
 (add-hook 'server-switch-hook 
           (lambda ()
             (local-set-key (kbd "C-x k") 
@@ -62,4 +58,3 @@
 
 ;; lang
 (setq initial-major-mode 'emacs-lisp-mode)
-
