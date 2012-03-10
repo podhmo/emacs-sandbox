@@ -1,3 +1,11 @@
+(named-progn patch
+  (require 'help-fns)
+
+  (defun patch:function-arguments (sym)
+    (read
+     (car (help-split-fundoc (documentation sym t) sym))))
+)
+   
 (defmacro aif (test-form then-form &rest else-forms)
   "Anaphoric if. Temporary variable `it' is the result of test-form."
   (declare (indent 2)

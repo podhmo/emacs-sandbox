@@ -75,9 +75,11 @@ so. c-u 3 follow-with-n-window, then a frame splitted 3window
 (named-progn popwin
   (require-and-fetch-if-not 'popwin)
   (setq display-buffer-function 'popwin:display-buffer)
-  ;; why this is need?
-  (defadvice called-interactively-p (before print (&rest args) activate)
-    nil)
+
+  (named-progn patch ;; for bag fix
+    (when (>= 1 (length (patch:function-arguments 'called-interactively-p)))
+      (defun popwin:called-interactively-p ()
+        (called-interactively-p))))
   )
 
 
@@ -152,4 +154,4 @@ so. c-u 3 follow-with-n-window, then a frame splitted 3window
 
 (named-progn scroll-buffer
   (require-and-fetch-if-not 'deferred)
-)
+  )
