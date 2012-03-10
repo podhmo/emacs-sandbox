@@ -1,22 +1,3 @@
-(named-progn keyboad-settinsg
-  (setq global-individual-key-mapping
-        '(("C-c C-l" . eval-buffer)
-          ("C-c C-f" . ffap)
-          ("C-c C-e" . eval-defun) ;;
-          ("C-c j" . dabbrev-expand)
-          ("C-c C-j" . dabbrev-expand) ;;
-          ("C-c q" . comment-region)
-          ("C-c Q" . uncomment-region)
-          
-          ("C-c x" . (lambda () (interactive) (find-file (concat (current-directory) "/init.el"))))
-          ("C-j S" . elscreen-shell/next-screen)
-
-          ("C-;" . elscreen-previous)
-          ("C-:" . elscreen-next)))
-
-  (ffap-bindings) ;; url also enable when typed C-x C-f
-  (define-many-keys (current-global-map) global-individual-key-mapping))
-
 (defun elscreen-shell/next-screen () (interactive)
   (let1 dir (current-directory)
     (elscreen-create)
@@ -27,14 +8,19 @@
 
 ;; from: https://github.com/wakaran/config/blob/master/dot.emacs.d.server/init/90-last-setting.el
 
+(named-progn shell-settings
 ;;;; shell-modeで上下でヒストリ補完
 ;; C-p/C-nでヒストリを辿る (デフォルトでもM-p, M-nで出来る)
-(add-hook 'shell-mode-hook
-          (function (lambda ()
-                      (define-key shell-mode-map [up] 'comint-previous-input)
-                      (define-key shell-mode-map [down] 'comint-next-input)
-                      (define-key shell-mode-map "\C-p" 'comint-previous-input)
-                      (define-key shell-mode-map "\C-n" 'comint-next-input))))
+  (add-hook 
+   'on-after-keybord-setup
+   (lambda ()
+     (add-hook
+      'shell-mode-hook
+      (function (lambda ()
+                  (define-key shell-mode-map [up] 'comint-previous-input)
+                  (define-key shell-mode-map [down] 'comint-next-input)
+                  (define-key shell-mode-map "\C-p" 'comint-previous-input)
+                  (define-key shell-mode-map "\C-n" 'comint-next-input)))))))
 
 ;; kill-ring に同じ内容の文字列を複数入れない
 ;; kill-ring-save 等した時にその内容が既に kill-ring にある場合、その文字列が kill-ring の先頭に 1 つにまとめられます
@@ -63,3 +49,50 @@
             (save-excursion
               (goto-char (point-max))
               (delete-blank-lines))))
+
+;;; my own
+
+(named-progn anything
+  (require-and-fetch-if-not 'anything)
+  (require-and-fetch-if-not 'anything-config)
+  (require 'outline)
+  (defadvice anything-next-line (after execute-persistent-action disable)
+    (unless (or (anything-get-previous-header-pos)
+                (anything-get-next-header-pos))
+      (call-interactively 'anything-execute-persistent-action)))
+
+  (defadvice anything-previous-line (after execute-persistent-action disable)
+    (unless (or (anything-get-previous-header-pos)
+                (anything-get-next-header-pos))
+      (call-interactively 'anything-execute-persistent-action)))
+
+  (defmacro with-anything-line-move-advice (advice-name action)
+    `(progn
+       (ad-enable-advice 'anything-next-line 'after ',advice-name)
+       (ad-activate 'anything-next-line)
+       (ad-enable-advice 'anything-previous-line 'after ',advice-name)
+       (ad-activate 'anything-previous-line)
+       (flet ((message (&rest args)))
+         (unwind-protect
+             ,action
+           (progn (ad-deactivate 'anything-previous-line)
+                  (ad-deactivate 'anything-next-line))))))
+
+  (defun anything-occur* () 
+    "Preconfigured Anything for Occur source."
+    (interactive)
+    (with-anything-line-move-advice 
+     execute-persistent-action
+     (anything-occur)))
+
+  ;; key settings
+    (add-hook 'on-after-keybord-setup
+              (lambda ()
+                (define-many-keys global-map
+                  '(("<hiragana-katakana>" . anything)
+                    ("C-c C-;" . anything-occur*)
+                    ("M-x" . anything-M-x)
+                    ("C-x b" . anything-buffers+)
+                    ("M-y" . anything-show-kill-ring)
+                    ))))
+  )  

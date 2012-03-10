@@ -39,11 +39,50 @@
   (load "layout")
   (add-hook 'after-init-hook
             (lambda ()
-              (load "human-interfaces")))
+              (load "human-interfaces")
+              (keybord-settings-setup)
+              ))
   (load "auto-save")
   (add-hook 'after-init-hook
             (lambda () 
               (auto-save-buffers-start 0.5))))
+
+(named-progn keyboad-settings
+  (defvar on-after-keybord-setup (list))
+  (defvar on-before-keybord-setup (list))
+
+  (defvar ctl-j-map (make-keymap))
+  (global-set-key (kbd "C-j") ctl-j-map)
+  
+  (defvar keybord-settings:curdir (current-directory))
+  (defun keybord-settings-setup ()
+    ;; occur before settings hook
+    (run-hook-with-args-until-failure
+     'on-before-keybord-setup)
+
+    (named-progn global-key-settings
+      (setq global-individual-key-mapping
+            '(("C-c C-l" . eval-buffer)
+              ("C-c C-f" . ffap)
+              ("C-c C-e" . eval-defun) ;;
+              ("C-c j" . dabbrev-expand)
+              ("C-c C-j" . dabbrev-expand) ;;
+              ("C-c q" . comment-region)
+              ("C-c Q" . uncomment-region)
+              
+              ("C-c x" . (lambda () (interactive) (find-file (concat keybord-settings:curdir "/init.el"))))
+              ("C-j S" . elscreen-shell/next-screen)
+              
+              ("C-;" . elscreen-previous)
+              ("C-:" . elscreen-next)))
+      (define-many-keys (current-global-map) global-individual-key-mapping))
+
+    (ffap-bindings) ;; url also enable when typed C-x C-f
+
+    ;; occur after settings hook
+    (run-hook-with-args-until-failure
+     'on-after-keybord-setup)
+    ))
 
 (named-progn emacsclient
   ;; emacsclient サーバを起動
@@ -78,17 +117,15 @@
   (defun global-j-define-key (&optional kmap)
     (and-let* ((kmap (or kmap (current-local-map))))
       (define-key kmap "\C-j" nil))) ;; experimental
-  
-  (defadvice elscreen-goto (after kill-Cj  activate)
-    (global-j-define-key))
-  (defadvice switch-to-buffer (after kill-Cj  activate)
-    (global-j-define-key))
 
-  (defvar ctl-j-map (make-keymap))
-  (global-set-key (kbd "C-j") ctl-j-map)
-  (setq elscreen-prefix-key (kbd "C-j"))
-
-  (elscreen-start)
+  (add-hook 'on-before-keybord-setup
+            (lambda ()
+              (defadvice elscreen-goto (after kill-Cj  activate)
+                (global-j-define-key))
+              (defadvice switch-to-buffer (after kill-Cj  activate)
+                (global-j-define-key))
+              (setq elscreen-prefix-key (kbd "C-j"))
+              (elscreen-start)))
   )
 
 (named-progn editing
@@ -141,48 +178,6 @@
    comment
    (delete-and-extract-region beg end)))
 
-(named-progn anything
-  (require-and-fetch-if-not 'anything)
-  (require-and-fetch-if-not 'anything-config)
-  (require 'outline)
-  (defadvice anything-next-line (after execute-persistent-action disable)
-    (unless (or (anything-get-previous-header-pos)
-                (anything-get-next-header-pos))
-      (call-interactively 'anything-execute-persistent-action)))
-
-  (defadvice anything-previous-line (after execute-persistent-action disable)
-    (unless (or (anything-get-previous-header-pos)
-                (anything-get-next-header-pos))
-      (call-interactively 'anything-execute-persistent-action)))
-
-  (defmacro with-anything-line-move-advice (advice-name action)
-    `(progn
-       (ad-enable-advice 'anything-next-line 'after ',advice-name)
-       (ad-activate 'anything-next-line)
-       (ad-enable-advice 'anything-previous-line 'after ',advice-name)
-       (ad-activate 'anything-previous-line)
-       (flet ((message (&rest args)))
-         (unwind-protect
-             ,action
-           (progn (ad-deactivate 'anything-previous-line)
-                  (ad-deactivate 'anything-next-line))))))
-
-  (defun anything-occur* () 
-    "Preconfigured Anything for Occur source."
-    (interactive)
-    (with-anything-line-move-advice 
-     execute-persistent-action
-     (anything-occur)))
-
-  (define-many-keys global-map
-    '(("<hiragana-katakana>" . anything)
-      ("C-c C-;" . anything-occur*)
-      ("M-x" . anything-M-x)
-      ("C-x b" . anything-buffers+)
-      ("M-y" . anything-show-kill-ring)
-      ))    
-  )  
-
 (named-progn programming-languages
   (named-progn emacs-lisp
     (defun my:emacs-lisp-setup ()
@@ -193,9 +188,8 @@
       (eldoc-add-command
        'paredit-backward-delete
        'paredit-close-round)
-      
-      (paredit-mode +1))
-    
+      ;; (paredit-mode +1)
+      )    
     (add-hook 'emacs-lisp-mode-hook 'my:emacs-lisp-setup))
   ;;(require 'paredit)
 
