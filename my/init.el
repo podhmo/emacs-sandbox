@@ -7,6 +7,7 @@
 
 (defmacro comment (&rest body)
   nil)
+
 (defmacro named-progn (name &rest body)
   (declare (indent 1))
   `(progn ,@body))
