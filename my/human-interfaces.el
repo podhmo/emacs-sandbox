@@ -60,7 +60,7 @@
   )
 
 (named-progn elscreen
-  (require-and-fetch-if-not 'elscreen)
+  (require-and-fetch-if-not 'elscreen :installed-package 'po-elscreen)
 
   (defun global-j-define-key (&optional kmap)
     (and-let* ((kmap (or kmap (current-local-map))))
