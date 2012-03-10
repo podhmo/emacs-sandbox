@@ -62,8 +62,6 @@
         (foreground-color . "white")
         ,@default-frame-alist))
 
-(set-frame-parameter (selected-frame) 'foreground-color "white")
-(set-frame-parameter (selected-frame) 'background-color "black")
 ;;(describe-face 'font-lock-variable-name-face)
 ;;   (print* (frame-parameters (selected-frame)))
 (set-face-attribute 'font-lock-comment-face nil :weight 'semi-light :foreground "RosyBrown3")

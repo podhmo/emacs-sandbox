@@ -7,7 +7,6 @@
 
 (defmacro comment (&rest body)
   nil)
-
 (defmacro named-progn (name &rest body)
   (declare (indent 1))
   `(progn ,@body))
@@ -50,6 +49,16 @@
 (named-progn keyboad-settings
   (defvar on-after-keybord-setup (list))
   (defvar on-before-keybord-setup (list))
+  (defmacro with-before-keybord-setup (&rest body)
+    `(add-hook 
+      'on-before-keybord-setup
+      (lambda ()
+        ,@body)))
+  (defmacro with-after-keybord-setup (&rest body)
+    `(add-hook 
+     'on-after-keybord-setup
+     (lambda ()
+       ,@body)))
 
   (defvar ctl-j-map (make-keymap))
   (global-set-key (kbd "C-j") ctl-j-map)
@@ -63,6 +72,8 @@
     (named-progn global-key-settings
       (setq global-individual-key-mapping
             '(("C-c C-l" . eval-buffer)
+              ("M-r" . replace-string)
+              ("M-R" . replace-regexp)
               ("C-c C-f" . ffap)
               ("C-c C-e" . eval-defun) ;;
               ("C-c j" . dabbrev-expand)
@@ -86,10 +97,11 @@
 
 (named-progn emacsclient
   ;; emacsclient サーバを起動
-  ;; (when (and (require 'server nil t) (not (server-running-p)))
-  ;;   (server-start))
-  (autoload 'server-running-p "server") 
-  (unless (server-running-p)  (server-start)))
+  (condition-case err
+      (progn
+        (autoload 'server-running-p "server") 
+        (unless (server-running-p)  (server-start)))
+    (error (message "emacsclient load fail"))))
 
 (named-progn recentf
   (setq recentf-max-saved-items 500)
@@ -150,33 +162,35 @@
           (t ad-do-it)))
   )
 
-(defvar junks-directory-path "~/junks")
-(defvar junks-directory-force-create-p t)
+(named-progn treat-dumped-junks
+  (defvar junks-directory-path "~/junks")
+  (defvar junks-directory-force-create-p t)
 
-(defun junks-create-directory-if-force (force-p)
-  (unless (and forcep
-               (file-exists-p junks-directory-path) 
-               (file-directory-p junks-directory-path))
-    (make-directory junks-directory-path)))
+  (defun junks-create-directory-if-force (force-p)
+    (unless (and forcep
+                 (file-exists-p junks-directory-path) 
+                 (file-directory-p junks-directory-path))
+      (make-directory junks-directory-path)))
 
-(defun junks-insert-content (strings)
-  (save-excursion
-    (goto-char (point-max))
-    (insert "\n\n")
-    (dolist (s strings)
-      (insert s "\n"))))
+  (defun junks-insert-content (strings)
+    (save-excursion
+      (goto-char (point-max))
+      (insert "\n\n")
+      (dolist (s strings)
+        (insert s "\n"))))
 
-(defun move-junks (&rest contents) 
-  (let* ((timestamp (format-time-string "%Y-%m-%d" (current-time)))
-         (fname (format "%s/junks.%s" junks-directory-path timestamp)))
-    (junks-create-directory-if-force  junks-directory-force-create-p)
-    (with-current-buffer (find-file-noselect fname)
-      (junks-insert-content contents))))
+  (defun move-junks (&rest contents) 
+    (let* ((timestamp (format-time-string "%Y-%m-%d" (current-time)))
+           (fname (format "%s/junks.%s" junks-directory-path timestamp)))
+      (junks-create-directory-if-force  junks-directory-force-create-p)
+      (with-current-buffer (find-file-noselect fname)
+        (junks-insert-content contents))))
 
-(defun move-junks-region (beg end comment) (interactive "r\nscomment:")
-  (move-junks
-   comment
-   (delete-and-extract-region beg end)))
+  (defun move-junks-region (beg end comment) (interactive "r\nscomment:")
+    (move-junks
+     comment
+     (delete-and-extract-region beg end)))
+  )
 
 (named-progn programming-languages
   (named-progn emacs-lisp
