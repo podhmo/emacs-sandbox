@@ -25,6 +25,15 @@
        ,@body)))
 
 (named-progn plugins-are-here
+  (python:define-plugin python:strict-indent-plugin (&optional (tabsize 4))
+    (lexical-let ((tabsize tabsize))
+      (python:with-plugin-mode-hook
+       (setq-default indent-tabs-mode nil)
+       (setq-default tab-width tabsize))))
+
+  (python:define-plugin python:auto-mode-alist-plugin ()
+    (add-to-list 'auto-mode-alist `("\\.p\\(yx\\|xd\\)$" . ,python:python-mode)))
+  )
   (python:define-plugin python:autopair-plugin ()
     (require-and-fetch-if-not 'autopair)
     (python:with-plugin-mode-hook
@@ -34,13 +43,14 @@
     (require-and-fetch-if-not 'flymake)
     (setq python:flymake-program validate-program)
 
-    (defun* python:flymake-create-temp (file-name &optional (prefix "flymake-python"))
-      (make-temp-file prefix nil ".py"))
+    (named-progn utility-for-flymake
+      (defun* python:flymake-create-temp (file-name &optional (prefix "flymake-python"))
+        (make-temp-file prefix nil ".py"))
     
-    (defun python:flymake-init ()
-      (let ((temp-file (flymake-init-create-temp-buffer-copy 
-                        'python:flymake-create-temp)))
-        (list python:flymake-program (list temp-file))))
+      (defun python:flymake-init ()
+        (let ((temp-file (flymake-init-create-temp-buffer-copy 
+                          'python:flymake-create-temp)))
+          (list python:flymake-program (list temp-file)))))
 
     (named-progn treat-timer-as-active-timer-is-one
       (defun python:flymake-kill-timer ()
@@ -53,13 +63,26 @@
           (setq flymake-timer
                 (run-at-time nil 1 'flymake-on-timer-event (current-buffer)))))
 
-      (defadvice find-file (around kill-flymake-timer activate)
-        (when (equal python:python-mode major-mode)
-          (python:flymake-kill-timer))
-        around-it
-        (when (equal python:python-mode major-mode)
-          (python:flymake-rebirth-timer))))
-      
+      (named-progn advices
+        (defadvice find-file (around kill-flymake-timer activate)
+          ;; (message "before:%s %s" major-mode (current-buffer))
+          (when (equal python:python-mode major-mode)
+            (python:flymake-kill-timer))
+          ad-do-it
+          ;; (message "after:%s %s" major-mode (current-buffer))
+          (when (equal python:python-mode major-mode)
+            (python:flymake-rebirth-timer)))
+        
+        (when (require-and-fetch-if-not 'elscreen) ;;
+          (defadvice elscreen-goto (around kill-flymake-timer activate)
+            ;; (message "before:%s" major-mode)
+            (when (equal python:python-mode major-mode)
+              (python:flymake-kill-timer))
+            ad-do-it
+            ;; (message "after:%s" major-mode)
+            (when (equal python:python-mode major-mode)
+              (python:flymake-rebirth-timer))))))
+    
     (named-progn add-hook
       (python:with-plugin-mode-hook
        (set (make-local-variable 'flymake-allowed-file-name-masks) '(("." python:flymake-init)))
@@ -83,7 +106,7 @@
         (setq python:flymake-eldoc-timer nil))
       
       (defun python:flymake-eldoc-dispatch ()
-        (message "dispatch")
+        ;; (message "dispatch")
         (cond ((equal major-mode python:python-mode)
                (python:flymake-eldoc-start))
               (python:flymake-eldoc-timer
@@ -105,13 +128,3 @@
 
        (add-hook 'cmh:change-mode-hook 'python:flymake-eldoc-dispatch)
        (python:flymake-eldoc-start))))
-
-  (python:define-plugin python:strict-indent-plugin (&optional (tabsize 4))
-    (lexical-let ((tabsize tabsize))
-      (python:with-plugin-mode-hook
-       (setq-default indent-tabs-mode nil)
-       (setq-default tab-width tabsize))))
-
-  (python:define-plugin python:auto-mode-alist-plugin ()
-    (add-to-list 'auto-mode-alist `("\\.p\\(yx\\|xd\\)$" . ,python:python-mode)))
-  )
