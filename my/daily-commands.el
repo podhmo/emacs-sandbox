@@ -46,7 +46,7 @@ so. c-u 3 follow-with-n-window, then a frame splitted 3window
   (defvar junks-directory-force-create-p t)
 
   (defun junks-create-directory-if-force (force-p)
-    (unless (and forcep
+    (unless (and force-p
                  (file-exists-p junks-directory-path) 
                  (file-directory-p junks-directory-path))
       (make-directory junks-directory-path)))

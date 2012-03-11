@@ -176,8 +176,14 @@
       )
 
     (defun my:python-setup ()
-      (run-hook-with-args-until-failure 'python:plugin-mode-hook))
+      (run-hooks 'python:plugin-mode-hook))
     (add-hook 'python-mode-hook 'my:python-setup))
+
+  (named-progn ruby
+    (require-and-fetch-if-not 'flymake-ruby)
+    (require 'ruby-mode nil t)
+    (add-hook 'ruby-mode-hook 'flymake-ruby-load)
   )
+)
 
 (run-hook-with-args 'after-init-hook)

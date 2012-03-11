@@ -30,23 +30,28 @@
     (python:with-plugin-mode-hook
      (autopair-on)))
 
-
   (python:define-plugin python:flymake-plugin (&optional (validate-program "pyflakes"))
     (require-and-fetch-if-not 'flymake)
     (setq python:flymake-program validate-program)
 
+    (defun* python:flymake-create-temp (file-name &optional (prefix "flymake-python"))
+      (make-temp-file prefix nil ".py"))
+    
     (defun python:flymake-init ()
-      (let* ((temp-file (flymake-init-create-temp-buffer-copy
-                         'flymake-create-temp-inplace))
-             (cmd (format "%s %s" python:flymake-program temp-file)))
-        (list shell-file-name 
-              (list shell-command-switch cmd)
-              default-directory)))
+      (let ((temp-file (flymake-init-create-temp-buffer-copy 
+                        'python:flymake-create-temp)))
+        (list python:flymake-program (list temp-file))))
 
-    (add-to-list 'flymake-allowed-file-name-masks
-                 '("\\.py\\'" python:flymake-init))
-    (python:with-plugin-mode-hook
-     (flymake-mode-on)))
+    ;; (add-to-list 'flymake-allowed-file-name-masks
+    ;;              '("\\.py\\'" python:flymake-init))
+
+    (named-progn add-hook
+      (python:with-plugin-mode-hook
+       (set (make-local-variable 'flymake-allowed-file-name-masks) '(("." python:flymake-init)))
+       ;; (set (make-local-variable 'flymake-err-line-patterns) flymake-python-err-line-patterns)
+       (if (executable-find python:flymake-program)
+           (flymake-mode t)
+         (message "Not enabling flymake: '%' command not found" python:flymake-program)))))
 
   (python:define-plugin python:flymake-eldoc/current-position-plugin ()
     (require 'eldoc nil t)
