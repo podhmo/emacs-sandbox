@@ -43,6 +43,8 @@
             (lambda ()
               (load "human-interfaces")
               (keybord-settings-setup)
+              (named-progn experimental
+                (load "change-mode-hook"))
               ))
   (load "auto-save")
   (add-hook 'after-init-hook
@@ -170,7 +172,7 @@
       (python:flymake-plugin)
       (python:autopair-plugin)
       (python:strict-indent-plugin)
-      ;; (python:flymake-eldoc/current-position-plugin) ;;buggy
+      (python:flymake-eldoc/current-position-plugin) ;;buggy
       )
 
     (defun my:python-setup ()
