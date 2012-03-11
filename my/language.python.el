@@ -42,15 +42,30 @@
                         'python:flymake-create-temp)))
         (list python:flymake-program (list temp-file))))
 
-    ;; (add-to-list 'flymake-allowed-file-name-masks
-    ;;              '("\\.py\\'" python:flymake-init))
+    (named-progn treat-timer-as-active-timer-is-one
+      (defun python:flymake-kill-timer ()
+        (when flymake-timer
+          (cancel-timer flymake-timer)
+          (setq flymake-timer nil)))
 
+      (defun python:flymake-rebirth-timer ()
+        (unless flymake-timer
+          (setq flymake-timer
+                (run-at-time nil 1 'flymake-on-timer-event (current-buffer)))))
+
+      (defadvice find-file (around kill-flymake-timer activate)
+        (when (equal python:python-mode major-mode)
+          (python:flymake-kill-timer))
+        around-it
+        (when (equal python:python-mode major-mode)
+          (python:flymake-rebirth-timer))))
+      
     (named-progn add-hook
       (python:with-plugin-mode-hook
        (set (make-local-variable 'flymake-allowed-file-name-masks) '(("." python:flymake-init)))
        ;; (set (make-local-variable 'flymake-err-line-patterns) flymake-python-err-line-patterns)
        (if (executable-find python:flymake-program)
-           (flymake-mode t)
+           (flymake-mode-on)
          (message "Not enabling flymake: '%' command not found" python:flymake-program)))))
 
   (python:define-plugin python:flymake-eldoc/current-position-plugin ()
