@@ -33,7 +33,7 @@
 
   (python:define-plugin python:auto-mode-alist-plugin ()
     (add-to-list 'auto-mode-alist `("\\.p\\(yx\\|xd\\)$" . ,python:python-mode)))
-  )
+
   (python:define-plugin python:autopair-plugin ()
     (require-and-fetch-if-not 'autopair)
     (python:with-plugin-mode-hook
@@ -46,7 +46,7 @@
     (named-progn utility-for-flymake
       (defun* python:flymake-create-temp (file-name &optional (prefix "flymake-python"))
         (make-temp-file prefix nil ".py"))
-    
+      
       (defun python:flymake-init ()
         (let ((temp-file (flymake-init-create-temp-buffer-copy 
                           'python:flymake-create-temp)))
@@ -93,24 +93,24 @@
               (python:flymake-kill-other-timer)
               (python:flymake-rebirth-timer)))))
 
-    (named-progn add-hook
-      (named-progn support-virtual-env ;;todo: move-it
-        (defun python:flymake-program-real (program)
-          (if (functionp program)
-              (funcall program)
-            program))
-        
-        (defalias 'python:target-in-path 'target-in-path) ;; import from my util.el
-        
-        (defun* python:get-virtualenved (cmd &optional (prefix "bin/"))
-          (let ((venvroot (python:target-in-path (concat prefix cmd))))
-            (if venvroot (concat venvroot "/" prefix cmd) cmd))))
+      (named-progn add-hook
+        (named-progn support-virtual-env ;;todo: move-it
+          (defun python:flymake-program-real (program)
+            (if (functionp program)
+                (funcall program)
+              program))
+          
+          (defalias 'python:target-in-path 'target-in-path) ;; import from my util.el
+          
+          (defun* python:get-virtualenved (cmd &optional (prefix "bin/"))
+            (let ((venvroot (python:target-in-path (concat prefix cmd))))
+              (if venvroot (concat venvroot "/" prefix cmd) cmd))))
 
         (python:with-plugin-mode-hook
-         (set (make-local-variable 'flymake-allowed-file-name-masks) '(("." python:flymake-init)))
-         ;; (set (make-local-variable 'flymake-err-line-patterns) flymake-python-err-line-patterns)
          (let ((flymake-program (python:get-virtualenved python:flymake-program)))
            (cond ((executable-find flymake-program)
+                  (set (make-local-variable 'flymake-allowed-file-name-masks) '(("." python:flymake-init)))
+                  ;; (set (make-local-variable 'flymake-err-line-patterns) flymake-python-err-line-patterns)
                   (flymake-mode-on)
                   (python:flymake-kill-other-timer)
                   (push (current-buffer) python:flymake-timered-buffers))
@@ -153,4 +153,4 @@
            (error "this plugin depends on `cmh:change-mode-hook (individual package)")))
 
        (add-hook 'cmh:change-mode-hook 'python:flymake-eldoc-dispatch)
-       (python:flymake-eldoc-start))))
+       (python:flymake-eldoc-start)))))

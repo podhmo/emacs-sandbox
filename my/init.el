@@ -93,6 +93,8 @@
               ("C-c Q" . uncomment-region)
               
               ("C-c x" . (lambda () (interactive) (find-file (concat keybord-settings:curdir "/init.el"))))
+              ("C-c e" . enclose-element-interactive)
+              ("C-c d" . delete-syntax-forward*)
               ("C-j S" . elscreen-shell/next-screen)
               
               ("C-;" . elscreen-previous)

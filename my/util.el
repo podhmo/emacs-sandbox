@@ -69,6 +69,30 @@
 	   (otherwise (,name (if (not ,state) 1 -1))))))))
 
 
+(named-progn enclose-element
+  (defun enclose-element (beg-tag end-tag)
+    (multiple-value-bind (beg end)
+        (if (region-active-p)
+            (values (region-beginning) (region-end))
+          (values (progn (skip-syntax-backward "w_") (point))
+                  (progn (skip-syntax-forward "w_") (point))))
+      (save-excursion
+        (let1 element (buffer-substring-no-properties beg end)
+          (delete-region beg end)
+          (insert (format "%s%s%s" beg-tag element end-tag))))))
+
+  (defun enclose-element-interactive (tag) (interactive "s")
+    (enclose-element tag tag)))
+
+(named-progn delete-syntax
+  (defun* delete-syntax-forward (&optional (syntax "w_"))
+    (delete-region (point) (progn (skip-syntax-forward syntax) (point))))
+  
+  (defun delete-syntax-forward* () (interactive)
+    (if (looking-at-p "[ \t]")
+        (delete-region (point) (progn (skip-chars-forward "[ \t]") (point)))
+      (delete-syntax-forward))))
+  
 ;;
 
 (defun directory-files2 (directory &optional full nosort)
