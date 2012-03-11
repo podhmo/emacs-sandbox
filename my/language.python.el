@@ -58,38 +58,51 @@
           (cancel-timer flymake-timer)
           (setq flymake-timer nil)))
 
+      (defun python:flymake-kill-other-timer ()
+        (dolist (b python:flymake-timered-buffers)
+          (with-current-buffer b
+            (python:flymake-kill-timer)))
+        (setq python:flymake-timered-buffers nil))
+
       (defun python:flymake-rebirth-timer ()
         (unless flymake-timer
           (setq flymake-timer
-                (run-at-time nil 1 'flymake-on-timer-event (current-buffer)))))
+                (run-at-time nil 1 'flymake-on-timer-event (current-buffer)))
+          (push (current-buffer) python:flymake-timered-buffers)))
+
+      (defvar python:flymake-timered-buffers nil)
+
+      (named-progn utility
+        (defsubst python:singlep (pair)
+          (null (cdr pair)))
+        (defsubst python:is-same-current-buffer-and-timered-buffer ()
+          (and (python:singlep python:flymake-timered-buffers)
+               (equal (current-buffer) (car python:flymake-timered-buffers)))))
 
       (named-progn advices
-        (defadvice find-file (around kill-flymake-timer activate)
-          ;; (message "before:%s %s" major-mode (current-buffer))
-          (when (equal python:python-mode major-mode)
-            (python:flymake-kill-timer))
-          ad-do-it
-          ;; (message "after:%s %s" major-mode (current-buffer))
-          (when (equal python:python-mode major-mode)
-            (python:flymake-rebirth-timer)))
+        (when (require 'elscreen nil t)
+          (defadvice elscreen-goto (after kill-other-flymake-timer activate)
+            (when (equal python:python-mode major-mode)
+              (unless (python:is-same-current-buffer-and-timered-buffer)
+                (python:flymake-kill-other-timer)
+                (python:flymake-rebirth-timer)))))
         
-        (when (require-and-fetch-if-not 'elscreen) ;;
-          (defadvice elscreen-goto (around kill-flymake-timer activate)
-            ;; (message "before:%s" major-mode)
-            (when (equal python:python-mode major-mode)
-              (python:flymake-kill-timer))
-            ad-do-it
-            ;; (message "after:%s" major-mode)
-            (when (equal python:python-mode major-mode)
-              (python:flymake-rebirth-timer))))))
-    
+        (defadvice switch-to-buffer (after kill-other-flymake-timer activate)
+          (when (equal python:python-mode major-mode)
+            (unless (python:is-same-current-buffer-and-timered-buffer)
+              (python:flymake-kill-other-timer)
+              (python:flymake-rebirth-timer)))))
+
     (named-progn add-hook
       (python:with-plugin-mode-hook
        (set (make-local-variable 'flymake-allowed-file-name-masks) '(("." python:flymake-init)))
        ;; (set (make-local-variable 'flymake-err-line-patterns) flymake-python-err-line-patterns)
-       (if (executable-find python:flymake-program)
-           (flymake-mode-on)
-         (message "Not enabling flymake: '%' command not found" python:flymake-program)))))
+       (cond ((executable-find python:flymake-program)
+              (flymake-mode-on)
+              (python:flymake-kill-other-timer)
+              (push (current-buffer) python:flymake-timered-buffers))
+             (t
+              (message "Not enabling flymake: '%' command not found" python:flymake-program)))))))
 
   (python:define-plugin python:flymake-eldoc/current-position-plugin ()
     (require 'eldoc nil t)
