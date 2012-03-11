@@ -96,7 +96,9 @@
               ("C-j S" . elscreen-shell/next-screen)
               
               ("C-;" . elscreen-previous)
-              ("C-:" . elscreen-next)))
+              ("C-:" . elscreen-next)
+              ("<f5>" . revert-buffer))
+              )
       (define-many-keys (current-global-map) global-individual-key-mapping))
 
     (ffap-bindings) ;; url also enable when typed C-x C-f

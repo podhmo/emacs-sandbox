@@ -50,7 +50,7 @@
       (defun python:flymake-init ()
         (let ((temp-file (flymake-init-create-temp-buffer-copy 
                           'python:flymake-create-temp)))
-          (list python:flymake-program (list temp-file)))))
+          (list (python:get-virtualenved python:flymake-program) (list temp-file)))))
 
     (named-progn treat-timer-as-active-timer-is-one
       (defun python:flymake-kill-timer ()
@@ -94,15 +94,28 @@
               (python:flymake-rebirth-timer)))))
 
     (named-progn add-hook
-      (python:with-plugin-mode-hook
-       (set (make-local-variable 'flymake-allowed-file-name-masks) '(("." python:flymake-init)))
-       ;; (set (make-local-variable 'flymake-err-line-patterns) flymake-python-err-line-patterns)
-       (cond ((executable-find python:flymake-program)
-              (flymake-mode-on)
-              (python:flymake-kill-other-timer)
-              (push (current-buffer) python:flymake-timered-buffers))
-             (t
-              (message "Not enabling flymake: '%' command not found" python:flymake-program)))))))
+      (named-progn support-virtual-env ;;todo: move-it
+        (defun python:flymake-program-real (program)
+          (if (functionp program)
+              (funcall program)
+            program))
+        
+        (defalias 'python:target-in-path 'target-in-path) ;; import from my util.el
+        
+        (defun* python:get-virtualenved (cmd &optional (prefix "bin/"))
+          (let ((venvroot (python:target-in-path (concat prefix cmd))))
+            (if venvroot (concat venvroot "/" prefix cmd) cmd))))
+
+        (python:with-plugin-mode-hook
+         (set (make-local-variable 'flymake-allowed-file-name-masks) '(("." python:flymake-init)))
+         ;; (set (make-local-variable 'flymake-err-line-patterns) flymake-python-err-line-patterns)
+         (let ((flymake-program (python:get-virtualenved python:flymake-program)))
+           (cond ((executable-find flymake-program)
+                  (flymake-mode-on)
+                  (python:flymake-kill-other-timer)
+                  (push (current-buffer) python:flymake-timered-buffers))
+                 (t
+                  (message "Not enabling flymake: '%s' command not found" flymake-program))))))))
 
   (python:define-plugin python:flymake-eldoc/current-position-plugin ()
     (require 'eldoc nil t)
