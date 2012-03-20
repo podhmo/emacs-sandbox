@@ -22,7 +22,10 @@
     (declare (indent 2))
     `(defun* ,name ,args 
        (add-to-list 'python:activated-plugins ',name)
-       ,@body)))
+       ,@body))
+
+  (defun python:plugin-activate-p (plugin)
+    (memq plugin python:activated-plugins)))
 
 (named-progn plugins-are-here
   (python:define-plugin python:strict-indent-plugin (&optional (tabsize 4))
@@ -30,6 +33,14 @@
       (python:with-plugin-mode-hook
        (setq-default indent-tabs-mode nil)
        (setq-default tab-width tabsize))))
+
+  (python:define-plugin python:run-program-plugin-simple ()
+    (defun python:run-program-current-buffer () (interactive)
+      (and-let* ((fname (buffer-file-name)))
+        (compile
+         (format "%s %s" 
+                 (python:get-virtualenved "python")
+                 fname)))))
 
   (python:define-plugin python:auto-mode-alist-plugin ()
     (add-to-list 'auto-mode-alist `("\\.p\\(yx\\|xd\\)$" . ,python:python-mode)))
@@ -95,11 +106,6 @@
 
       (named-progn add-hook
         (named-progn support-virtual-env ;;todo: move-it
-          (defun python:flymake-program-real (program)
-            (if (functionp program)
-                (funcall program)
-              program))
-          
           (defalias 'python:target-in-path 'target-in-path) ;; import from my util.el
           
           (defun* python:get-virtualenved (cmd &optional (prefix "bin/"))

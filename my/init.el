@@ -176,11 +176,17 @@
       (python:flymake-plugin)
       (python:autopair-plugin)
       (python:strict-indent-plugin)
-      (python:flymake-eldoc/current-position-plugin) ;;buggy
+      (python:flymake-eldoc/current-position-plugin)
+      (python:run-program-plugin-simple)
       )
 
     (defun my:python-setup ()
-      (run-hooks 'python:plugin-mode-hook))
+      (run-hooks 'python:plugin-mode-hook)
+
+      (when (python:plugin-activate-p 'python:run-program-plugin-simple)
+        (define-many-keys python-mode-map
+          '(("C-c @" . python:run-program-current-buffer)))))
+
     (add-hook 'python-mode-hook 'my:python-setup))
 
   (named-progn ruby
