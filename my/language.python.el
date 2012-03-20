@@ -28,6 +28,10 @@
     (memq plugin python:activated-plugins)))
 
 (named-progn plugins-are-here
+  (python:define-plugin python:yasnippet-plugin ()
+    (python:with-plugin-mode-hook
+     (yas/minor-mode-on)))
+
   (python:define-plugin python:strict-indent-plugin (&optional (tabsize 4))
     (lexical-let ((tabsize tabsize))
       (python:with-plugin-mode-hook

@@ -135,6 +135,7 @@
   (require 'package)
   (setq package-user-dir (concat (current-directory) "/3rdparty"))
   (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
+  (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
   ;; get available packages
   (package-initialize)
   (unless package-archive-contents
@@ -168,6 +169,10 @@
     (add-hook 'emacs-lisp-mode-hook 'my:emacs-lisp-setup))
   ;;(require 'paredit)
 
+  (named-progn yasnipet ;;move-it
+    (require-and-fetch-if-not 'yasnippet)
+    (yas/load-directory (concat (current-directory) "3rdparty/yasnippet-20120320/snippets")))
+  
   (named-progn python 
     (load "language.python")
 
@@ -178,6 +183,7 @@
       (python:strict-indent-plugin)
       (python:flymake-eldoc/current-position-plugin)
       (python:run-program-plugin-simple)
+      (python:yasnippet-plugin)
       )
 
     (defun my:python-setup ()
