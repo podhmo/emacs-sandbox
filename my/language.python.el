@@ -95,13 +95,13 @@
                (equal (current-buffer) (car python:flymake-timered-buffers)))))
 
       (named-progn advices
-        (when (require 'elscreen nil t)
-          (defadvice elscreen-goto (after kill-other-flymake-timer activate)
-            (when (equal python:python-mode major-mode)
-              (unless (python:is-same-current-buffer-and-timered-buffer)
-                (python:flymake-kill-other-timer)
-                (python:flymake-rebirth-timer)))))
-        
+        ;; (when (require 'elscreen nil t)
+        ;;   (defadvice elscreen-goto (after kill-other-flymake-timer activate)
+        ;;     (when (equal python:python-mode major-mode)
+        ;;       (unless (python:is-same-current-buffer-and-timered-buffer)
+        ;;         (python:flymake-kill-other-timer)
+        ;;         (python:flymake-rebirth-timer)))))
+
         (defadvice switch-to-buffer (after kill-other-flymake-timer activate)
           (when (equal python:python-mode major-mode)
             (unless (python:is-same-current-buffer-and-timered-buffer)

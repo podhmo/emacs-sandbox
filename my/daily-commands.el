@@ -1,3 +1,10 @@
+(defun open-shell-with-pwd () (interactive)
+  (let1 dir (current-directory)
+    (shell)
+    (comint-simple-send (get-buffer-process dir)
+                        (concat "cd " dir))
+    (goto-char (point-max))))
+
 (defun current-hook-change-to-empty () (interactive)
   (let ((hook (symbol-at-point)))
     (cond ((boundp hook)
@@ -10,15 +17,6 @@
              (dolist (w (get-buffer-window-list (help-buffer)))
                (delete-window  w))))
           (t (message "no bound found -%s-" hook)))))
-
-(defun elscreen-shell/next-screen () (interactive)
-  "create shell buffer with current directory as pwd"
-  (let1 dir (current-directory)
-    (elscreen-create)
-    (shell)
-    (comint-simple-send (get-buffer-process dir)
-                        (concat "cd " dir))
-    (goto-char (point-max))))
 
 (named-progn for-follow-mode
   (defvar split-window-function

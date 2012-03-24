@@ -53,27 +53,59 @@
 
 ;;; my own
 (named-progn redo
-  (require-and-fetch-if-not 'redo+)
-  (define-many-keys (current-global-map)
-    '(("C-." . redo)
-      ("C-/" . undo)))
-  )
+  (require-and-fetch-if-not 'redo+))
 
-(named-progn elscreen
-  (require-and-fetch-if-not 'elscreen :installed-package 'po-elscreen)
+(named-progn tabbar
+  (require-and-fetch-if-not 'tabbar)
+  (tabbar-mode 1)
+  (setq tabbar-buffer-groups-function nil)
 
-  (defun global-j-define-key (&optional kmap)
-    (and-let* ((kmap (or kmap (current-local-map))))
-      (define-key kmap "\C-j" nil))) ;; experimental
+  (defvar my:always-display-buffers '("*scratch*" "*shell*"))
+  (defun my:tabbar-buffer-list ()
+    (append (loop for bname in my:always-display-buffers
+                  for b = (get-buffer bname)
+                  when b collect b)
+            (loop for b in (buffer-list)
+                  when (buffer-file-name b)
+                  collect b)))
 
+  (setq tabbar-buffer-list-function 'my:tabbar-buffer-list)
+  (setq tabbar-separator '(0.5))
+
+  (defun tabbar-create () (interactive)
+    (switch-to-buffer "*scratch*"))
+  
   (add-hook 'on-before-keybord-setup
             (lambda ()
+              (defun global-j-define-key (&optional kmap)
+                (and-let* ((kmap (or kmap (current-local-map))))
+                  (define-key kmap "\C-j" nil))) ;; experimental
+              
               (defadvice elscreen-goto (after kill-Cj  activate)
                 (global-j-define-key))
+
               (defadvice switch-to-buffer (after kill-Cj  activate)
-                (global-j-define-key))
-              (setq elscreen-prefix-key (kbd "C-j"))
-              (elscreen-start)))
+                (global-j-define-key))))
+
+  (add-hook 'after-init-hook
+            (lambda ()
+              (set-face-attribute
+               'tabbar-unselected nil
+               :background (frame-parameter (selected-frame) 'background-color)
+               :foreground (frame-parameter (selected-frame) 'foreground-color)
+               :box nil)
+              (set-face-attribute
+               'tabbar-selected nil
+               :background (frame-parameter (selected-frame) 'background-color)
+               :foreground "yellow"
+               :box nil)
+              (set-face-attribute
+               'tabbar-button nil
+               :box nil)
+              (set-face-attribute
+               'tabbar-separator nil
+               :height 1.5)
+              ))
   )
 
 (named-progn editing
@@ -253,5 +285,39 @@
     (add-hook 'view-mode-hook
               (lambda ()
                 (define-many-keys view-mode-map pager-keysettings)))
-   
+    
     ))
+
+(named-progn elscreen
+  (comment
+   ("C-;" . elscreen-previous)
+   ("C-:" . elscreen-next)
+   ("C-j S" . elscreen-shell/next-screen)
+
+   (named-progn daily-commands
+     (defun elscreen-shell/next-screen () (interactive)
+       "create shell buffer with current directory as pwd"
+       (let1 dir (current-directory)
+         (elscreen-create)
+         (shell)
+         (comint-simple-send (get-buffer-process dir)
+                             (concat "cd " dir))
+         (goto-char (point-max)))))
+
+   (named-progn elscreen
+     (require-and-fetch-if-not 'elscreen :installed-package 'po-elscreen)
+     
+     (defun global-j-define-key (&optional kmap)
+       (and-let* ((kmap (or kmap (current-local-map))))
+         (define-key kmap "\C-j" nil))) ;; experimental
+
+     (add-hook 'on-before-keybord-setup
+               (lambda ()
+                 (defadvice elscreen-goto (after kill-Cj  activate)
+                   (global-j-define-key))
+                 (defadvice switch-to-buffer (after kill-Cj  activate)
+                   (global-j-define-key))
+                 (setq elscreen-prefix-key (kbd "C-j"))
+                 (elscreen-start)))
+     )
+   ))

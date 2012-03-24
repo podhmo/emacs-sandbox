@@ -113,10 +113,16 @@
               ("C-c x" . (lambda () (interactive) (find-file (concat keybord-settings:curdir "/init.el"))))
               ("C-c e" . enclose-element-interactive)
               ("C-c d" . delete-syntax-forward*)
-              ("C-j S" . elscreen-shell/next-screen)
-              
-              ("C-;" . elscreen-previous)
-              ("C-:" . elscreen-next)
+
+              ("C-." . redo)
+              ("C-/" . undo)
+
+              ("C-;" . tabbar-backward-tab)
+              ("C-:" . tabbar-forward-tab)
+              ("C-j S" . open-shell-with-pwd)
+              ("C-j c" . tabbar-create)
+              ("C-j C-f" . find-file)
+              ("C-j C-k" . (lambda () (interactive) (kill-buffer (current-buffer))))
               ("<f5>" . revert-buffer))
               )
       (define-many-keys (current-global-map) global-individual-key-mapping))
