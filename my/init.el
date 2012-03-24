@@ -52,13 +52,30 @@
             (lambda () 
               (auto-save-buffers-start 0.5))))
 
-(named-progn key-chord
-  (require 'key-chord) ;; key-chord downlod via wget(my/download)
-  (setq key-chord-two-keys-delay 0.04)
-  (key-chord-mode 1)
-)
+
+(named-progn package-management
+  (require 'package)
+  (setq package-user-dir (concat (current-directory) "3rdparty"))
+  (load "package+")
+  
+  (named-progn marmalade
+    (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
+    (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
+    ;; get available packages
+    (package-initialize)
+    (unless package-archive-contents
+      (package-refresh-contents))
+    ;; (package-list-packages)
+    )) 
+
 
 (named-progn keyboad-settings
+  (named-progn key-chord
+    (require-and-fetch-if-not 'key-chord :url "http://www.emacswiki.org/emacs/download/key-chord.el")
+    (setq key-chord-two-keys-delay 0.04)
+    (key-chord-mode 1)
+    )
+
   (defvar on-after-keybord-setup (list))
   (defvar on-before-keybord-setup (list))
   (defmacro with-before-keybord-setup (&rest body)
@@ -130,22 +147,6 @@
 (named-progn uniquify
   (require 'uniquify)
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
-
-
-(named-progn package-management
-  (require 'package)
-  (setq package-user-dir (concat (current-directory) "3rdparty"))
-  (load "package+")
-  
-  (named-progn marmalade
-    (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
-    (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
-    ;; get available packages
-    (package-initialize)
-    (unless package-archive-contents
-      (package-refresh-contents))
-    ;; (package-list-packages)
-    )) 
 
 (named-progn programming-languages
 

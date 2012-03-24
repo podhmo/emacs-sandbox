@@ -32,18 +32,21 @@
   (save-excursion
     (progn (goto-char (point-min))
            (re-search-forward "Version: *" nil t 1)
-           (or (buffer-substring-no-properties (point) (point-at-eol)) "0.0"))))
+           (or (thing-at-point 'symbol) "0.0"))))
 
 ;; functions
 (defun my:package-install-from-url (url name &optional version description requires)
+  (let ((version version))
     (my:package--with-work-buffer url
-      (let ((version (or version (my:package--find-version))))
-        (package-unpack-single name version (or description "no description")
-                               requires)))
+      (unless version
+        (setq version (my:package--find-version)))
+      (package-unpack-single name version (or description "no description")
+                             requires))
     ;; Try to activate it.
+    (add-to-list 'load-path (package--dir name version))
     (when my:local-package-sync-p
       (add-to-list 'my:local-package-list (list name version))
-      (my:local-package-store-save)))
+      (my:local-package-store-save))))
 
 ;; local package
 (defun my:local-package-store--create (fname &optional forcep)
