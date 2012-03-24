@@ -14,10 +14,11 @@
   (declare (indent 1))
   `(progn ,@body))
 
-(defmacro* require-and-fetch-if-not (package &key (filename nil) (noerror t) (installed-package nil))
+(defmacro* require-and-fetch-if-not (package &key (filename nil) (noerror t) (installed-package nil) (url nil))
   (let ((pname (gensym)))
     `(or (require ,package ,filename t)
-         (let ((,pname (or ,installed-package ,package)))
+         (let ((,pname (or ,installed-package ,package))
+               (my:package-install-url ,url))
            (package-install ,pname)
            (require ,package ,filename t)))))
 
@@ -131,19 +132,27 @@
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
 
 
-(named-progn marmalade
+(named-progn package-management
   (require 'package)
-  (setq package-user-dir (concat (current-directory) "/3rdparty"))
-  (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
-  (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
-  ;; get available packages
-  (package-initialize)
-  (unless package-archive-contents
-    (package-refresh-contents))
-  ;; (package-list-packages)
-  )
+  (setq package-user-dir (concat (current-directory) "3rdparty"))
+  (load "package+")
+  
+  (named-progn marmalade
+    (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
+    (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
+    ;; get available packages
+    (package-initialize)
+    (unless package-archive-contents
+      (package-refresh-contents))
+    ;; (package-list-packages)
+    )) 
 
 (named-progn programming-languages
+
+  (named-progn quick-run
+    (require-and-fetch-if-not 'quickrun :url "https://raw.github.com/syohex/emacs-quickrun/master/quickrun.el")
+    )
+
   (named-progn font-lock-language-plugin
     ;; (defmacro language:define-plugin (name args &rest body)
     ;;   (declare (indent 2))
