@@ -57,6 +57,9 @@
 ;;; my own
 (named-progn redo
   (require-and-fetch-if-not 'redo+))
+(named-progn zlc
+  (require-and-fetch-if-not 'zlc)
+  )
 
 (named-progn tabbar
   (require-and-fetch-if-not 'tabbar)
