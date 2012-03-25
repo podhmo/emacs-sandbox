@@ -5,6 +5,35 @@
     (read
      (car (help-split-fundoc (documentation sym t) sym))))
 )
+
+(defmacro tapp (exp)
+  (let ((tmp (gensym)))
+    `(let ((,tmp ,exp))
+       (print ,tmp)
+       ,tmp)))
+
+(named-progn hashtable
+  (defsubst hash-table-get (table k &optional default)
+    (gethash k table default))
+
+  (defsubst hash-table-put (table k v)
+    (puthash k v table))
+
+  (defun hash-table-keys (table)
+    (loop for k being the hash-keys in table
+          collect k))
+
+  (defun hash-table-values (table)
+    (loop for v being the hash-values in table
+          collect v))
+
+  (defun hash-table->alist (table)
+    (loop for k being the hash-keys in table using (hash-value v)
+          collect (cons k v)))
+
+  (defun hash-table-mapcar (fn table)
+    (loop for k being the hash-keys in table using (hash-value v)
+          collect (fn k v))))
    
 (defmacro aif (test-form then-form &rest else-forms)
   "Anaphoric if. Temporary variable `it' is the result of test-form."

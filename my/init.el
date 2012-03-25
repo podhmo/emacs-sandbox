@@ -114,16 +114,25 @@
               ("C-c e" . enclose-element-interactive)
               ("C-c d" . delete-syntax-forward*)
 
+              ;; quick-run
+              ("C-c @" . quickrun-compile-only)
+              ("C-c C-@" . quickrun)
               ("C-." . redo)
               ("C-/" . undo)
 
-              ("C-;" . tabbar-backward-tab)
-              ("C-:" . tabbar-forward-tab)
+              ("C-;" . my:tabbar-backward-tab)
+              ("C-:" . my:tabbar-forward-tab)
+              ("C-j p" . my:tabbar-backward-tab)
+              ("C-j n" . my:tabbar-forward-tab)
+              ("C-j C-p" . my:tabbar-backward-tab)
+              ("C-j C-n" . my:tabbar-forward-tab)
               ("C-j S" . open-shell-with-pwd)
-              ("C-j c" . tabbar-create)
+              ("C-j c" . my:tabbar-create)
               ("C-j C-f" . find-file)
               ("C-j C-k" . (lambda () (interactive) (kill-buffer (current-buffer))))
-              ("<f5>" . revert-buffer))
+              ("<f5>" . revert-buffer)
+              ("<f12>" . (lambda () (interactive) (message "reflesh") (setq extended-command-history nil)))
+              )
               )
       (define-many-keys (current-global-map) global-individual-key-mapping))
 
@@ -158,6 +167,12 @@
 
   (named-progn quick-run
     (require-and-fetch-if-not 'quickrun :url "https://raw.github.com/syohex/emacs-quickrun/master/quickrun.el")
+    (defadvice quickrun (around help-mode-after-quickrun activate)
+      (lexical-let ((before-buf (current-buffer)))
+        ad-do-it
+        (when (and (not (equal before-buf (current-buffer)))
+                   (eq major-mode 'fundamental-mode))
+          (help-mode))))
     )
 
   (named-progn font-lock-language-plugin
@@ -189,6 +204,13 @@
     (require-and-fetch-if-not 'yasnippet)
     (yas/load-directory (concat (current-directory) "3rdparty/yasnippet-20120320/snippets")))
   
+  (named-progn auto-complete ;;move-it
+    (require-and-fetch-if-not 'auto-complete)
+    (setq ac-use-menu-map t)
+    (define-key ac-menu-map "\C-n" 'ac-next)
+    (define-key ac-menu-map "\C-p" 'ac-previous)
+    )
+
   (named-progn python 
     (load "language.python")
 
@@ -198,8 +220,10 @@
       (python:autopair-plugin)
       (python:strict-indent-plugin)
       (python:flymake-eldoc/current-position-plugin)
-      (python:run-program-plugin-simple)
       (python:yasnippet-plugin)
+      ;; (python:run-program-plugin-simple)
+      (python:quickrun-with-virtualenv-plugin)
+      (python:auto-complete-plugin)
       )
 
     (defun my:python-setup ()

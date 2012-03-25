@@ -163,4 +163,56 @@
            (error "this plugin depends on `cmh:change-mode-hook (individual package)")))
 
        (add-hook 'cmh:change-mode-hook 'python:flymake-eldoc-dispatch)
-       (python:flymake-eldoc-start)))))
+       (python:flymake-eldoc-start))))
+
+  (python:define-plugin python:quickrun-with-virtualenv-plugin ()
+    (unless (require 'quickrun nil t)
+      (error "this plugin `python:quickrun-plugin' require `quickrun', so please install it."))
+
+    (defun python/virtualenv ()
+      (python:get-virtualenved "python"))
+
+    ;; remove python setting
+    (named-progn setup
+      (setq quickrun/language-alist 
+            (remove* "python" quickrun/language-alist :key 'car :test 'equal))
+      (push '("python" . ((:command . python/virtualenv) (:compile-only . "pyflakes %s")
+                          (:description . "Run Python script")))
+            quickrun/language-alist)
+      ))
+
+  (python:define-plugin python:auto-complete-plugin ()
+    (unless (require 'auto-complete nil t)
+      (error "this plugin require auto-complete-mode.el"))
+
+    (defun ac-get-python-symbol-at-point ()
+      "Return python symbol at point.Assumes symbol can be alphanumeric, `.' or `_'."
+      (let ((end (point))
+            (start (ac-python-start-of-expression)))
+        (buffer-substring-no-properties start end)))
+    
+    (defun ac-python-completion-at-point ()
+      "Returns a possibly empty list of completions for the symbol at point."
+      (python-symbol-completions (ac-get-python-symbol-at-point)))
+
+    (defun ac-python-start-of-expression ()
+      "Return point of the start of python expression at point. Assumes symbol can be alphanumeric, `.' or `_'."
+      (save-excursion
+        (and (re-search-backward
+              (rx (or buffer-start (regexp "[^[:alnum:]._]"))
+                  (group (1+ (regexp "[[:alnum:]._]"))) point)
+              nil t)
+             (match-beginning 1))))
+
+    (defvar ac-source-python
+      '((candidates . ac-python-completion-at-point)
+        (prefix . ac-python-start-of-expression)
+        (symbol . "f")
+        (requires . 2))
+      "Source for python completion.")
+
+    (named-progn setup
+      (python:with-plugin-mode-hook
+       (auto-complete-mode t)
+       (add-to-list 'ac-sources 'ac-source-python))))
+  )

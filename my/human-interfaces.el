@@ -44,6 +44,9 @@
   (require-and-fetch-if-not 'popwin)
   (setq display-buffer-function 'popwin:display-buffer)
 
+  ;; quickrunここがただしい？
+  (add-to-list 'popwin:special-display-config '("*quickrun*" :noselect t))
+  
   (named-progn patch ;; for bag fix
     (when (>= 1 (length (patch:function-arguments 'called-interactively-p)))
       (defun popwin:called-interactively-p ()
@@ -61,6 +64,7 @@
   (setq tabbar-buffer-groups-function nil)
 
   (defvar my:always-display-buffers '("*scratch*" "*shell*"))
+  (defun my:hidden-buffers-list nil)
   (defun my:tabbar-buffer-list ()
     (append (loop for bname in my:always-display-buffers
                   for b = (get-buffer bname)
@@ -69,11 +73,29 @@
                   when (buffer-file-name b)
                   collect b)))
 
+  (defvar my:tabbar-configuration-table (make-hash-table :test 'equal)) 
+  (defun my:tabbar--around (action)
+    "almost same defadvice's around + ad-do-it"
+    (lexical-let ((has-many-windows (> (count-windows) 1)))
+      (when has-many-windows
+        (hash-table-put my:tabbar-configuration-table
+                        (current-buffer) (current-window-configuration)))
+      (funcall action)
+      (or (and-let* ((wconf (hash-table-get my:tabbar-configuration-table
+                                            (current-buffer) nil)))
+            (set-window-configuration wconf))
+          (and has-many-windows
+               (delete-other-windows)))))
+
+  (defun my:tabbar-forward-tab () (interactive)
+    (my:tabbar--around 'tabbar-forward-tab))
+  (defun my:tabbar-backward-tab () (interactive)
+    (my:tabbar--around 'tabbar-backward-tab))
+  (defun my:tabbar-create () (interactive)
+    (my:tabbar--around (lambda () (switch-to-buffer "*scratch*"))))
+
   (setq tabbar-buffer-list-function 'my:tabbar-buffer-list)
   (setq tabbar-separator '(0.5))
-
-  (defun tabbar-create () (interactive)
-    (switch-to-buffer "*scratch*"))
   
   (add-hook 'on-before-keybord-setup
             (lambda ()
@@ -137,6 +159,7 @@
   (require-and-fetch-if-not 'anything)
   (require-and-fetch-if-not 'anything-config)
   (require-and-fetch-if-not 'anything-match-plugin)
+  ;; (require-and-fetch-if-not 'anything-complete)
 
   (setq anything-execute-action-at-once-if-one t)
 
