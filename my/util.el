@@ -70,6 +70,10 @@
      ,@body
      ,var))
 
+(defmacro with-lexical-bindings (syms &rest body)
+  (declare (indent 1))
+  (let ((clauses (loop for sym in syms collect (\` ((\, sym) (\, sym))))))
+    (\` (lexical-let ((\,@ clauses)) (\,@ body)))))
 ;;;
 
 (defmacro bind-region-or-line-with (&rest ac)

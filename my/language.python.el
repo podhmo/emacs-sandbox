@@ -127,6 +127,187 @@
                  (t
                   (message "Not enabling flymake: '%s' command not found" flymake-program))))))))
 
+  (python:define-plugin python:anything-with-modules-plugin ()
+    (unless (require 'anything nil t)
+      (error "anything is not found"))
+    ;; todo refactoring
+
+    (setq python:module-tokens-regexp "[^\n .]+\\(\\.[^\n .]+\\)*")
+    (setq python:module-import-sentence-regexp 
+          (format "^[\n \t]*\\(from +\\(%s\\) +import +[^ \n]+\\|import +\\(%s\\)\\)"
+                  python:module-tokens-regexp
+                  python:module-tokens-regexp))
+
+    (defun* pyutil:find-file-safe (path &key open)
+      (and (file-exists-p path)
+           (file-readable-p path)
+           (funcall (or open 'find-file) path)))
+
+    (defun pyutil:shell-command-to-string* (command)
+      (let ((r (shell-command-to-string command)))
+        (substring-no-properties r 0 (- (length r) 1))))
+    
+    (defun pyutil:fresh-buffer-and-is-created (buf &optional force-erase-p)
+      (cond ((and (stringp buf) (not (get-buffer buf)))
+             (values (get-buffer-create buf) t))
+            (t
+             (let1 buf (if (bufferp buf) buf (get-buffer buf))
+               (when force-erase-p
+                 (with-current-buffer buf
+                   (erase-buffer)))
+               (values buf force-erase-p)))))
+
+    (defun pyutil:command-to-buffer-ansync (procname bufname cmd &optional force-reload-p call-back)
+      (let1 call-back (or call-back 'display-buffer)
+        (multiple-value-bind (buf new-p)
+            (pyutil:fresh-buffer-and-is-created bufname force-reload-p)
+          (cond (new-p
+                 (set-process-sentinel
+                  (start-process-shell-command procname buf cmd)
+                  (with-lexical-bindings (call-back)
+                    (lambda (process status)
+                      (funcall call-back (process-buffer process))))))
+                (t (funcall call-back (get-buffer bufname))))
+          buf)))
+
+    (lexical-let ((previous-python nil))
+      (defun python:all-modules-to-buffer (&optional force-reload-p call-back)
+        ;; return buffer
+        (let1 python (python/virtualenv)
+          (let* ((reload-p (or force-reload-p (not (string-equal previous-python python))))
+                 (cmd (format "%s -c 'import pydoc; import sys; pydoc.ModuleScanner().run(lambda path,modname,desc : sys.stdout.write(modname+\"\\n\"))' 2>/dev/null | sort -u" python))
+                 (bufname "*python all-modules*"))
+            (setq previous-python python)
+            (pyutil:command-to-buffer-ansync "python-ex-util:all-module"
+                                             bufname cmd reload-p call-back)))))
+
+    (defun python:find-module-tokens-maybe (&optional beg end)
+      "[maybe] find module import sentence, beg and end are optional (default end value is `point-at-eol')"
+      (when beg
+        (goto-char beg))
+      (let ((end (or end (point-at-eol))))
+        (and (re-search-forward python:module-import-sentence-regexp end t 1)
+             (or (match-string-no-properties 4)
+                 (match-string-no-properties 2)))))
+
+    (defun python:module-tokens-in-current-line ()
+      "[maybe] return match object or nil"
+      (save-excursion
+        (python:find-module-tokens-maybe (point-at-bol) (point-at-eol))))
+
+    (defun python:library-path-list ()
+      (let* ((script "import sys; D=[d for d in sys.path if not 'bin' in d]; print ','.join(D)")
+             (sys-paths-str (pyutil:shell-command-to-string*
+                             (format "%s -c \"%s\"" (python/virtualenv) script))))
+        (cdr (split-string sys-paths-str ","))))
+    
+    (defun python:current-library-path ()
+      "[maybe] return current library path from import sentence"
+      (python:and-let* ((module (python:module-tokens-in-current-line)))
+                       (python:module-name-to-file-path module)))
+    
+    (defun python:ffap/import-sentence (other-frame-p) (interactive "P")
+      "ffap for import sentence"
+      (python:and-let* ((path (python:current-library-path)))
+                       (cond (other-frame-p (find-file-other-frame path))
+                             (t (find-file path)))))
+
+    (defun python:module-tokens-in-current-line ()
+      "[maybe] return match object or nil"
+      (save-excursion
+        (python:find-module-tokens-maybe (point-at-bol) (point-at-eol))))
+
+    (defvar python:collect-imported-modules-max 200)
+    (defun python:collect-imported-modules-in-buffer (&optional buf)
+      (let1 buf (or buf (current-buffer))
+        (with-current-buffer buf
+          (goto-char (point-min))
+          (let1 end (min (point-max) python:collect-imported-modules-max) ;;
+            (loop while t
+                  for token = (python:find-module-tokens-maybe nil end)
+                  if token
+                  collect token into modules
+                  else
+                  return (delete-duplicates modules :test 'string-equal))))))
+
+    (defun python:anything-update-callback (buffer)
+      (anything-update)
+      buffer)
+
+    (define-anything-type-attribute 'python-module
+      '((action . (("find-file" . 
+                    (lambda (c)
+                      (and-let* ((path (python:module-name-to-file-path c)))
+                        (pyutil:find-file-safe path))))
+                   ("find-file-other-frame" .
+                    (lambda (c)
+                      (and-let* ((path (python:module-name-to-file-path c)))
+                        (pyutil:find-file-safe path :open 'find-file-other-frame))))
+                   ("web-page" .
+                    (lambda (c)
+                      (and-let* ((url (python:module-name-to-web-page c)))
+                        (browse-url-generic url))))
+                   ("info-egg" .
+                    (lambda (c)
+                      (and-let* ((path (python:module-name-to-egg-info c)))
+                        (pyutil:find-file-safe path)))))))
+      "Python module")
+
+    (setq python:anything-c-source-imported-modules
+          '((name . "imported modules")
+            (candidates . (lambda ()
+                            (python:collect-imported-modules-in-buffer  anything-current-buffer)))
+            (update . python:all-modules-to-buffer-reload)
+            (type . python-module)))
+
+    (setq python:anything-c-source-all-modules
+          '((name . "python all module")
+            (candidates-in-buffer)
+            (init . (lambda () 
+                      (anything-candidate-buffer
+                       (python:all-modules-to-buffer nil 'python:anything-update-callback))))
+            (update .  python:all-modules-to-buffer-reload)
+            (type . python-module)))
+
+    (defvar python:standard-doc-url-base "http://docs.python.org/library")
+
+    (defun python:module-name-to-file-path (module &optional force-reload-p) ;;force-reload is not implemented
+      "python module -> file path"
+      (let1 path (replace-regexp-in-string "\\." "/" module)
+        (loop for dir in (python:library-path-list)
+              for d = (concat dir "/" path)
+              if (file-exists-p d)
+              return d
+              else
+              for file = (concat d ".py")
+              when (file-exists-p file)
+              return file)))
+
+    (defun python:module-name-to-egg-info (module &optional force-reload-p) ;;force-reload is not implemented
+      (let* ((module-top (car (split-string module "\\.")))
+             (info-rx (format "\\(%s\\|%s\\)-.*egg-info$" (capitalize module-top) module-top)))
+        (loop for dir in (python:library-path-list)
+              when (and (file-exists-p dir) (file-directory-p dir))
+              for candidate = (directory-files dir t info-rx t)
+              when candidate return (car candidate))))
+    
+    (defun python:module-name-to-web-page (module &optional force-reload-p) ;;force-reload is not implemented
+      (or (and-let* ((egg-info (python:module-name-to-egg-info module force-reload-p))
+                     (file (format "%s/PKG-INFO" egg-info)))
+            (with-current-buffer (find-file-noselect file)
+              (goto-char (point-min))
+              (re-search-forward "Home-page: *\\(.+\\)" nil t 1)
+              (match-string 1)))
+          (format "%s/%s.html" python:standard-doc-url-base module)))
+
+    (defun python:anything-with-modules () (interactive)
+      (let1 sources (list python:anything-c-source-imported-modules
+                          anything-c-source-imenu
+                          ;; python:anything-c-source-active-enves
+                          python:anything-c-source-all-modules)
+        (anything-other-buffer sources (get-buffer-create " *with-modules:python*"))))
+    )
+
   (python:define-plugin python:flymake-eldoc/current-position-plugin ()
     (require 'eldoc nil t)
     (named-progn define-variables-and-function
@@ -180,6 +361,15 @@
                           (:description . "Run Python script")))
             quickrun/language-alist)
       ))
+  (python:define-plugin python:swap-backquote-and-underscore-plugin ()
+    (python:with-plugin-mode-hook
+
+     (define-key (current-local-map) "`" (lambda () (interactive) (insert "_"))) ;; slack-off
+     (define-key (current-local-map) "_" (lambda () (interactive) (insert "`")))))
+
+  (python:define-plugin python:mako-html-plugin ()
+    (add-to-list 'auto-mode-alist '("\\.mako?$" . html-mode))
+    )
 
   (python:define-plugin python:auto-complete-plugin ()
     (unless (require 'auto-complete nil t)

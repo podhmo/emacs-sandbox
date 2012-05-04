@@ -34,11 +34,11 @@
     (set-buffer-modified-p t)))
 
 ;; 連続する文末の空行を削除
-(add-hook 'before-save-hook
-          (lambda ()
-            (save-excursion
-              (goto-char (point-max))
-              (delete-blank-lines))))
+;; (add-hook 'before-save-hook
+;;           (lambda ()
+;;             (save-excursion
+;;               (goto-char (point-max))
+;;               (delete-blank-lines))))
 
 (named-progn popwin
   (require-and-fetch-if-not 'popwin)
@@ -135,6 +135,7 @@
 
 (named-progn editing
   (require-and-fetch-if-not 'autopair)
+  (setq-default autopair-dont-pair `(:string (?') :comment  (?') :never (?`)))
   ;; (require-and-fetch-if-not 'paredit)
   )
 

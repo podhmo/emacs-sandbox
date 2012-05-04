@@ -163,6 +163,10 @@
   (require 'uniquify)
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
 
+;; (named-progn speedbar
+;;   (require-and-fetch-if-not 'sr-speedbar)
+;;   )
+
 (named-progn programming-languages
 
   (named-progn quick-run
@@ -200,9 +204,9 @@
     (add-hook 'emacs-lisp-mode-hook 'my:emacs-lisp-setup))
   ;;(require 'paredit)
 
-  (named-progn yasnipet ;;move-it
-    (require-and-fetch-if-not 'yasnippet)
-    (yas/load-directory (concat (current-directory) "3rdparty/yasnippet-20120320/snippets")))
+  ;; (named-progn yasnipet ;;move-it
+  ;;   (require-and-fetch-if-not 'yasnippet)
+  ;;   (yas/load-directory (concat (current-directory) "3rdparty/yasnippet-20120320/snippets")))
   
   (named-progn auto-complete ;;move-it
     (require-and-fetch-if-not 'auto-complete)
@@ -210,6 +214,12 @@
     (define-key ac-menu-map "\C-n" 'ac-next)
     (define-key ac-menu-map "\C-p" 'ac-previous)
     )
+
+  (named-progn html
+    (add-hook 'html-mode-hook ;; move-it
+              (lambda ()
+                (autopair-on)
+                (modify-syntax-entry ?% "w_"))))
 
   (named-progn python 
     (load "language.python")
@@ -220,18 +230,27 @@
       (python:autopair-plugin)
       (python:strict-indent-plugin)
       (python:flymake-eldoc/current-position-plugin)
-      (python:yasnippet-plugin)
+      (python:anything-with-modules-plugin)
+      ;; (python:yasnippet-plugin)
       ;; (python:run-program-plugin-simple)
       (python:quickrun-with-virtualenv-plugin)
       (python:auto-complete-plugin)
+      (python:swap-backquote-and-underscore-plugin)
       )
 
     (defun my:python-setup ()
       (run-hooks 'python:plugin-mode-hook)
 
-      (when (python:plugin-activate-p 'python:run-program-plugin-simple)
-        (define-many-keys python-mode-map
-          '(("C-c @" . python:run-program-current-buffer)))))
+      (let1 keymaps
+          (loop for (plugin . key-maps) in
+                '((python:run-program-plugin-simple
+                   . (("C-c @" . python:run-program-current-buffer)))
+                  (python:anything-with-modules-plugin
+                   . (("C-c C-f" . python:anything-with-modules)
+                       ("C-c f" . python-describe-symbol))))
+                when (python:plugin-activate-p plugin)
+                append key-maps)
+        (define-many-keys python-mode-map keymaps)))
 
     (add-hook 'python-mode-hook 'my:python-setup))
 

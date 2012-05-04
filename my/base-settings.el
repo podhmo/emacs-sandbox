@@ -41,6 +41,8 @@
 
 (setq comment-style 'multi-line)
 
+;; tab
+(setq-default indent-tabs-mode nil)
 
 ;;; mouse
 (mouse-wheel-mode t)
