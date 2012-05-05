@@ -103,6 +103,7 @@
             '(("C-c C-l" . eval-buffer)
               ("M-r" . replace-string)
               ("M-R" . replace-regexp)
+              ("C-c C-c" . toggle-file)
               ("C-c C-f" . ffap)
               ("C-c C-e" . eval-defun) ;;
               ("C-c j" . dabbrev-expand)
@@ -163,6 +164,9 @@
   (require 'uniquify)
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
 
+(named-progn toggle-file-mode
+  (require-and-fetch-if-not 'toggle-file-mode :url "https://raw.github.com/gist/2600353/9a5d6965bc075c2c967b8fbb832cc4800abc14dc/toggle-file-mode.el"))
+  
 ;; (named-progn speedbar
 ;;   (require-and-fetch-if-not 'sr-speedbar)
 ;;   )

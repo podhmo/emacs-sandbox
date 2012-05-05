@@ -28,10 +28,10 @@
 
 ;; 新規作成したファイルを未編集でも保存できるようにする
 ;; http://stackoverflow.com/questions/2592095/how-do-i-create-an-empty-file-in-emacs
-(add-hook 'find-file-hooks 'assume-new-is-modified)
-(defun assume-new-is-modified ()
-  (when (not (file-exists-p (buffer-file-name)))
-    (set-buffer-modified-p t)))
+;; (add-hook 'find-file-hooks 'assume-new-is-modified)
+;; (defun assume-new-is-modified ()
+;;   (when (not (file-exists-p (buffer-file-name)))
+;;     (set-buffer-modified-p t)))
 
 ;; 連続する文末の空行を削除
 ;; (add-hook 'before-save-hook
@@ -315,36 +315,36 @@
     
     ))
 
-(named-progn elscreen
-  (comment
-   ("C-;" . elscreen-previous)
-   ("C-:" . elscreen-next)
-   ("C-j S" . elscreen-shell/next-screen)
+;; (named-progn elscreen
+;;   (comment
+;;    ("C-;" . elscreen-previous)
+;;    ("C-:" . elscreen-next)
+;;    ("C-j S" . elscreen-shell/next-screen)
 
-   (named-progn daily-commands
-     (defun elscreen-shell/next-screen () (interactive)
-       "create shell buffer with current directory as pwd"
-       (let1 dir (current-directory)
-         (elscreen-create)
-         (shell)
-         (comint-simple-send (get-buffer-process dir)
-                             (concat "cd " dir))
-         (goto-char (point-max)))))
+;;    (named-progn daily-commands
+;;      (defun elscreen-shell/next-screen () (interactive)
+;;        "create shell buffer with current directory as pwd"
+;;        (let1 dir (current-directory)
+;;          (elscreen-create)
+;;          (shell)
+;;          (comint-simple-send (get-buffer-process dir)
+;;                              (concat "cd " dir))
+;;          (goto-char (point-max)))))
 
-   (named-progn elscreen
-     (require-and-fetch-if-not 'elscreen :installed-package 'po-elscreen)
+;;    (named-progn elscreen
+;;      (require-and-fetch-if-not 'elscreen :installed-package 'po-elscreen)
      
-     (defun global-j-define-key (&optional kmap)
-       (and-let* ((kmap (or kmap (current-local-map))))
-         (define-key kmap "\C-j" nil))) ;; experimental
+;;      (defun global-j-define-key (&optional kmap)
+;;        (and-let* ((kmap (or kmap (current-local-map))))
+;;          (define-key kmap "\C-j" nil))) ;; experimental
 
-     (add-hook 'on-before-keybord-setup
-               (lambda ()
-                 (defadvice elscreen-goto (after kill-Cj  activate)
-                   (global-j-define-key))
-                 (defadvice switch-to-buffer (after kill-Cj  activate)
-                   (global-j-define-key))
-                 (setq elscreen-prefix-key (kbd "C-j"))
-                 (elscreen-start)))
-     )
-   ))
+;;      (add-hook 'on-before-keybord-setup
+;;                (lambda ()
+;;                  (defadvice elscreen-goto (after kill-Cj  activate)
+;;                    (global-j-define-key))
+;;                  (defadvice switch-to-buffer (after kill-Cj  activate)
+;;                    (global-j-define-key))
+;;                  (setq elscreen-prefix-key (kbd "C-j"))
+;;                  (elscreen-start)))
+;;      )
+;;    ))

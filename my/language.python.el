@@ -246,7 +246,8 @@
                    ("web-page" .
                     (lambda (c)
                       (and-let* ((url (python:module-name-to-web-page c)))
-                        (browse-url-generic url))))
+                        (message "browse: %s" url)
+                        (browse-url url))))
                    ("info-egg" .
                     (lambda (c)
                       (and-let* ((path (python:module-name-to-egg-info c)))
