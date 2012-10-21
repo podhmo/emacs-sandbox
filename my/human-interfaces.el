@@ -67,13 +67,16 @@
   (setq tabbar-buffer-groups-function nil)
 
   (defvar my:always-display-buffers '("*scratch*" "*shell*"))
-  (defun my:hidden-buffers-list nil)
+  (defvar my:hidden-buffers-list nil)
+  (defadvice switch-to-buffer (after pop-switched-buffer-from-hidden-list activate)
+    (setq my:hidden-buffers-list (delete (current-buffer) my:hidden-buffers-list)))
+
   (defun my:tabbar-buffer-list ()
     (append (loop for bname in my:always-display-buffers
                   for b = (get-buffer bname)
                   when b collect b)
             (loop for b in (buffer-list)
-                  when (buffer-file-name b)
+                  when (and (buffer-file-name b) (not (member b my:hidden-buffers-list)))
                   collect b)))
 
   (defvar my:tabbar-configuration-table (make-hash-table :test 'equal)) 
@@ -89,6 +92,11 @@
             (set-window-configuration wconf))
           (and has-many-windows
                (delete-other-windows)))))
+
+  (defun my:tabbar-hidden-tab (&optional b) (interactive)
+    (let ((b (or b (current-buffer))))
+      (my:tabbar--around 'tabbar-forward-tab)
+      (add-to-list 'my:hidden-buffers-list b)))
 
   (defun my:tabbar-forward-tab () (interactive)
     (my:tabbar--around 'tabbar-forward-tab))

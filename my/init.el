@@ -68,7 +68,7 @@
     ;; (package-list-packages)
     )) 
 
-
+(require-and-fetch-if-not 'anything)
 (named-progn keyboad-settings
   (named-progn key-chord
     (require-and-fetch-if-not 'key-chord :url "http://www.emacswiki.org/emacs/download/key-chord.el")
@@ -130,7 +130,7 @@
               ("C-j S" . open-shell-with-pwd)
               ("C-j c" . my:tabbar-create)
               ("C-j C-f" . find-file)
-              ("C-j C-k" . (lambda () (interactive) (kill-buffer (current-buffer))))
+              ("C-j C-k" . my:tabbar-hidden-tab)
               ("<f5>" . revert-buffer)
               ("<f12>" . (lambda () (interactive) (message "reflesh") (setq extended-command-history nil)))
               )
@@ -266,3 +266,8 @@
 )
 
 (run-hook-with-args 'after-init-hook)
+
+(defadvice anything-M-x (before keep-history-size-more-than-one activate)
+    (while (null (cdr extended-command-history))
+      (push "*dummy*" extended-command-history)))
+

@@ -45,8 +45,8 @@
 (setq-default indent-tabs-mode nil)
 
 ;;; mouse
-(mouse-wheel-mode t)
-(setq mouse-wheel-follow-mouse t)
+;;(mouse-wheel-mode t)
+;;(setq mouse-wheel-follow-mouse t)
 
 (require 'font-lock)
 (global-font-lock-mode t)
