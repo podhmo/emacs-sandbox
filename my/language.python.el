@@ -75,8 +75,9 @@
 
       (defun python:flymake-kill-other-timer ()
         (dolist (b python:flymake-timered-buffers)
-          (with-current-buffer b
-            (python:flymake-kill-timer)))
+          (when (buffer-live-p b)
+            (with-current-buffer b
+              (python:flymake-kill-timer))))
         (setq python:flymake-timered-buffers nil))
 
       (defun python:flymake-rebirth-timer ()

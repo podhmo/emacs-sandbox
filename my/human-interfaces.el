@@ -45,7 +45,24 @@
   (setq display-buffer-function 'popwin:display-buffer)
 
   ;; quickrunここがただしい？
-  (add-to-list 'popwin:special-display-config '("*quickrun*" :noselect t))
+  (setq popwin:special-display-config
+        '(("*anything*" :height 20)
+          ("*quickrun*" :noselect t)
+          help-mode
+          ;; (completion-list-mode :noselect t)
+          ;; (compilation-mode :noselect t)
+          (grep-mode :noselect t)
+          (occur-mode :noselect t)
+          ("*Pp Macroexpand Output*" :noselect t)
+          "*Shell Command Output*" "*vc-diff*" "*vc-change-log*"
+          (" *undo-tree*" :width 60 :position right)
+          ("^\\*anything.*\\*$" :regexp t)
+          "*slime-apropos*" "*slime-macroexpansion*" "*slime-description*"
+          ("*slime-compilation*" :noselect t)
+          "*slime-xref*"
+          (sldb-mode :stick t)
+          ("*quickrun*" :noselect t)
+          slime-repl-mode slime-connection-list-mode))
   
   (named-progn patch ;; for bag fix
     (when (>= 1 (length (patch:function-arguments 'called-interactively-p)))
@@ -97,7 +114,7 @@
     (let ((b (or b (current-buffer))))
       (my:tabbar--around 'tabbar-forward-tab)
       (add-to-list 'my:hidden-buffers-list b)))
-
+  (tabbar-backward-tab)
   (defun my:tabbar-forward-tab () (interactive)
     (my:tabbar--around 'tabbar-forward-tab))
   (defun my:tabbar-backward-tab () (interactive)
@@ -226,6 +243,7 @@
                 (define-many-keys global-map
                   '(("<hiragana-katakana>" . anything)
                     ("C-c C-;" . anything-occur*)
+                    ("C-c C-:" . anything)
                     ("M-x" . anything-M-x)
                     ("C-x b" . anything-buffers+)
                     ("M-y" . anything-show-kill-ring)

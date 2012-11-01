@@ -72,7 +72,7 @@
 (named-progn keyboad-settings
   (named-progn key-chord
     (require-and-fetch-if-not 'key-chord :url "http://www.emacswiki.org/emacs/download/key-chord.el")
-    (setq key-chord-two-keys-delay 0.04)
+    (setq key-chord-two-keys-delay 0.02)
     (key-chord-mode 1)
     )
 
@@ -103,6 +103,9 @@
             '(("C-c C-l" . eval-buffer)
               ("M-r" . replace-string)
               ("M-R" . replace-regexp)
+
+              ("C-x C-l" . goto-line)
+
               ("C-c C-c" . toggle-file)
               ("C-c C-f" . ffap)
               ("C-c C-e" . eval-defun) ;;
@@ -195,18 +198,31 @@
         ("[^\t ]+?" nil nil (0 font-lock-function-name-face))))))
   
   (named-progn emacs-lisp
+    (require 'paredit)
+    (define-key paredit-mode-map (kbd "C-j") ctl-j-map)
+    ;; (setq paredit-do-commands-changed-p nil)
+    ;; (defadvice paredit-do-commands (before live-c-j-in-paredit activate)
+    ;;   (unless paredit-do-commands-changed-p
+    ;;     (setq paredit-do-commands-changed-p t)
+    ;;     (setq paredit-commands
+    ;;           (loop for x in paredit-commands
+    ;;                 unless (and (listp x) (equal (car x) "C-j"))
+
     (defun my:emacs-lisp-setup ()
       (define-many-keys emacs-lisp-mode-map
         '(("C-c C-j" . lisp-complete-symbol)
+          ("C-c M-r" . paredit-forward-slurp-sexp)
+          ("C-c M-R" . paredit-forward-barf-sexp)
+          ("C-c M-l" . paredit-backward-slurp-sexp)
+          ("C-c M-L" . paredit-backward-barf-sexp)
           ))
       (turn-on-eldoc-mode)
       (eldoc-add-command
        'paredit-backward-delete
        'paredit-close-round)
-      ;; (paredit-mode +1)
+      (paredit-mode +1)
       )    
     (add-hook 'emacs-lisp-mode-hook 'my:emacs-lisp-setup))
-  ;;(require 'paredit)
 
   ;; (named-progn yasnipet ;;move-it
   ;;   (require-and-fetch-if-not 'yasnippet)
@@ -251,7 +267,7 @@
                    . (("C-c @" . python:run-program-current-buffer)))
                   (python:anything-with-modules-plugin
                    . (("C-c C-f" . python:anything-with-modules)
-                       ("C-c f" . python-describe-symbol))))
+                      ("C-c f" . python-describe-symbol))))
                 when (python:plugin-activate-p plugin)
                 append key-maps)
         (define-many-keys python-mode-map keymaps)))
@@ -270,4 +286,7 @@
 (defadvice anything-M-x (before keep-history-size-more-than-one activate)
     (while (null (cdr extended-command-history))
       (push "*dummy*" extended-command-history)))
+
+;; this is ad-hoc settings for mac
+(define-key global-map "¥" (lambda (&optional n) (interactive "p") (dotimes (i (or n 1))  (insert "\\"))))
 
