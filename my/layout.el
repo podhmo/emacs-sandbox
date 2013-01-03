@@ -60,6 +60,7 @@
         ;; (background-color . "black")
         (background-color . "dark slate gray")
         (foreground-color . "white")
+        (font . "-apple-Menlo-medium-normal-normal-*-16-*-*-*-m-0-iso10646-1" )
         ,@default-frame-alist))
 
 ;;(describe-face 'font-lock-variable-name-face)
@@ -72,3 +73,4 @@
 (set-face-attribute 'font-lock-variable-name-face nil :foreground "plum3" :slant 'normal :weight 'bold)
 (set-face-attribute 'font-lock-function-name-face nil :foreground "plum3" :weight 'bold)
 (set-face-attribute 'font-lock-type-face nil :foreground "DarkSlateGray4":weight 'bold)
+

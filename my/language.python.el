@@ -353,7 +353,7 @@
       (error "this plugin `python:quickrun-plugin' require `quickrun', so please install it."))
 
     (defun python/virtualenv ()
-      (python:get-virtualenved "python"))
+      (concat (python:get-virtualenved "python") " -W default"))
 
     ;; remove python setting
     (named-progn setup

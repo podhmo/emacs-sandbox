@@ -124,7 +124,8 @@
   (defun delete-syntax-forward* () (interactive)
     (if (looking-at-p "[ \t]")
         (delete-region (point) (progn (skip-chars-forward "[ \t]") (point)))
-      (delete-syntax-forward))))
+      (delete-syntax-forward)))
+  )
   
 ;;
 

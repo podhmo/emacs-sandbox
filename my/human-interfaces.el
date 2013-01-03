@@ -78,85 +78,94 @@
   (require-and-fetch-if-not 'zlc)
   )
 
-(named-progn tabbar
-  (require-and-fetch-if-not 'tabbar)
-  (tabbar-mode 1)
-  (setq tabbar-buffer-groups-function nil)
+;; (named-progn tabbar
+;;   ;; ("C-;" . my:tabbar-backward-tab)
+;;   ;; ("C-:" . my:tabbar-forward-tab)
+;;   ;; ("C-j p" . my:tabbar-backward-tab)
+;;   ;; ("C-j n" . my:tabbar-forward-tab)
+;;   ;; ("C-j C-p" . my:tabbar-backward-tab)
+;;   ;; ("C-j C-n" . my:tabbar-forward-tab)
+;;   ;; ("C-j c" . my:tabbar-create)
+;;   ;; ("C-j C-k" . my:tabbar-hidden-tab)
 
-  (defvar my:always-display-buffers '("*scratch*" "*shell*"))
-  (defvar my:hidden-buffers-list nil)
-  (defadvice switch-to-buffer (after pop-switched-buffer-from-hidden-list activate)
-    (setq my:hidden-buffers-list (delete (current-buffer) my:hidden-buffers-list)))
+;;   (require-and-fetch-if-not 'tabbar)
+;;   (tabbar-mode 1)
+;;   (setq tabbar-buffer-groups-function nil)
 
-  (defun my:tabbar-buffer-list ()
-    (append (loop for bname in my:always-display-buffers
-                  for b = (get-buffer bname)
-                  when b collect b)
-            (loop for b in (buffer-list)
-                  when (and (buffer-file-name b) (not (member b my:hidden-buffers-list)))
-                  collect b)))
+;;   (defvar my:always-display-buffers '("*scratch*" "*shell*"))
+;;   (defvar my:hidden-buffers-list nil)
+;;   (defadvice switch-to-buffer (after pop-switched-buffer-from-hidden-list activate)
+;;     (setq my:hidden-buffers-list (delete (current-buffer) my:hidden-buffers-list)))
 
-  (defvar my:tabbar-configuration-table (make-hash-table :test 'equal)) 
-  (defun my:tabbar--around (action)
-    "almost same defadvice's around + ad-do-it"
-    (lexical-let ((has-many-windows (> (count-windows) 1)))
-      (when has-many-windows
-        (hash-table-put my:tabbar-configuration-table
-                        (current-buffer) (current-window-configuration)))
-      (funcall action)
-      (or (and-let* ((wconf (hash-table-get my:tabbar-configuration-table
-                                            (current-buffer) nil)))
-            (set-window-configuration wconf))
-          (and has-many-windows
-               (delete-other-windows)))))
+;;   (defun my:tabbar-buffer-list ()
+;;     (append (loop for bname in my:always-display-buffers
+;;                   for b = (get-buffer bname)
+;;                   when b collect b)
+;;             (loop for b in (buffer-list)
+;;                   when (and (buffer-file-name b) (not (member b my:hidden-buffers-list)))
+;;                   collect b)))
 
-  (defun my:tabbar-hidden-tab (&optional b) (interactive)
-    (let ((b (or b (current-buffer))))
-      (my:tabbar--around 'tabbar-forward-tab)
-      (add-to-list 'my:hidden-buffers-list b)))
-  (tabbar-backward-tab)
-  (defun my:tabbar-forward-tab () (interactive)
-    (my:tabbar--around 'tabbar-forward-tab))
-  (defun my:tabbar-backward-tab () (interactive)
-    (my:tabbar--around 'tabbar-backward-tab))
-  (defun my:tabbar-create () (interactive)
-    (my:tabbar--around (lambda () (switch-to-buffer "*scratch*"))))
+;;   (defvar my:tabbar-configuration-table (make-hash-table :test 'equal)) 
+;;   (defun my:tabbar--around (action)
+;;     "almost same defadvice's around + ad-do-it"
+;;     (lexical-let ((has-many-windows (> (count-windows) 1)))
+;;       (when has-many-windows
+;;         (hash-table-put my:tabbar-configuration-table
+;;                         (current-buffer) (current-window-configuration)))
+;;       (funcall action)
+;;       (or (and-let* ((wconf (hash-table-get my:tabbar-configuration-table
+;;                                             (current-buffer) nil)))
+;;             (set-window-configuration wconf))
+;;           (and has-many-windows
+;;                (delete-other-windows)))))
 
-  (setq tabbar-buffer-list-function 'my:tabbar-buffer-list)
-  (setq tabbar-separator '(0.5))
+;;   (defun my:tabbar-hidden-tab (&optional b) (interactive)
+;;     (let ((b (or b (current-buffer))))
+;;       (my:tabbar--around 'tabbar-forward-tab)
+;;       (add-to-list 'my:hidden-buffers-list b)))
+;;   (tabbar-backward-tab)
+;;   (defun my:tabbar-forward-tab () (interactive)
+;;     (my:tabbar--around 'tabbar-forward-tab))
+;;   (defun my:tabbar-backward-tab () (interactive)
+;;     (my:tabbar--around 'tabbar-backward-tab))
+;;   (defun my:tabbar-create () (interactive)
+;;     (my:tabbar--around (lambda () (switch-to-buffer "*scratch*"))))
+
+;;   (setq tabbar-buffer-list-function 'my:tabbar-buffer-list)
+;;   (setq tabbar-separator '(0.5))
   
-  (add-hook 'on-before-keybord-setup
-            (lambda ()
-              (defun global-j-define-key (&optional kmap)
-                (and-let* ((kmap (or kmap (current-local-map))))
-                  (define-key kmap "\C-j" nil))) ;; experimental
+;;   (add-hook 'on-before-keybord-setup
+;;             (lambda ()
+;;               (defun global-j-define-key (&optional kmap)
+;;                 (and-let* ((kmap (or kmap (current-local-map))))
+;;                   (define-key kmap "\C-j" nil))) ;; experimental
               
-              (defadvice elscreen-goto (after kill-Cj  activate)
-                (global-j-define-key))
+;;               (defadvice elscreen-goto (after kill-Cj  activate)
+;;                 (global-j-define-key))
 
-              (defadvice switch-to-buffer (after kill-Cj  activate)
-                (global-j-define-key))))
+;;               (defadvice switch-to-buffer (after kill-Cj  activate)
+;;                 (global-j-define-key))))
 
-  (add-hook 'after-init-hook
-            (lambda ()
-              (set-face-attribute
-               'tabbar-unselected nil
-               :background (frame-parameter (selected-frame) 'background-color)
-               :foreground (frame-parameter (selected-frame) 'foreground-color)
-               :box nil)
-              (set-face-attribute
-               'tabbar-selected nil
-               :background (frame-parameter (selected-frame) 'background-color)
-               :foreground "yellow"
-               :box nil)
-              (set-face-attribute
-               'tabbar-button nil
-               :box nil)
-              (set-face-attribute
-               'tabbar-separator nil
-               :height 1.5)
-              ))
-  )
+;;   (add-hook 'after-init-hook
+;;             (lambda ()
+;;               (set-face-attribute
+;;                'tabbar-unselected nil
+;;                :background (frame-parameter (selected-frame) 'background-color)
+;;                :foreground (frame-parameter (selected-frame) 'foreground-color)
+;;                :box nil)
+;;               (set-face-attribute
+;;                'tabbar-selected nil
+;;                :background (frame-parameter (selected-frame) 'background-color)
+;;                :foreground "yellow"
+;;                :box nil)
+;;               (set-face-attribute
+;;                'tabbar-button nil
+;;                :box nil)
+;;               (set-face-attribute
+;;                'tabbar-separator nil
+;;                :height 1.5)
+;;               ))
+;;   )
 
 (named-progn editing
   (require-and-fetch-if-not 'autopair)
@@ -243,11 +252,10 @@
                 (define-many-keys global-map
                   '(("<hiragana-katakana>" . anything)
                     ("C-c C-;" . anything-occur*)
-                    ("C-c C-:" . anything)
+                    ("C-c C-:" . anything-vcs-project)
                     ("M-x" . anything-M-x)
                     ("C-x b" . anything-buffers+)
                     ("M-y" . anything-show-kill-ring)
-                    
                     ("C-j C-j" . anything-bm-list*)
                     ("C-j j" . bm-toggle)
                     ))))
@@ -341,36 +349,36 @@
     
     ))
 
-;; (named-progn elscreen
-;;   (comment
-;;    ("C-;" . elscreen-previous)
-;;    ("C-:" . elscreen-next)
-;;    ("C-j S" . elscreen-shell/next-screen)
+(named-progn elscreen
+   (named-progn daily-commands
+     (defun elscreen-shell/next-screen () (interactive)
+       "create shell buffer with current directory as pwd"
+       (let1 dir (current-directory)
+         (elscreen-create)
+         (shell)
+         (comint-simple-send (get-buffer-process dir)
+                             (concat "cd " dir))
+         (goto-char (point-max)))))
 
-;;    (named-progn daily-commands
-;;      (defun elscreen-shell/next-screen () (interactive)
-;;        "create shell buffer with current directory as pwd"
-;;        (let1 dir (current-directory)
-;;          (elscreen-create)
-;;          (shell)
-;;          (comint-simple-send (get-buffer-process dir)
-;;                              (concat "cd " dir))
-;;          (goto-char (point-max)))))
+   (named-progn elscreen
+     (require-and-fetch-if-not 'pym :url "https://raw.github.com/nelhage/elisp/master/site/apel-10.6/pym.el")     
+     (require-and-fetch-if-not 'apel-ver :url "https://raw.github.com/nelhage/elisp/master/site/apel-10.6/apel-ver.el")
+     (require-and-fetch-if-not 'product :url "https://raw.github.com/nelhage/elisp/master/site/apel-10.6/product.el")
+     (require-and-fetch-if-not 'static :url "https://raw.github.com/nelhage/elisp/master/site/apel-10.6/static.el")
+     (require-and-fetch-if-not 'alist :url "https://raw.github.com/nelhage/elisp/master/site/apel-10.6/alist.el")
+     (require-and-fetch-if-not 'elscreen)
 
-;;    (named-progn elscreen
-;;      (require-and-fetch-if-not 'elscreen :installed-package 'po-elscreen)
-     
-;;      (defun global-j-define-key (&optional kmap)
-;;        (and-let* ((kmap (or kmap (current-local-map))))
-;;          (define-key kmap "\C-j" nil))) ;; experimental
+     (defun global-j-define-key (&optional kmap)
+       (and-let* ((kmap (or kmap (current-local-map))))
+         (define-key kmap "\C-j" nil))) ;; experimental
 
-;;      (add-hook 'on-before-keybord-setup
-;;                (lambda ()
-;;                  (defadvice elscreen-goto (after kill-Cj  activate)
-;;                    (global-j-define-key))
-;;                  (defadvice switch-to-buffer (after kill-Cj  activate)
-;;                    (global-j-define-key))
-;;                  (setq elscreen-prefix-key (kbd "C-j"))
-;;                  (elscreen-start)))
-;;      )
-;;    ))
+     (add-hook 'on-before-keybord-setup
+               (lambda ()
+                 (defadvice elscreen-goto (after kill-Cj  activate)
+                   (global-j-define-key))
+                 (defadvice switch-to-buffer (after kill-Cj  activate)
+                   (global-j-define-key))
+                 (setq elscreen-prefix-key (kbd "C-j"))
+                 (elscreen-start)))
+     )
+   )

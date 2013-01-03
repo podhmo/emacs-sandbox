@@ -69,10 +69,11 @@
     )) 
 
 (require-and-fetch-if-not 'anything)
+
 (named-progn keyboad-settings
   (named-progn key-chord
     (require-and-fetch-if-not 'key-chord :url "http://www.emacswiki.org/emacs/download/key-chord.el")
-    (setq key-chord-two-keys-delay 0.02)
+    (setq key-chord-two-keys-delay 0.01)
     (key-chord-mode 1)
     )
 
@@ -117,25 +118,26 @@
               ("C-c x" . (lambda () (interactive) (find-file (concat keybord-settings:curdir "/init.el"))))
               ("C-c e" . enclose-element-interactive)
               ("C-c d" . delete-syntax-forward*)
+              ("M-r" . replace-string)
+              ("M-R" . replace-regexp)
 
               ;; quick-run
               ("C-c @" . quickrun-compile-only)
               ("C-c C-@" . quickrun)
+
+              ;elscreen
+              ("C-;" . elscreen-previous)
+              ("C-:" . elscreen-next)
+              ("C-j S" . elscreen-shell/next-screen)
+              ("C-j C-f" . elscreen-find-file)              
+
               ("C-." . redo)
               ("C-/" . undo)
-
-              ("C-;" . my:tabbar-backward-tab)
-              ("C-:" . my:tabbar-forward-tab)
-              ("C-j p" . my:tabbar-backward-tab)
-              ("C-j n" . my:tabbar-forward-tab)
-              ("C-j C-p" . my:tabbar-backward-tab)
-              ("C-j C-n" . my:tabbar-forward-tab)
               ("C-j S" . open-shell-with-pwd)
-              ("C-j c" . my:tabbar-create)
-              ("C-j C-f" . find-file)
-              ("C-j C-k" . my:tabbar-hidden-tab)
               ("<f5>" . revert-buffer)
-              ("<f12>" . (lambda () (interactive) (message "reflesh") (setq extended-command-history nil)))
+              ("<f12>" . (lambda () (interactive)
+                           (message "reflesh")
+                           (setq extended-command-history nil)))
               )
               )
       (define-many-keys (current-global-map) global-individual-key-mapping))
@@ -150,6 +152,16 @@
     (run-hook-with-args-until-failure
      'on-after-keybord-setup)
     ))
+
+(named-progn anything-git
+  (require-and-fetch-if-not 'with-prefix :url "https://raw.github.com/podhmo/anything-vcs-project.el/master/with-prefix.el")
+  (require-and-fetch-if-not 'anything-vcs-project :url "https://raw.github.com/podhmo/anything-vcs-project.el/master/anything-vcs-project.el")
+  (setq anything-vcs-project:cache-enable-p t)
+  (setq anything-vcs-project:cache.project-list-path "~/.emacs.d/.project.list")
+  (setq anything-vcs-project-git:exclude-args "--exclude .hg --exclude '*.pyc'")
+  (setq anything-vcs-project-hg:exclude-args "--exclude .git --exclude '*.pyc'")
+  (global-set-key (kbd "C-c C-:") 'anything-vcs-project)
+)
 
 (named-progn emacsclient
   ;; emacsclient サーバを起動
@@ -198,15 +210,8 @@
         ("[^\t ]+?" nil nil (0 font-lock-function-name-face))))))
   
   (named-progn emacs-lisp
-    (require 'paredit)
+    (require-and-fetch-if-not 'paredit)
     (define-key paredit-mode-map (kbd "C-j") ctl-j-map)
-    ;; (setq paredit-do-commands-changed-p nil)
-    ;; (defadvice paredit-do-commands (before live-c-j-in-paredit activate)
-    ;;   (unless paredit-do-commands-changed-p
-    ;;     (setq paredit-do-commands-changed-p t)
-    ;;     (setq paredit-commands
-    ;;           (loop for x in paredit-commands
-    ;;                 unless (and (listp x) (equal (car x) "C-j"))
 
     (defun my:emacs-lisp-setup ()
       (define-many-keys emacs-lisp-mode-map
@@ -289,4 +294,49 @@
 
 ;; this is ad-hoc settings for mac
 (define-key global-map "¥" (lambda (&optional n) (interactive "p") (dotimes (i (or n 1))  (insert "\\"))))
+(setq-default tab-stop-list (loop for i from 4 to 120 by 4
+                                  collect i))
 
+(setq-default ring-bell-function
+              (lambda () (message "ding")))
+
+;; this is haskell settings
+;; sudo port install ghc hs-cabal
+;; cabal-0.14.0 update
+;; cabal-0.14.0 install cabal-install
+;; cabal-0.14.0 install ghc-mod hlint
+(require-and-fetch-if-not 'haskell-mode)
+(require-and-fetch-if-not 'haskell-cabal)
+
+(add-to-list 'auto-mode-alist '("\\.hs$" . haskell-mode))
+(add-to-list 'auto-mode-alist '("\\.lhs$" . literate-haskell-mode))
+(add-to-list 'auto-mode-alist '("\\.cabal\\'" . haskell-cabal-mode))
+(add-to-list 'interpreter-mode-alist '("runghc" . haskell-mode))     
+(add-to-list 'interpreter-mode-alist '("runhaskell" . haskell-mode)) 
+
+(defun my:haskell-cabal-home ()
+  (concat (getenv "HOME") "/.cabal"))
+
+(add-to-list 'exec-path (concat (my:haskell-cabal-home) "/bin"))
+
+(defun my:haskell-setup ()
+  (ghc-init)
+  (flymake-mode)
+  )
+;; (autoload 'ghc-init "ghc" nil t)
+;; (ac-define-source ghc-mod
+;;   '((depends ghc)
+;;     (candidates . (ghc-select-completion-symbol))
+;;     (symbol . "s")
+;;     (cache)))
+
+(defun my:ac-haskell-mode ()
+  (setq ac-sources '(ac-source-words-in-same-mode-buffers ac-source-dictionary ac-source-ghc-mod)))
+(add-hook 'haskell-mode-hook 'my:ac-haskell-mode)
+
+(defun my:haskell-ac-init ()
+  (when (member (file-name-extension buffer-file-name) '("hs" "lhs"))
+    (auto-complete-mode t)
+    (setq ac-sources '(ac-source-words-in-same-mode-buffers ac-source-dictionary ac-source-ghc-mod))))
+
+(add-hook 'find-file-hook 'my:haskell-ac-init)
