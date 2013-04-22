@@ -17,7 +17,8 @@
 
 ;; eye candy
 (menu-bar-mode -1)
-(tool-bar-mode -1)
+(when (fboundp 'tool-bar-mode)
+  (tool-bar-mode -1))
 (setq echo-keystrokes 0.2)
 (line-number-mode t)
 (column-number-mode t)

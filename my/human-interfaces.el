@@ -73,7 +73,8 @@
 
 ;;; my own
 (named-progn redo
-  (require-and-fetch-if-not 'redo+))
+  (require-and-fetch-if-not 'redo+)
+  )
 (named-progn zlc
   (require-and-fetch-if-not 'zlc)
   )
@@ -361,11 +362,11 @@
          (goto-char (point-max)))))
 
    (named-progn elscreen
-     (require-and-fetch-if-not 'pym :url "https://raw.github.com/nelhage/elisp/master/site/apel-10.6/pym.el")     
-     (require-and-fetch-if-not 'apel-ver :url "https://raw.github.com/nelhage/elisp/master/site/apel-10.6/apel-ver.el")
-     (require-and-fetch-if-not 'product :url "https://raw.github.com/nelhage/elisp/master/site/apel-10.6/product.el")
-     (require-and-fetch-if-not 'static :url "https://raw.github.com/nelhage/elisp/master/site/apel-10.6/static.el")
-     (require-and-fetch-if-not 'alist :url "https://raw.github.com/nelhage/elisp/master/site/apel-10.6/alist.el")
+     ;; (require-and-fetch-if-not 'pym :url "https://raw.github.com/nelhage/elisp/master/site/apel-10.6/pym.el")     
+     ;; (require-and-fetch-if-not 'apel-ver :url "https://raw.github.com/nelhage/elisp/master/site/apel-10.6/apel-ver.el")
+     ;; (require-and-fetch-if-not 'product :url "https://raw.github.com/nelhage/elisp/master/site/apel-10.6/product.el")
+     ;; (require-and-fetch-if-not 'static :url "https://raw.github.com/nelhage/elisp/master/site/apel-10.6/static.el")
+     ;; (require-and-fetch-if-not 'alist :url "https://raw.github.com/nelhage/elisp/master/site/apel-10.6/alist.el")
      (require-and-fetch-if-not 'elscreen)
 
      (defun global-j-define-key (&optional kmap)

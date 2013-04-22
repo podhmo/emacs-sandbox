@@ -22,9 +22,9 @@
        (with-current-buffer ,buf
          (progn 
            (package-handle-response)
-           (re-search-forward "^$" nil 'move)
-           (forward-char)
-           (delete-region (point-min) (point)))
+           (goto-char (point-min))
+           (re-search-forward "^$" nil t)
+           (delete-region (point-min) (+ 1 (point))))
          ,@body)
        (kill-buffer ,buf))))
 

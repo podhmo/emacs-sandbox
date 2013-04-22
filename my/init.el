@@ -1,6 +1,6 @@
 (require 'cl)
 ;; utility
-(setq debug-on-error nil)
+(setq debug-on-error t)
 
 (defun current-directory ()
   (if load-file-name
