@@ -33,7 +33,7 @@
     (when status
       (auto-save-buffer-deactivte))))
 
-(named-progn patch-for-invalid-coding-system-when-auto-save
+(progn ;; patch-for-invalid-coding-system-when-auto-save
   (require 'mule)
 
   (defun my:select-safe-coding-system (from to &optional default-coding-system

@@ -2,17 +2,17 @@
   (unless (fboundp 'require-and-fetch-if-not)
     (defalias 'require-and-fetch-if-not 'require))
   (unless (fboundp 'named-progn)
-    (defmacro named-progn (name &rest body)
+    (defmacro progn ;; (name &rest body)
       (declare (indent 1))
       `(progn ,@body))))
 
-(named-progn define-internal-variables
+(progn ;; define-internal-variables
   (defvar python:plugin-mode-hook '())
   (defvar python:python-mode 'python-mode)
   (defvar python:activated-plugins '())
   )
 
-(named-progn define-utility
+(progn ;; define-utility
   (defmacro python:with-plugin-mode-hook (&rest body)
     `(add-hook 'python:plugin-mode-hook
                (lambda ()
@@ -27,7 +27,7 @@
   (defun python:plugin-activate-p (plugin)
     (memq plugin python:activated-plugins)))
 
-(named-progn plugins-are-here
+(progn ;; plugins-are-here
   (python:define-plugin python:yasnippet-plugin ()
     (python:with-plugin-mode-hook
      (yas/minor-mode-on)))
@@ -58,7 +58,7 @@
     (require-and-fetch-if-not 'flymake)
     (setq python:flymake-program validate-program)
 
-    (named-progn utility-for-flymake
+    (progn ;; utility-for-flymake
       (defun* python:flymake-create-temp (file-name &optional (prefix "flymake-python"))
         (make-temp-file prefix nil ".py"))
       
@@ -67,7 +67,7 @@
                           'python:flymake-create-temp)))
           (list (python:get-virtualenved python:flymake-program) (list temp-file)))))
 
-    (named-progn treat-timer-as-active-timer-is-one
+    (progn ;; treat-timer-as-active-timer-is-one
       (defun python:flymake-kill-timer ()
         (when flymake-timer
           (cancel-timer flymake-timer)
@@ -88,14 +88,14 @@
 
       (defvar python:flymake-timered-buffers nil)
 
-      (named-progn utility
+      (progn ;; utility
         (defsubst python:singlep (pair)
           (null (cdr pair)))
         (defsubst python:is-same-current-buffer-and-timered-buffer ()
           (and (python:singlep python:flymake-timered-buffers)
                (equal (current-buffer) (car python:flymake-timered-buffers)))))
 
-      (named-progn advices
+      (progn ;; advices
         ;; (when (require 'elscreen nil t)
         ;;   (defadvice elscreen-goto (after kill-other-flymake-timer activate)
         ;;     (when (equal python:python-mode major-mode)
@@ -109,8 +109,8 @@
               (python:flymake-kill-other-timer)
               (python:flymake-rebirth-timer)))))
 
-      (named-progn add-hook
-        (named-progn support-virtual-env ;;todo: move-it
+      (progn ;; add-hook
+        (progn ;; support-virtual-env ;;todo: move-it
           (defalias 'python:target-in-path 'target-in-path) ;; import from my util.el
           
           (defun* python:get-virtualenved (cmd &optional (prefix "bin/"))
@@ -312,7 +312,7 @@
 
   (python:define-plugin python:flymake-eldoc/current-position-plugin ()
     (require 'eldoc nil t)
-    (named-progn define-variables-and-function
+    (progn ;; define-variables-and-function
       (defvar python:flymake-eldoc-timer nil)
       (defvar python:flymake-eldoc-timer-delay 0.25)
 
@@ -337,9 +337,9 @@
                 (run-with-idle-timer python:flymake-eldoc-timer-delay t
                                      'python:flymake-eldoc-print-current-message-info)))))
 
-    (named-progn add-hook
+    (progn ;; add-hook
       (python:with-plugin-mode-hook
-       (named-progn dependency-check
+       (progn ;; dependency-check
          (unless (member 'python:flymake-plugin python:activated-plugins)
            (error "this plugin depends on `python:flymake-plugin"))
          (unless (boundp 'cmh:change-mode-hook)
@@ -356,7 +356,7 @@
       (concat (python:get-virtualenved "python") " -W default"))
 
     ;; remove python setting
-    (named-progn setup
+    (progn ;; setup
       (setq quickrun/language-alist 
             (remove* "python" quickrun/language-alist :key 'car :test 'equal))
       (push '("python" . ((:command . python/virtualenv) (:compile-only . "pyflakes %s")
@@ -403,7 +403,7 @@
         (requires . 2))
       "Source for python completion.")
 
-    (named-progn setup
+    (progn ;; setup
       (python:with-plugin-mode-hook
        (auto-complete-mode t)
        (add-to-list 'ac-sources 'ac-source-python))))

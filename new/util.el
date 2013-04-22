@@ -1,4 +1,4 @@
-(named-progn patch
+(progn ;; patch
   (require 'help-fns)
 
   (defun patch:function-arguments (sym)
@@ -12,7 +12,7 @@
        (print ,tmp)
        ,tmp)))
 
-(named-progn hashtable
+(progn ;; hashtable
   (defsubst hash-table-get (table k &optional default)
     (gethash k table default))
 
@@ -102,7 +102,7 @@
 	   (otherwise (,name (if (not ,state) 1 -1))))))))
 
 
-(named-progn enclose-element
+(progn ;; enclose-element
   (defun enclose-element (beg-tag end-tag)
     (multiple-value-bind (beg end)
         (if (region-active-p)
@@ -117,7 +117,7 @@
   (defun enclose-element-interactive (tag) (interactive "s")
     (enclose-element tag tag)))
 
-(named-progn delete-syntax
+(progn ;; delete-syntax
   (defun* delete-syntax-forward (&optional (syntax "w_"))
     (delete-region (point) (progn (skip-syntax-forward syntax) (point))))
   

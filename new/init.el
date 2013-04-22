@@ -10,10 +10,6 @@
 (defmacro comment (&rest body)
   nil)
 
-(defmacro named-progn (name &rest body)
-  (declare (indent 1))
-  `(progn ,@body))
-
 (defmacro* require-and-fetch-if-not (package &key (filename nil) (noerror t) (installed-package nil) (url nil))
   (let ((pname (gensym)))
     `(or (require ,package ,filename t)
@@ -35,7 +31,7 @@
 (add-to-list 'load-path (concat (current-directory) "/3rdparty"))
 
 
-(named-progn my-base-settings
+(progn ;; my-base-settings
   (load "util")
   (load "base-settings")
   (load "daily-commands")
@@ -44,7 +40,7 @@
             (lambda ()
               (load "human-interfaces")
               (keybord-settings-setup)
-              (named-progn experimental
+              (progn ;; experimental
                 (load "change-mode-hook"))
               ))
   (load "auto-save")
@@ -53,12 +49,12 @@
               (auto-save-buffers-start 0.5))))
 
 
-(named-progn package-management
+(progn ;; package-management
   (require 'package)
   (setq package-user-dir (concat (current-directory) "3rdparty"))
   (load "package+")
   
-  (named-progn marmalade
+  (progn ;; marmalade
     (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
     (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
     ;; get available packages
@@ -70,8 +66,8 @@
 
 (require-and-fetch-if-not 'anything)
 
-(named-progn keyboad-settings
-  (named-progn key-chord
+(progn ;; keyboad-settings
+  (progn ;; key-chord
     (require-and-fetch-if-not 'key-chord :url "http://www.emacswiki.org/emacs/download/key-chord.el")
     (setq key-chord-two-keys-delay 0.01)
     (key-chord-mode 1)
@@ -99,7 +95,7 @@
     (run-hook-with-args-until-failure
      'on-before-keybord-setup)
 
-    (named-progn global-key-settings ;; or human-interfaces.el
+    (progn ;; global-key-settings ;; or human-interfaces.el
       (setq global-individual-key-mapping
             '(("C-c C-l" . eval-buffer)
               ("M-r" . replace-string)
@@ -144,7 +140,7 @@
 
     (ffap-bindings) ;; url also enable when typed C-x C-f
 
-    (named-progn key-chord
+    (progn ;; key-chord
       (key-chord-define-global "jk" 'view-mode)
       (key-chord-define-global "po" 'org-remember))
 
@@ -153,7 +149,7 @@
      'on-after-keybord-setup)
     ))
 
-(named-progn anything-git
+(progn ;; anything-git
   (require-and-fetch-if-not 'with-prefix :url "https://raw.github.com/podhmo/anything-vcs-project.el/master/with-prefix.el")
   (require-and-fetch-if-not 'anything-vcs-project :url "https://raw.github.com/podhmo/anything-vcs-project.el/master/anything-vcs-project.el")
   (setq anything-vcs-project:cache-enable-p t)
@@ -163,7 +159,7 @@
   (global-set-key (kbd "C-c C-:") 'anything-vcs-project)
 )
 
-(named-progn emacsclient
+(progn ;; emacsclient
   ;; emacsclient サーバを起動
   (condition-case err
       (progn
@@ -171,24 +167,24 @@
         (unless (server-running-p)  (server-start)))
     (error (message "emacsclient load fail"))))
 
-(named-progn recentf
+(progn ;; recentf
   (setq recentf-max-saved-items 500)
   (recentf-mode 1))
 
-(named-progn uniquify
+(progn ;; uniquify
   (require 'uniquify)
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
 
-(named-progn toggle-file-mode
+(progn ;; toggle-file-mode
   (require-and-fetch-if-not 'toggle-file-mode :url "https://raw.github.com/gist/2600353/9a5d6965bc075c2c967b8fbb832cc4800abc14dc/toggle-file-mode.el"))
   
-;; (named-progn speedbar
+;; (progn ;; speedbar
 ;;   (require-and-fetch-if-not 'sr-speedbar)
 ;;   )
 
-(named-progn programming-languages
+(progn ;; programming-languages
 
-  (named-progn quick-run
+  (progn ;; quick-run
     (require-and-fetch-if-not 'quickrun :url "https://raw.github.com/syohex/emacs-quickrun/master/quickrun.el")
     (defadvice quickrun (around help-mode-after-quickrun activate)
       (lexical-let ((before-buf (current-buffer)))
@@ -198,7 +194,7 @@
           (help-mode))))
     )
 
-  (named-progn font-lock-language-plugin
+  (progn ;; font-lock-language-plugin
     ;; (defmacro language:define-plugin (name args &rest body)
     ;;   (declare (indent 2))
     ;;   `(defun* ,name ,args 
@@ -209,7 +205,7 @@
      '(("(\\([^\t ]*?:define-plugin\\) " (1 font-lock-keyword-face) 
         ("[^\t ]+?" nil nil (0 font-lock-function-name-face))))))
   
-  (named-progn emacs-lisp
+  (progn ;; emacs-lisp
     (require-and-fetch-if-not 'paredit)
     (define-key paredit-mode-map (kbd "C-j") ctl-j-map)
 
@@ -229,29 +225,29 @@
       )    
     (add-hook 'emacs-lisp-mode-hook 'my:emacs-lisp-setup))
 
-  ;; (named-progn yasnipet ;;move-it
+  ;; (progn ;; yasnipet ;;move-it
   ;;   (require-and-fetch-if-not 'yasnippet)
   ;;   (yas/load-directory (concat (current-directory) "3rdparty/yasnippet-20120320/snippets")))
   
-  (named-progn auto-complete ;;move-it
+  (progn ;; auto-complete ;;move-it
     (require-and-fetch-if-not 'auto-complete)
     (setq ac-use-menu-map t)
     (define-key ac-menu-map "\C-n" 'ac-next)
     (define-key ac-menu-map "\C-p" 'ac-previous)
     )
 
-  (named-progn html
+  (progn ;; html
     (add-hook 'html-mode-hook ;; move-it
               (lambda ()
                 (autopair-on)
                 (modify-syntax-entry ?% "w_"))))
-  (named-progn scheme
+  (progn ;; scheme
     (load "language.scheme"))
 
-  (named-progn python 
+  (progn ;; python 
     (load "language.python")
 
-    (named-progn activate-plugin
+    (progn ;; activate-plugin
       (python:auto-mode-alist-plugin)
       (python:flymake-plugin)
       (python:autopair-plugin)
@@ -281,7 +277,7 @@
 
     (add-hook 'python-mode-hook 'my:python-setup))
 
-  (named-progn ruby
+  (progn ;; ruby
     (require-and-fetch-if-not 'flymake-ruby)
     (require 'ruby-mode nil t)
     (add-hook 'ruby-mode-hook 'flymake-ruby-load)
