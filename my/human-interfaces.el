@@ -1,5 +1,5 @@
 ;; from: https://github.com/wakaran/config/blob/master/dot.emacs.d.server/init/90-last-setting.el
-(named-progn shell-settings
+(progn ;; shell-settings
 ;;;; shell-modeで上下でヒストリ補完
   ;; C-p/C-nでヒストリを辿る (デフォルトでもM-p, M-nで出来る)
   (add-hook 'on-after-keybord-setup
@@ -40,7 +40,7 @@
 ;;               (goto-char (point-max))
 ;;               (delete-blank-lines))))
 
-(named-progn popwin
+(progn ;; popwin
   (require-and-fetch-if-not 'popwin)
   (setq display-buffer-function 'popwin:display-buffer)
 
@@ -64,7 +64,7 @@
           ("*quickrun*" :noselect t)
           slime-repl-mode slime-connection-list-mode))
   
-  (named-progn patch ;; for bag fix
+  (progn ;; patch ;; for bag fix
     (when (>= 1 (length (patch:function-arguments 'called-interactively-p)))
       (defun popwin:called-interactively-p ()
         (called-interactively-p))))
@@ -72,14 +72,14 @@
 
 
 ;;; my own
-(named-progn redo
+(progn ;; redo
   (require-and-fetch-if-not 'redo+)
   )
-(named-progn zlc
+(progn ;; zlc
   (require-and-fetch-if-not 'zlc)
   )
 
-;; (named-progn tabbar
+;; (progn ;; tabbar
 ;;   ;; ("C-;" . my:tabbar-backward-tab)
 ;;   ;; ("C-:" . my:tabbar-forward-tab)
 ;;   ;; ("C-j p" . my:tabbar-backward-tab)
@@ -168,14 +168,14 @@
 ;;               ))
 ;;   )
 
-(named-progn editing
+(progn ;; editing
   (require-and-fetch-if-not 'autopair)
   (setq-default autopair-dont-pair `(:string (?') :comment  (?') :never (?`)))
   ;; (require-and-fetch-if-not 'paredit)
   )
 
-(named-progn eye-candy
-  (named-progn eldoc
+(progn ;; eye-candy
+  (progn ;; eldoc
     (require 'eldoc)
     (setq eldoc-argument-case 'downcase)
     
@@ -188,13 +188,13 @@
                       (goto-char (scan-sexps (point) 1))
                       (skip-syntax-forward "^w_")
                       (thing-at-point 'symbol))))
-               (message "named-progn -- %s --" section-name)))
+               (message "progn ;; -- %s --" section-name)))
             (t ad-do-it)))
     )
   )
 
 
-(named-progn anything
+(progn ;; anything
   (require-and-fetch-if-not 'anything)
   (require-and-fetch-if-not 'anything-config)
   (require-and-fetch-if-not 'anything-match-plugin)
@@ -232,7 +232,7 @@
      execute-persistent-action
      (anything-occur)))
 
-  (named-progn bookmarking-current-buffer
+  (progn ;; bookmarking-current-buffer
     (require-and-fetch-if-not 'bm)
 
     (defun anything-bm-list* ()
@@ -242,12 +242,12 @@
        execute-persistent-action
        (anything-bm-list)))
     )
-  (named-progn popwin
+  (progn ;; popwin
     (when (boundp 'popwin:special-display-config)
       (setq anything-samewindow nil)
       (add-to-list 'popwin:special-display-config '("*anything*" :height 20))))
 
-  (named-progn key-settings/anything
+  (progn ;; key-settings/anything
     (add-hook 'on-after-keybord-setup
               (lambda ()
                 (define-many-keys global-map
@@ -263,7 +263,7 @@
     )
   )  
 
-;; (named-progn scroll-buffer 
+;; (progn ;; scroll-buffer 
 ;;   (require-and-fetch-if-not 'deferred)
 ;;   (require 'inertial-scroll)
 ;;   (setq inertias-initial-velocity 50)
@@ -288,8 +288,8 @@
 ;;   (inertias-global-minor-mode 1)
 ;;   )
 
-(named-progn viewer-mode-settings
-  (named-progn for-buffer-file-permission
+(progn ;; viewer-mode-settings
+  (progn ;; for-buffer-file-permission
     (setq view-read-only t)
     (defadvice find-file
       (around find-file-switch-to-view-file (file &optional wild) activate)
@@ -309,7 +309,7 @@
     (do-not-exit-view-mode-unless-writable-advice view-mode-exit)
     (do-not-exit-view-mode-unless-writable-advice view-mode-disable))
 
-  (named-progn keybord-settings/viewer-mode
+  (progn ;; keybord-settings/viewer-mode
     (defmacro funcall&viewer-mode (func) ;;slack-off
       `(lambda () (interactive) ,func (view-mode-enable)))
 
@@ -350,8 +350,8 @@
     
     ))
 
-(named-progn elscreen
-   (named-progn daily-commands
+(progn ;; elscreen
+   (progn ;; daily-commands
      (defun elscreen-shell/next-screen () (interactive)
        "create shell buffer with current directory as pwd"
        (let1 dir (current-directory)
@@ -361,7 +361,7 @@
                              (concat "cd " dir))
          (goto-char (point-max)))))
 
-   (named-progn elscreen
+   (progn ;; elscreen
      ;; (require-and-fetch-if-not 'pym :url "https://raw.github.com/nelhage/elisp/master/site/apel-10.6/pym.el")     
      ;; (require-and-fetch-if-not 'apel-ver :url "https://raw.github.com/nelhage/elisp/master/site/apel-10.6/apel-ver.el")
      ;; (require-and-fetch-if-not 'product :url "https://raw.github.com/nelhage/elisp/master/site/apel-10.6/product.el")

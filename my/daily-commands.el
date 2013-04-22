@@ -18,7 +18,7 @@
                (delete-window  w))))
           (t (message "no bound found -%s-" hook)))))
 
-(named-progn for-follow-mode
+(progn ;; for-follow-mode
   (defvar split-window-function
     'split-window-horizontally)
   
@@ -39,7 +39,7 @@ so. c-u 3 follow-with-n-window, then a frame splitted 3window
       (turn-on-follow-mode))))
 
 
-(named-progn treat-dumped-junks
+(progn ;; treat-dumped-junks
   (defvar junks-directory-path "~/junks")
   (defvar junks-directory-force-create-p t)
 
