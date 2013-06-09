@@ -404,3 +404,58 @@
        (auto-complete-mode t)
        (add-to-list 'ac-sources 'ac-source-python))))
   )
+
+;;; begin setup
+(progn ;; activate-plugin
+  (python:auto-mode-alist-plugin)
+  (python:flymake-plugin)
+  (python:autopair-plugin)
+  (python:strict-indent-plugin)
+  (python:flymake-eldoc/current-position-plugin)
+  (python:anything-with-modules-plugin)
+  ;; (python:yasnippet-plugin)
+  ;; (python:run-program-plugin-simple)
+  (python:quickrun-with-virtualenv-plugin)
+  (python:auto-complete-plugin)
+  (python:swap-backquote-and-underscore-plugin)
+  )
+
+(defun my:python-setup ()
+  (run-hooks 'python:plugin-mode-hook)
+
+  (let1 keymaps
+      (loop for (plugin . key-maps) in
+            '((python:run-program-plugin-simple
+               . (("C-c @" . python:run-program-current-buffer)))
+              (python:anything-with-modules-plugin
+               . (("C-c C-f" . python:anything-with-modules)
+                  ("C-c f" . python-describe-symbol))))
+            when (python:plugin-activate-p plugin)
+            append key-maps)
+    (define-many-keys python-mode-map keymaps)
+    (define-key python-mode-map "\C-c\C-c" 'toggle-file)
+    ))
+
+(add-hook 'python-mode-hook 'my:python-setup)
+
+(when (require 'insert-pair-element nil t)  
+  (setq python-selfish:mapping
+        `(("`" . ,(ilambda (insert "_")))
+          ("_" . ,(ilambda (insert "`")))
+          ("\\" . insert-pair-escaped-after)
+          ("," . ,(ilambda (insert ", ")))))
+  
+  (setq python-selfish:key-pair
+        '(("(" . ")")
+          ("\"" . "\"")
+          ("'" . "'")
+          ("{"  "}" "{")
+          ("[" "]" "[")))
+
+  (defun python-selfish:install ()
+    (loop for (k . f) in python-selfish:mapping
+          do (define-key python-mode-map k f))
+    (define-insert-pair-binding python-mode-map python-selfish:key-pair)
+    )
+  (add-hook 'python-mode-hook 'python-selfish:install)
+

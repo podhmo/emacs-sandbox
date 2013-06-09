@@ -19,12 +19,20 @@
   (setq auto-save-buffers-timer
 	(run-with-idle-timer delay t 'auto-save-buffers)))
 
+(defvar auto-save-disable-check-functions nil)
+(defun auto-save-disable-check (buf)
+  (rlet1 disabled nil
+    (loop for p in auto-save-disable-check-functions
+          if (funcall p buf)
+          do (setq disabled t))))
+
 (defun auto-save-buffers ()
   (loop for buf in (remove-if-not 'buffer-file-name (buffer-list))
 	when (and (buffer-modified-p buf)
-		  (not buffer-read-only)
-		  (not (string-match "^#" (buffer-name buf)))
-		  (file-writable-p (buffer-file-name buf)))
+              (not buffer-read-only)
+              (not (string-match "^#" (buffer-name buf)))
+              (file-writable-p (buffer-file-name buf))
+              (not (auto-save-disable-check buf)))
 	do (with-current-buffer buf 
          (save-buffer))))
 
