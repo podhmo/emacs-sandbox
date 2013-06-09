@@ -6,7 +6,6 @@
   (if load-file-name
       (file-name-directory load-file-name)
     default-directory))
-
 (defmacro comment (&rest body)
   nil)
 
@@ -23,9 +22,9 @@
         do (define-key key-map (read-kbd-macro key) cmd)))
 
 ;;
-(add-hook 'after-init-hook
-          (lambda ()
-            (find-file (concat (current-directory) "init.el"))))
+;; (add-hook 'after-init-hook
+;;           (lambda ()
+;;             (find-file (concat (current-directory) "init.el"))))
 
 (add-to-list 'load-path (current-directory))
 (add-to-list 'load-path (concat (current-directory) "/3rdparty"))
@@ -182,8 +181,22 @@
 ;;   (require-and-fetch-if-not 'sr-speedbar)
 ;;   )
 
-(progn ;; programming-languages
+;; code-block
+(require-and-fetch-if-not 'config-block :url "https://gist.github.com/podhmo/3917706/raw/3bd74df6fbc69995be57f4635d4b14f2afeedaa4/config-block.el")
 
+;; python
+;; (load "language.python-new")
+;; (config-block-setup! 
+;;  '(
+;;    addon:python.core
+;;    addon:python.strict.indent
+;;    addon:python.find-python
+;;    addon:python.import.ffap
+;;    addon:python.quickrun
+;;    addon:python.hook.initialize
+;;    ))
+
+(progn ;; programming-languages
   (progn ;; quick-run
     (require-and-fetch-if-not 'quickrun :url "https://raw.github.com/syohex/emacs-quickrun/master/quickrun.el")
     (defadvice quickrun (around help-mode-after-quickrun activate)
@@ -273,7 +286,9 @@
                       ("C-c f" . python-describe-symbol))))
                 when (python:plugin-activate-p plugin)
                 append key-maps)
-        (define-many-keys python-mode-map keymaps)))
+        (define-many-keys python-mode-map keymaps)
+        (define-key python-mode-map "\C-c\C-c" 'toggle-file)
+        ))
 
     (add-hook 'python-mode-hook 'my:python-setup))
 
@@ -318,30 +333,70 @@
 (add-to-list 'exec-path (concat (my:haskell-cabal-home) "/bin"))
 
 (custom-set-variables
- '(haskell-mode-hook '(turn-on-haskell-indentation)))
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(haskell-mode-hook (quote (turn-on-haskell-indentation)))
+ '(org-agenda-files (quote ("~/org/sample.org")))
+ '(remember-handler-functions (quote (remember-insert-top-of-the-file))))
 
-;; (defun my:haskell-setup ()
-;;   ;; (ghc-init)
-;;   (flymake-mode)
-;;   )
-;; (add-hook 'haskell-mode-hook 'my:haskell-setup)
+(defun my:haskell-setup ()
+  (ghc-init)
+  (flymake-mode)
+  )
+(add-hook 'haskell-mode-hook 'my:haskell-setup)
 
-;; (autoload 'ghc-init "ghc" nil t)
-;; (ac-define-source ghc-mod
-;;   '((depends ghc)
-;;     (candidates . (ghc-select-completion-symbol))
-;;     (symbol . "s")
-;;     (cache)))
+(add-to-list 'load-path (concat (current-directory) "ghc-mod"))
+(autoload 'ghc-init "ghc" nil t)
 
-;; (defun my:ac-haskell-mode ()
-;;   (setq ac-sources '(ac-source-words-in-same-mode-buffers ac-source-dictionary ac-source-ghc-mod)))
-;; (add-hook 'haskell-mode-hook 'my:ac-haskell-mode)
-
-;; (defun my:haskell-ac-init ()
-;;   (when (member (file-name-extension buffer-file-name) '("hs" "lhs"))
-;;     (auto-complete-mode t)
-;;     (setq ac-sources '(ac-source-words-in-same-mode-buffers ac-source-dictionary ac-source-ghc-mod))))
-
-;; (add-hook 'find-file-hook 'my:haskell-ac-init)
 (put 'narrow-to-region 'disabled nil)
+(setq debug-on-error nil)
+
+(defun simple-timer (n d &optional color) (interactive "nwait
+ndelay")
+  (run-with-timer 
+   n nil 
+   (lexical-let ((d d) (color (or color "#8d8d8d")))
+     (lambda (&rest args)
+       (lexical-let ((original-color (background-color-at-point)))
+         (set-background-color color)
+         (run-with-timer d nil (lambda (&rest args) (set-background-color original-color)))
+         )))))
+
+;; org-mode
+(require 'org-install)
+(require 'org-remember)
+(add-to-list 'auto-mode-alist '("\\.notes$" . org-mode))
+(add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
+(add-to-list 'auto-mode-alist '("memo[0-9]+\\.txt" . org-mode))
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-cc" 'org-capture)
+(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cb" 'org-iswitchb)
+
+(defun remember-insert-top-of-the-file ()
+  (let ((text (buffer-string))
+        (desc (remember-buffer-desc)))
+    (with-temp-buffer
+      (insert remember-leader-text (current-time-string)
+              " (" desc ")\n\n" text)
+      (let ((remember-text (buffer-string)))
+        (with-current-buffer (find-file-noselect remember-data-file)
+          (save-excursion
+            (goto-char (point-min))
+            (insert remember-text "\n")
+            (goto-char (point-min))
+            (when remember-save-after-remembering (save-buffer)))))
+      )))
+(setq remember-handler-functions '(remember-insert-top-of-the-file))
+
+;; org-agenda
+(setq calendar-holidays nil)
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "WAIT(w)" "|" "DONE(d)" "SOMEDAY(s)")))
+(setq org-log-done 'time)
+
+(setq org-agenda-custom-commands
+      '(("f" occur-tree "FIXME")))
 

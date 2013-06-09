@@ -25,7 +25,7 @@
 
 (progn ;; plugins-are-here
   (python:define-plugin python:yasnippet-plugin ()
-    (python:with-plugin-mode-hook
+    (python:with-plugin-mode-ook
      (yas/minor-mode-on)))
 
   (python:define-plugin python:strict-indent-plugin (&optional (tabsize 4))
