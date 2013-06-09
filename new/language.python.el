@@ -1,10 +1,6 @@
 (progn ;; prepare
   (unless (fboundp 'require-and-fetch-if-not)
-    (defalias 'require-and-fetch-if-not 'require))
-  (unless (fboundp 'named-progn)
-    (defmacro progn ;; (name &rest body)
-      (declare (indent 1))
-      `(progn ,@body))))
+    (defalias 'require-and-fetch-if-not 'require)))
 
 (progn ;; define-internal-variables
   (defvar python:plugin-mode-hook '())
@@ -29,7 +25,7 @@
 
 (progn ;; plugins-are-here
   (python:define-plugin python:yasnippet-plugin ()
-    (python:with-plugin-mode-hook
+    (python:with-plugin-mode-ook
      (yas/minor-mode-on)))
 
   (python:define-plugin python:strict-indent-plugin (&optional (tabsize 4))
