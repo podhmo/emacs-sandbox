@@ -1,3 +1,7 @@
+;;pickup
+(require-and-fetch-if-not 'pickup)
+
+
 ;;; debug utiltities
 (defvar cmh:debug-buffer nil)
 (defvar cmh:me nil)
