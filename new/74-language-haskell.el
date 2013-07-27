@@ -13,18 +13,27 @@
 (add-to-list 'interpreter-mode-alist '("runghc" . haskell-mode))     
 (add-to-list 'interpreter-mode-alist '("runhaskell" . haskell-mode)) 
 
+
 (defun my:haskell-cabal-home ()
   (concat (getenv "HOME") "/.cabal"))
 
 (add-to-list 'exec-path (concat (my:haskell-cabal-home) "/bin"))
 
-
+(when (require 'insert-pair-element nil t)  
+  (setq haskell-selfish:key-pair
+        '(("(" . ")")
+          ("\"" . "\"")
+          ("'" . "'")
+          ("{"  "}" "{")
+          ("[" "]" "["))))
 
 (defun my:haskell-setup ()
-  (ghc-init)
   (flymake-mode)
+  (ghc-init)
+  (turn-on-haskell-doc-mode)
+  (turn-on-haskell-indentation)
+  (define-insert-pair-binding haskell-mode-map haskell-selfish:key-pair)
   )
 (add-hook 'haskell-mode-hook 'my:haskell-setup)
+(require-and-fetch-if-not 'ghc)
 
-(add-to-list 'load-path (concat (current-directory) "ghc-mod"))
-(autoload 'ghc-init "ghc" nil t)

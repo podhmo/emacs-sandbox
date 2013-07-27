@@ -168,3 +168,6 @@
     (check-target-is-exist-in-path
      (file-truename dir) target find-all-p)))
 
+(defun define-many-keys (key-map key-table)
+  (loop for (key . cmd) in key-table
+        do (define-key key-map (read-kbd-macro key) cmd)))

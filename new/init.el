@@ -8,110 +8,10 @@
 
 
 ;;; begin 1
-(require 'cl)
-(defmacro* require-and-fetch-if-not (package &key (filename nil) (noerror t) (installed-package nil) (url nil))
-  (let ((pname (gensym)))
-    `(or (require ,package ,filename t)
-         (let ((,pname (or ,installed-package ,package))
-               (my:package-install-url ,url))
-           (package-install ,pname)
-           (require ,package ,filename t)))))
-
-(require 'package)
-
-;; dont-use, directly
-(defvar my:package-install-url nil)
-(defvar my:local-package-list nil)
-
-;; custom variable 
-(defvar my:local-package-sync-p t)
-
-;; utility
-(defmacro* my:package--with-work-buffer (url &rest body)
-  "inspired by `package--with-work-buffer'"
-  (declare (indent 1))
-  (let ((buf (gensym)))
-    `(let ((,buf  (url-retrieve-synchronously ,url)))
-       (with-current-buffer ,buf
-         (progn 
-           (package-handle-response)
-           (goto-char (point-min))
-           (re-search-forward "^$" nil t)
-           (delete-region (point-min) (+ 1 (point))))
-         ,@body)
-       (kill-buffer ,buf))))
-
-(defun my:package--find-version ()
-  (save-excursion
-    (progn (goto-char (point-min))
-           (re-search-forward "Version: *" nil t 1)
-           (or (thing-at-point 'symbol) "0.0"))))
-
-;; functions
-(defun my:package-install-from-url (url name &optional version description requires)
-  (let ((version version))
-    (my:package--with-work-buffer url
-      (unless version
-        (setq version (my:package--find-version)))
-      (package-unpack-single name version (or description "no description")
-                             requires))
-    ;; Try to activate it.
-    (add-to-list 'load-path (package--dir name version))
-    (when my:local-package-sync-p
-      (add-to-list 'my:local-package-list (list name version))
-      (my:local-package-store-save))))
-
-;; local package
-(defun my:local-package-store--create (fname &optional forcep)
-  (when (or (not (file-exists-p fname)) forcep)
-    (with-current-buffer (find-file-noselect fname)
-      (insert "nil")
-      (save-buffer))))
-
-(defun my:local-package-store-fname ()
-  (concat package-user-dir "/.local-package.list"))
-
-(defun my:local-package-store-load ()
-  (let ((fname (my:local-package-store-fname)))
-    ;; if not found. create store file
-    (my:local-package-store--create fname)
-    (let ((buf (find-file-noselect fname)))
-      (prog1 (read (with-current-buffer buf (buffer-string)))
-        (kill-buffer buf)))))
-
-(defun my:local-package-store-save ()
-  (let ((fname (my:local-package-store-fname)))
-    (with-current-buffer (find-file-noselect fname)
-      (erase-buffer)
-      (insert (prin1-to-string my:local-package-list))
-      (save-buffer)
-      (kill-buffer))))
-
-(defun my:local-package-initialize ()
-  (loop for (name version) in (my:local-package-store-load)
-        do (add-to-list 'load-path (package--dir name version))))
-
-;; advices
-(defadvice package-install (around from-url-dispatch last (name) activate)
-  (cond (my:package-install-url
-         (let ((name (if (symbolp name) (symbol-name name) name)))
-           (my:package-install-from-url my:package-install-url name)))
-        (t ad-do-it)))
-
-(defadvice package-initialize (after local-package-initialize activate)
-  (my:local-package-initialize))
-
-
-;;; begin 2
-(defvar ctl-j-map (make-keymap))
-(defun define-many-keys (key-map key-table)
-  (loop for (key . cmd) in key-table
-        do (define-key key-map (read-kbd-macro key) cmd)))
-
-;;; begin 3
-
 (add-to-list 'load-path (current-directory))
-(add-to-list 'load-path (concat (current-directory) "/3rdparty"))
+(add-to-list 'load-path (concat (current-directory) "3rdparty"))
+
+(load "package+")
 
 (progn ;; package-management
   (require 'package)
@@ -173,3 +73,32 @@
     )
 
 (run-hook-with-args 'after-init-hook)
+
+;; gist
+;; (require 'gist)
+
+(defun flymake-post-syntax-check (exit-status command)
+  (setq flymake-err-info flymake-new-err-info)
+  (setq flymake-new-err-info nil)
+  (setq flymake-err-info
+        (flymake-fix-line-numbers
+         flymake-err-info 1 (flymake-count-lines)))
+  (flymake-delete-own-overlays)
+  (flymake-highlight-err-lines flymake-err-info)
+  (let (err-count warn-count)
+    (setq err-count (flymake-get-err-count flymake-err-info "e"))
+    (setq warn-count  (flymake-get-err-count flymake-err-info "w"))
+    (flymake-log 2 "%s: %d error(s), %d warning(s) in %.2f second(s)"
+		 (buffer-name) err-count warn-count
+		 (- (flymake-float-time) flymake-check-start-time))
+    (setq flymake-check-start-time nil)
+
+    (if (and (equal 0 err-count) (equal 0 warn-count))
+	(if (equal 0 exit-status)
+	    (flymake-report-status "" "")	; PASSED
+	  (if (not flymake-check-was-interrupted)
+	      ;; (flymake-report-fatal-status "CFGERR"
+		  ;;   		   (format "Configuration error has occurred while running %s" command))
+	    (flymake-report-status nil ""))) ; "STOPPED"
+      (flymake-report-status (format "%d/%d" err-count warn-count) ""))))
+

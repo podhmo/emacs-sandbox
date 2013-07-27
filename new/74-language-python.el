@@ -64,16 +64,22 @@
           (list (python:get-virtualenved python:flymake-program) (list temp-file)))))
 
     (progn ;; treat-timer-as-active-timer-is-one
-      (defun python:flymake-kill-timer ()
-        (when flymake-timer
-          (cancel-timer flymake-timer)
-          (setq flymake-timer nil)))
+      (defun python:flymake-kill-timer (&optional buffer)
+        (when (and (not flymake-is-running) 
+                   flymake-timer)
+          (condition-case e
+              (progn 
+                (cancel-timer flymake-timer)
+                (message "canceld timer %s %s" buffer (current-time))
+                (setq flymake-timer nil)
+                )
+            (error nil))))
 
       (defun python:flymake-kill-other-timer ()
         (dolist (b python:flymake-timered-buffers)
           (when (buffer-live-p b)
             (with-current-buffer b
-              (python:flymake-kill-timer))))
+              (python:flymake-kill-timer b))))
         (setq python:flymake-timered-buffers nil))
 
       (defun python:flymake-rebirth-timer ()
@@ -83,6 +89,7 @@
           (push (current-buffer) python:flymake-timered-buffers)))
 
       (defvar python:flymake-timered-buffers nil)
+      )
 
       (progn ;; utility
         (defsubst python:singlep (pair)
@@ -403,13 +410,12 @@
       (python:with-plugin-mode-hook
        (auto-complete-mode t)
        (add-to-list 'ac-sources 'ac-source-python))))
-  )
 
 ;;; begin setup
 (progn ;; activate-plugin
   (python:auto-mode-alist-plugin)
   (python:flymake-plugin)
-  (python:autopair-plugin)
+  ;; (python:autopair-plugin)
   (python:strict-indent-plugin)
   (python:flymake-eldoc/current-position-plugin)
   (python:anything-with-modules-plugin)
@@ -457,5 +463,5 @@
           do (define-key python-mode-map k f))
     (define-insert-pair-binding python-mode-map python-selfish:key-pair)
     )
-  (add-hook 'python-mode-hook 'python-selfish:install)
+  (add-hook 'python-mode-hook 'python-selfish:install))
 

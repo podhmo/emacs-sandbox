@@ -1,3 +1,5 @@
+(defvar ctl-j-map (make-keymap))
+
 (defvar on-after-keyboard-setup (list))
 (defvar on-before-keyboard-setup (list))
 (defmacro with-before-keyboard-setup (&rest body)
