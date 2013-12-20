@@ -91,6 +91,20 @@
     (when (>= 1 (length (patch:function-arguments 'called-interactively-p)))
       (defun popwin:called-interactively-p ()
         (called-interactively-p))))
+
+  ;; suppress: memory and cpu leak (ad-hoc)
+  ;; todo   (or popwin:close-popup-window-timer
+  ;; (defadvice popwin:start-close-popup-window-timer (before suppress-timer-leak activate)
+  ;;   (when (and (not popwin:popup-window) (not (popwin:popup-window-live-p)))
+  ;;     (when (< 0 (random 2))
+  ;;       (dolist (tm timer-list)
+  ;;         (when (and (eq 'popwin:close-popup-window-timer (timer--function tm))
+  ;;                    (not (eq popwin:close-popup-window-timer tm)))
+  ;;           (cancel-timer tm)))
+  ;;         ) 
+  ;;     )
+  ;;   )
+  (setq popwin:close-popup-window-timer-interval 0.5)
   )
 
 
@@ -275,6 +289,7 @@
               (lambda ()
                 (define-many-keys global-map
                   '(("<hiragana-katakana>" . anything)
+                    ("C-c C-a" . anything)
                     ("C-c C-;" . anything-occur*)
                     ("C-c C-:" . anything-vcs-project)
                     ("M-x" . anything-M-x)
@@ -406,3 +421,7 @@
                 (elscreen-start)))
     )
   ) 
+
+;; supress bell sound
+(defun silent-bell () (message "bell!"))
+(setq ring-bell-function 'silent-bell)

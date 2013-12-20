@@ -118,7 +118,10 @@
           (insert (format "%s%s%s" beg-tag element end-tag))))))
 
   (defun enclose-element-interactive (tag) (interactive "s")
-    (enclose-element tag tag)))
+    (let* ((override-list '(("(" . ")") ("[" . "]") ("{" . "}")))
+           (end-tag (or (assoc-default tag override-list) tag)))
+      (enclose-element tag end-tag)))
+  )
 
 (progn ;; delete-syntax
   (defun* delete-syntax-forward (&optional (syntax "w_"))

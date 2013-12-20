@@ -11,6 +11,9 @@
 (setq enable-recursive-minibuffers t)
 (setq large-file-warning-threshold (* 25 1024 1024))
 
+;;dabbrev
+(setq dabbrev-case-replace nil)
+
 (add-hook 'server-switch-hook 
           (lambda ()
             (local-set-key (kbd "C-x k") 
@@ -32,10 +35,31 @@
 (setq completion-ignore-case t)
 (setq read-file-name-completion-ignore-case t)
 
+;;(get-language-info current-language-environment 'exit-function)
+;;(get-language-info current-language-environment 'coding-priority)
+;; (set-language-environment "Japanese")
+(set-language-environment 'utf-8)
+(prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 (set-buffer-file-coding-system 'utf-8)
+
+;; hmm. 
+(setq auto-coding-functions nil)
+
+;; 行末の空白を強調表示
+(setq-default show-trailing-whitespace t)
+(set-face-background 'trailing-whitespace "#b14770")
+
+;; hmm.
+(if (equal system-type 'darwin)
+    (if (>= emacs-major-version 23)
+        (set-file-name-coding-system 'utf-8-nfd)
+      (progn
+        (require 'utf-8m)
+        (set-file-name-coding-system 'utf-8m)))
+  (setq file-name-coding-system 'utf-8-unix))
 
 (auto-compression-mode t)
 (setq x-select-enable-clipboard t)

@@ -6,7 +6,6 @@
 
 (add-to-list 'load-path (current-directory))
 
-
 ;;; begin 1
 (add-to-list 'load-path (current-directory))
 (add-to-list 'load-path (concat (current-directory) "3rdparty"))
