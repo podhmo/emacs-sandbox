@@ -11,6 +11,18 @@
 (setq enable-recursive-minibuffers t)
 (setq large-file-warning-threshold (* 25 1024 1024))
 
+;;path setting
+(defun get-exec-path-from-shell ()
+  (interactive)
+  (let ((output (shell-command-to-string 
+                 "$SHELL --login -i -c 'echo $PATH'")))
+    (replace-regexp-in-string "[ \t\n]*$" "" output)))
+
+(let ((path-from-shell (get-exec-path-from-shell)))
+  (setenv "PATH" path-from-shell)
+  (setq exec-path (split-string path-from-shell path-separator)))
+
+
 ;;dabbrev
 (setq dabbrev-case-replace nil)
 

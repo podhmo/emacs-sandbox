@@ -49,6 +49,18 @@
 ;; (elpy-enable)
 
 ;;; initialize
+(defun current-memo ()
+  (let* ((memos (directory-files2 "~/vboxshare/memo" t))
+         (max-n-files-pair
+          (reduce (lambda (r x)
+                    (cond ((string-match "\\([0-9]+\\)\\.txt$" x)
+                           (let1 n (string-to-int (match-string-no-properties 1 x))
+                             (if (> n (car r)) (cons n x) r)))
+                          (t r)))
+                  memos
+                  :initial-value (cons 0 "memo0.txt"))))
+    (cdr max-n-files-pair)))
+
 ;;; do-execute
   (progn
     (auto-save-buffers-start 0.5)
@@ -58,17 +70,7 @@
     ;; occur after settings hook
     (keyboard-settings-setup)
     (run-hook-with-args-until-failure 'on-after-keyboard-setup)
-
-    (let* ((memos (directory-files2 "~/vboxshare/memo" t))
-           (max-n-files-pair
-            (reduce (lambda (r x)
-                      (cond ((string-match "\\([0-9]+\\)\\.txt$" x)
-                             (let1 n (string-to-int (match-string-no-properties 1 x))
-                               (if (> n (car r)) (cons n x) r)))
-                                             (t r)))
-                    memos
-                    :initial-value (cons 0 "memo0.txt"))))
-      (find-file (cdr  max-n-files-pair)))
+    (find-file (current-memo))
     )
 
 (run-hook-with-args 'after-init-hook)
@@ -101,3 +103,17 @@
 	    (flymake-report-status nil ""))) ; "STOPPED"
       (flymake-report-status (format "%d/%d" err-count warn-count) ""))))
 
+
+;; hy
+(require 'hy-mode)
+;; (define-derived-mode hy-mode lisp-mode "hy"
+;;   (add-hook 'hy-mode-hook 'turn-on-font-lock))
+
+(add-to-list 'auto-mode-alist '("\\.hy$" . hy-mode))
+
+(add-to-list 'quickrun-file-alist '("\\.hy$" . "hy"))
+(add-to-list 'quickrun/language-alist
+             '("hy" . ((:command . "~/vboxshare/venvs/my3/bin/hy")
+                       (:compile-only . "~/vboxshare/venvs/my3/bin/hyc %n.hy")
+                       (:description "Run Hy script"))))
+(put 'set-goal-column 'disabled nil)
