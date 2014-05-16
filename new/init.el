@@ -117,3 +117,14 @@
                        (:compile-only . "~/vboxshare/venvs/my3/bin/hyc %n.hy")
                        (:description "Run Hy script"))))
 (put 'set-goal-column 'disabled nil)
+
+
+;;; temporary
+(defun setup-sp-toggle-on-org ()
+  (define-key org-mode-map "\C-c\C-c" 'toggle-file)
+  )
+(add-hook 'org-mode-hook 'setup-sp-toggle-on-org)
+
+(let ((pair (rassoc 'image-file-handler file-name-handler-alist)))
+  (setcar pair "\\.\\(GIF\\|JP\\(?:E?G\\)\\|P\\(?:BM\\|GM\\|N[GM]\\|PM\\)\\|TIFF?\\|X\\(?:[BP]M\\)\\|gif\\|jp\\(?:e?g\\)\\|p\\(?:bm\\|gm\\|n[gm]\\|pm\\)\\|tiff?\\|x\\(?:[bp]m\\)\\)\\'")
+  )
