@@ -7,6 +7,14 @@
    '(help-at-pt-display-when-idle '(flymake-overlay)))
   )
 
+;; (progn ;; flycheck
+;;   (require-and-fetch-if-not 'request)
+;;   (require-and-fetch-if-not 'f)
+;;   (require-and-fetch-if-not 'flycheck)
+;;   (add-hook 'after-init-hook 'global-flycheck-mode)
+;; ;  (flycheck-checkers)
+;; ;  (flycheck-add-next-checker)
+;;   )
 
 
 (progn ;; quick-run

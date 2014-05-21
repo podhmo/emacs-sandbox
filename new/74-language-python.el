@@ -20,7 +20,7 @@
 ;;; ffap module
 ;; (require 'ffap-python)
 (load "~/work/myprojects/python-env/ffap-python")
-(setq ffap-python-disable-confirm-before-open t)
+(defvar ffap-python-disable-confirm-before-open t)
 ;;; flymake
 
 (defun flymake-create-temp--tmpdirectory (file-name prefix)
@@ -35,14 +35,20 @@
       (flymake-log 3 "create-temp-tmpdirectory: file=%s temp=%s" file-name temp-path)
       temp-path)))
 
-(defvar flymake-python:program "pyflakes")
+(setq flymake-python:program "pyflakes")
+(setq flymake-python:program "flake8")
 (defun flymake-python:find-program ()
-  (ffap-python:find-program flymake-python:program))
+  (or (ffap-python:find-program flymake-python:program)
+      (error "%s is not found in %s" flymake-python:program default-directory)))
 
 (defun flymake-python-init ()
   (let* ((temp-file (flymake-init-create-temp-buffer-copy
-                     'flymake-create-temp--tmpdirectory)))
-    (list (flymake-python:find-program) (list temp-file))))
+                     'flymake-create-temp--tmpdirectory))
+         (check-program (flymake-python:find-program)))
+    (cond ((string-match-p "flake8" check-program)
+           (list check-program (list "--ignore" "E501" temp-file)))
+          (t
+           (list check-program (list temp-file))))))
 
 (add-to-list 'flymake-allowed-file-name-masks '("\\.py$" flymake-python-init))
 

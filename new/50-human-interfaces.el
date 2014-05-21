@@ -16,7 +16,7 @@
 
 (progn ;; key-chord
   (require-and-fetch-if-not 'key-chord :url "http://www.emacswiki.org/emacs/download/key-chord.el")
-  (setq key-chord-two-keys-delay 0.01)
+  (setq key-chord-two-keys-delay 0.02)
   (key-chord-mode 1)
   )
 
