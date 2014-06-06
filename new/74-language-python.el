@@ -65,11 +65,16 @@
 (defun quickrun-python:compile-only () (interactive)
   (shell-command (format "%s %s" (flymake-python:find-program) buffer-file-name)))
 
+(defun my:python-insert-comma () (interactive)
+  (insert ",")
+  (unless (looking-at-p "$")
+    (insert " ")))
+
 ;;; auto-pair
 (require 'insert-pair-element nil t)  
 (setq my:python-key-map
       `(("`" . ,(ilambda (insert "_")))
-        ("_" . ,(ilambda (insert "`")))
+        ("_" . my:python-insert-comma )
         ("\\" . insert-pair-escaped-after)
         ("," . ,(ilambda (insert ", ")))
         ("C-c @" . quickrun-python:compile-only)

@@ -128,3 +128,7 @@
 (let ((pair (rassoc 'image-file-handler file-name-handler-alist)))
   (setcar pair "\\.\\(GIF\\|JP\\(?:E?G\\)\\|P\\(?:BM\\|GM\\|N[GM]\\|PM\\)\\|TIFF?\\|X\\(?:[BP]M\\)\\|gif\\|jp\\(?:e?g\\)\\|p\\(?:bm\\|gm\\|n[gm]\\|pm\\)\\|tiff?\\|x\\(?:[bp]m\\)\\)\\'")
   )
+
+;; gauche
+(add-to-list 'Info-default-directory-list "/opt/local/share/info")
+;(setenv "INFOPATH" "/opt/local/share/info/:$INFOPATH")
