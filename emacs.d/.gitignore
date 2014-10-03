@@ -1,0 +1,7 @@
+*.elc
+.cask
+3rdparty
+*~
+.project.list
+abbrev_defs
+tramp
