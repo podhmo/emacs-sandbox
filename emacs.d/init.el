@@ -4,16 +4,14 @@
       (file-name-directory load-file-name)
     default-directory))
 
-(add-to-list 'load-path (current-directory))
-
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
-;(require 'pallet)
+(require 'pallet)
 
 ;;; Begin 0.5 this is temporary
 (add-to-list 'load-path (concat (current-directory) "3rdparty"))
 
-(load "package+")
+(load (concat (current-directory) "package+"))
 
 (progn ;; package-management
   (require 'package)
@@ -26,7 +24,7 @@
     (package-initialize)
     (unless package-archive-contents
       (package-refresh-contents))
-    ;; (package-list-packages)
+   ;; (package-list-packages)
     )) 
 
 
@@ -91,3 +89,4 @@
 ;; gauche
 (add-to-list 'Info-default-directory-list "/opt/local/share/info")
 ;(setenv "INFOPATH" "/opt/local/share/info/:$INFOPATH")
+(put 'upcase-region 'disabled nil)

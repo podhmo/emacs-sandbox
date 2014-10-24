@@ -42,8 +42,8 @@
 (depends-on "go-mode")
 (depends-on "ghc")
 (depends-on "haskell-mode")
-(depends-on "flymake")
-(depends-on "flymake-go")
+;(depends-on "flymake")
+;(depends-on "flymake-go")
 (depends-on "flymake-cursor")
 (depends-on "flymake-ruby")
 

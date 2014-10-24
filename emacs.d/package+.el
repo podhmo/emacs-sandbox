@@ -9,6 +9,12 @@
 
 (require 'package)
 
+;; obsolete
+(defun package--dir (name &optional version)
+  (let ((version (or version "0.0")))
+    (format "%s/%s-%s/" package-user-dir name version)))
+
+
 ;; dont-use, directly
 (defvar my:package-install-url nil)
 (defvar my:local-package-list nil)
