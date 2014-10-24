@@ -375,43 +375,43 @@
 
 ;;
 
-(require 'pophint)
-(require 'pophint-config)
+;; (require 'pophint)
+;; (require 'pophint-config)
 
-(setq pophint:popup-max-tips 1000)
-(setq pophint:switch-direction-p nil)
-(setq pophint:switch-direction-char nil)
-(setq pophint:popup-chars "hjklyuiopnmtregfd")
-(setq pophint:select-source-chars "qazxcvbQAZXCVB")
+;; (setq pophint:popup-max-tips 1000)
+;; (setq pophint:switch-direction-p nil)
+;; (setq pophint:switch-direction-char nil)
+;; (setq pophint:popup-chars "hjklyuiopnmtregfd")
+;; (setq pophint:select-source-chars "qazxcvbQAZXCVB")
 
-(pophint:set-allwindow-command pophint:do-flexibly)
+;; (pophint:set-allwindow-command pophint:do-flexibly)
 
-(pophint-config:set-automatically-when-marking nil)
-(pophint-config:set-yank-immediately-when-marking nil)
-(pophint-config:set-automatically-when-isearch nil)
-(pophint-config:set-do-when-other-window nil)
-(pophint-config:set-relayout-when-rangeyank-start nil)
-(pophint-config:set-w3m-use-new-tab t)
+;; (pophint-config:set-automatically-when-marking nil)
+;; (pophint-config:set-yank-immediately-when-marking nil)
+;; (pophint-config:set-automatically-when-isearch nil)
+;; (pophint-config:set-do-when-other-window nil)
+;; (pophint-config:set-relayout-when-rangeyank-start nil)
+;; (pophint-config:set-w3m-use-new-tab t)
 
-(global-set-key (kbd "C-2")   'pophint:do)
-(global-set-key (kbd "C-1")   'pophint:do-interactively)
-(global-set-key (kbd "M-;")   'pophint:do-flexibly)
-(global-set-key (kbd "C-M-;") 'pophint:redo)
-(global-set-key (kbd "M-y")   'pophint:do-flexibly-yank)
-(global-set-key (kbd "C-M-y") 'pophint:do-rangeyank)
-(global-set-key (kbd "M-s S") 'pophint:do-flexibly-search)
-(global-set-key (kbd "M-s I") 'pophint:do-flexibly-isearch)
+;; (global-set-key (kbd "C-2")   'pophint:do)
+;; (global-set-key (kbd "C-1")   'pophint:do-interactively)
+;; (global-set-key (kbd "M-;")   'pophint:do-flexibly)
+;; (global-set-key (kbd "C-M-;") 'pophint:redo)
+;; (global-set-key (kbd "M-y")   'pophint:do-flexibly-yank)
+;; (global-set-key (kbd "C-M-y") 'pophint:do-rangeyank)
+;; (global-set-key (kbd "M-s S") 'pophint:do-flexibly-search)
+;; (global-set-key (kbd "M-s I") 'pophint:do-flexibly-isearch)
 
-(define-key dired-mode-map (kbd ";") 'pophint:do-dired-node)
+;; (define-key dired-mode-map (kbd ";") 'pophint:do-dired-node)
 
-(add-to-list 'Info-mode-hook
-             '(lambda () (local-set-key (kbd ";") 'pophint:do-info-ref))
-             t)
+;; (add-to-list 'Info-mode-hook
+;;              '(lambda () (local-set-key (kbd ";") 'pophint:do-info-ref))
+;;              t)
 
-(add-to-list 'help-mode-hook
-             '(lambda () (local-set-key (kbd ";") 'pophint:do-help-btn))
-             t)
+;; (add-to-list 'help-mode-hook
+;;              '(lambda () (local-set-key (kbd ";") 'pophint:do-help-btn))
+;;              t)
 
-(add-to-list 'Custom-mode-hook
-             '(lambda () (local-set-key (kbd ";") 'pophint:do-widget))
-             t)
+;; (add-to-list 'Custom-mode-hook
+;;              '(lambda () (local-set-key (kbd ";") 'pophint:do-widget))
+;;              t)

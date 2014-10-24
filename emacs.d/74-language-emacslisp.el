@@ -31,4 +31,4 @@
    'paredit-close-round)
   (paredit-mode +1)
   )    
-(add-hook 'emacs-lisp-mode-hook 'my:emacs-lisp-setup))
+(add-hook 'emacs-lisp-mode-hook 'my:emacs-lisp-setup)
