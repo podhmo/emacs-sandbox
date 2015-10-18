@@ -16,7 +16,7 @@
 
 (progn ;; key-chord
   (require 'key-chord)
-  (setq key-chord-two-keys-delay 0.02)
+  (setq key-chord-two-keys-delay 0.01)
   (key-chord-mode 1)
   )
 
@@ -415,3 +415,6 @@
 ;; (add-to-list 'Custom-mode-hook
 ;;              '(lambda () (local-set-key (kbd ";") 'pophint:do-widget))
 ;;              t)
+
+
+

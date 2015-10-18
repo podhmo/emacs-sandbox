@@ -13,7 +13,6 @@
 (add-to-list 'interpreter-mode-alist '("runghc" . haskell-mode))     
 (add-to-list 'interpreter-mode-alist '("runhaskell" . haskell-mode)) 
 
-
 (defun my:haskell-cabal-home ()
   (concat (getenv "HOME") "/.cabal"))
 
@@ -31,8 +30,10 @@
   (flymake-mode)
   (ghc-init)
   (turn-on-haskell-doc-mode)
-  (turn-on-haskell-indentation)
+  ;; (turn-on-haskell-indentation)
+  (turn-on-haskell-simple-indent)
   (define-insert-pair-binding haskell-mode-map haskell-selfish:key-pair)
+  (define-key haskell-mode-map (kbd "\C-c \C-@") 'haskell-hoogle)
   )
 (add-hook 'haskell-mode-hook 'my:haskell-setup)
 (require 'ghc)

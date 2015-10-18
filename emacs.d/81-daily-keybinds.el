@@ -1,3 +1,10 @@
+(require 'ffap)
+
+;; dict-support
+(setq ffap-url-regexp "\\(dict\\|file\\|ftp\\|https?\\|telnet\\|gopher\\|www\\|wais\\)://")
+
+(global-set-key (kbd "C-c C-f") 'ffap)
+
 (global-set-key (kbd "C-j") ctl-j-map)
 (defvar keyboard-settings:curdir (current-directory))
 (defun keyboard-settings-setup ()

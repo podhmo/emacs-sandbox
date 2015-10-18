@@ -25,6 +25,7 @@
 
 ;;dabbrev
 (setq dabbrev-case-replace nil)
+(setq dabbrev-case-distinction nil)
 
 (add-hook 'server-switch-hook 
           (lambda ()

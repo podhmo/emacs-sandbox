@@ -31,6 +31,12 @@
 ;;; Begin 1
 (require 'init-loader)
 (setq init-loader-show-log-after-init nil)
+;; suppress Warinig
+(setq *curdir* (current-directory))
+(defadvice init-loader-load (after suppress-warning activate)
+  (setq load-path
+        (remove-if (lambda (x) (string-equal x *curdir*)) load-path))
+  )
 (init-loader-load (current-directory))
 
 
@@ -90,3 +96,32 @@
 (add-to-list 'Info-default-directory-list "/opt/local/share/info")
 ;(setenv "INFOPATH" "/opt/local/share/info/:$INFOPATH")
 (put 'upcase-region 'disabled nil)
+
+;; temporary
+(defun rst-htmlize () (interactive)
+       (when (executable-find "htmlize")
+         (shell-command (format "htmlize -b -t 1 %s" (buffer-file-name)))))
+
+(eval-after-load "rst"
+  '(add-hook 'rst-mode-hook
+             (lambda () (define-key rst-mode-map "\C-c\C-c\C-l" 'rst-htmlize))))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(help-at-pt-display-when-idle (quote (flymake-overlay)) nil (help-at-pt))
+ '(help-at-pt-timer-delay 0.9)
+ '(safe-local-variable-values (quote ((encoding . utf-8)))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+
+;; locale settings
+(setenv "LC_ALL" "ja_JP.UTF-8")
+
+(global-set-key (kbd "C-x +") 'text-scale-increase)
+(global-set-key (kbd "C-x -") 'text-scale-decrease)

@@ -1,4 +1,5 @@
 (require 'haxe-mode)
+
 (defconst my-haxe-style
   '("java" (c-offsets-alist . ((case-label . +)
                                (arglist-intro . +)
@@ -12,8 +13,7 @@
            (lambda ()
              (c-add-style "haxe" my-haxe-style t)
              (setq tab-width 4)
-             (setq indent-tabs-mode t)
-             (setq fill-column 80)
+             (setq indent-tabs-mode nil)
              (local-set-key [(return)] 'newline-and-indent))))
 
 
