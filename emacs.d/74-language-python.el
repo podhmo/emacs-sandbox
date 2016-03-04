@@ -75,7 +75,7 @@
       `(("`" . ,(ilambda (insert "_")))
         ("_" . my:python-insert-comma )
         ("\\" . insert-pair-escaped-after)
-        ("," . ,(ilambda (insert ", ")))
+        ("," . my:python-insert-comma)
         ("C-c @" . quickrun-python:compile-only)
         ("C-c C-f" . ffap-python:import-ffap)
         ("C-c C-c" . toggle-file)))

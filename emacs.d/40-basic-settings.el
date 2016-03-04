@@ -154,6 +154,10 @@
         (font . ,myfont)
         ,@default-frame-alist))
 
+;; (unless (package-installed-p 'atom-dark-theme)
+;;   (package-install 'atom-dark-theme))
+;; (load-theme 'atom-dark t)
+
 ;;adhoc
 (set-face-attribute 'default nil :height 160)
 ;;(describe-face 'font-lock-variable-name-face)

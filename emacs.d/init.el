@@ -125,3 +125,4 @@
 
 (global-set-key (kbd "C-x +") 'text-scale-increase)
 (global-set-key (kbd "C-x -") 'text-scale-decrease)
+(put 'set-goal-column 'disabled nil)
