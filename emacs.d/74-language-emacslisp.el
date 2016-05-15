@@ -22,9 +22,13 @@
       ("C-c M-R" . paredit-forward-barf-sexp)
       ("C-c M-l" . paredit-backward-slurp-sexp)
       ("C-c M-L" . paredit-backward-barf-sexp)
-      
       ("C-c C-i" . elisp-output-with-comment)
       ))
+
+  (when (require 'company nil t)
+    (company-mode)
+    (define-key emacs-lisp-mode-map (kbd "C-M-i") 'company-complete)
+    )
   (turn-on-eldoc-mode)
   (eldoc-add-command
    'paredit-backward-delete
