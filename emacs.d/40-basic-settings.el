@@ -13,10 +13,8 @@
 
 ;;path setting
 (defun get-exec-path-from-shell ()
-  (interactive)
-  (let ((output (shell-command-to-string 
-                 "$SHELL --login -i -c 'echo $PATH'")))
-    (replace-regexp-in-string "[ \t\n]*$" "" output)))
+  (let ((output (shell-command-to-string "$SHELL --login -i -c 'echo $PATH'")))
+    (car (last (split-string output)))))
 
 (let ((path-from-shell (get-exec-path-from-shell)))
   (setenv "PATH" path-from-shell)

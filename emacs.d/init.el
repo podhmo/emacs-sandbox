@@ -126,3 +126,5 @@
 (global-set-key (kbd "C-x +") 'text-scale-increase)
 (global-set-key (kbd "C-x -") 'text-scale-decrease)
 (put 'set-goal-column 'disabled nil)
+(add-hook 'text-mode-hook (lambda () (setq auto-fill-mode nil)))
+(add-hook 'html-mode-hook (lambda () (setq auto-fill-mode nil)))
