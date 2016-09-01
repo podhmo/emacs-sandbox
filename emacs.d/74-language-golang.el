@@ -21,6 +21,11 @@
   (let ((query (my:anything-godoc--read-query)))
     (go--godoc query godoc-command)))
 
+(defun my:go-import-add (arg)
+  (interactive (list current-prefix-arg))
+  (let ((query (my:anything-godoc--read-query)))
+    (go-import-add arg query)))
+
 
 (defun %my:godoc--get-buffer (query)
   "Get an empty buffer for a godoc query."
@@ -135,7 +140,7 @@
      (progn ; godoc
        (require-and-fetch-if-not 'go-eldoc)
        (add-hook 'go-mode-hook 'go-eldoc-setup)
-       (setq godoc-command "godoc")
+       (setq godoc-command (if (executable-find "godoc") "godoc" "go doc"))
        (setq godoc-use-completing-read t)
 
        ; popwin
@@ -156,6 +161,7 @@
        ;; key bindings
        (define-key go-mode-map (kbd "C-x C-s") 'gofmt)
        (define-key go-mode-map (kbd "C-c C-e") 'my:godoc)
+       (define-key go-mode-map (kbd "C-c C-a") 'my:go-import-add)
        (define-key go-mode-map (kbd "M-.") 'godef-jump)
        (define-key go-mode-map (kbd "M-,") 'pop-tag-mark)
        (set (make-local-variable 'company-backends) '(company-go))
