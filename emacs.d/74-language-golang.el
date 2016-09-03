@@ -157,7 +157,7 @@
      (require-and-fetch-if-not 'company-go) ;; require gocode
 
      (defun my:go-mode-setup ()
-       (add-hook 'before-save-hook' 'gofmt-before-save)
+       ;; (add-hook 'before-save-hook' 'gofmt-before-save)
        ;; key bindings
        (define-key go-mode-map (kbd "C-x C-s") 'gofmt)
        (define-key go-mode-map (kbd "C-c C-e") 'my:godoc)

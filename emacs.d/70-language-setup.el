@@ -7,6 +7,10 @@
    '(help-at-pt-display-when-idle '(flymake-overlay)))
   )
 
+(progn ;; flycheck
+  (eval-after-load 'flycheck
+    '(setq flycheck-check-syntax-automatically '(save mode-enabled)))
+  )
 
 (progn ;; quick-run
   (require'quickrun)
