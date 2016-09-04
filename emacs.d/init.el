@@ -28,6 +28,9 @@
     )) 
 
 
+(load (concat (current-directory) "init-visualize")) ;; hmm
+;(initchart-visualize-init-sequence "/tmp/b.svg")
+
 ;;; Begin 1
 (require 'init-loader)
 (setq init-loader-show-log-after-init nil)

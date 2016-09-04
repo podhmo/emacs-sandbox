@@ -35,17 +35,20 @@
 (add-hook 'js-mode-hook 'my:js-setup)
 
 ;; typescript
-(require-and-fetch-if-not 'typescript)
-(eval-after-load 'flycheck
-  '(add-hook 'flycheck-mode-hook #'flycheck-typescript-tslint-setup))
+(autoload 'typescript-mode "typescript" nil t)
+(with-eval-after-load "typescript"
+  ;; (require-and-fetch-if-not 'typescript)
+  (eval-after-load 'flycheck
+    '(add-hook 'flycheck-mode-hook #'flycheck-typescript-tslint-setup))
 
-(defun my:typescript-setup ()
-  (flycheck-mode t)
-  (setq typescript-indent-level 2)
-  (define-many-keys typescript-mode-map my:js-key-map)
-  (define-insert-pair-binding typescript-mode-map my:js-key-pair))
+  (defun my:typescript-setup ()
+    (flycheck-mode t)
+    (setq typescript-indent-level 2)
+    (define-many-keys typescript-mode-map my:js-key-map)
+    (define-insert-pair-binding typescript-mode-map my:js-key-pair))
 
-(add-hook 'typescript-mode-hook 'my:typescript-setup)
+  (add-hook 'typescript-mode-hook 'my:typescript-setup)
+  )
 
 ;; es6
 
