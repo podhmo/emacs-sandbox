@@ -1,6 +1,27 @@
 (autoload 'go-mode "go-mode" nil t)
 (add-to-list 'auto-mode-alist '("\\.go$" . go-mode))
 
+(defun go-path ()
+  (interactive)
+  (find-file (getenv "GOPATH")))
+
+(defvar my:anything-c-source-go-src-selection
+  '((name . "Go src selection")
+    (init
+     . (lambda ()
+         (let ((buf (anything-candidate-buffer " *go src*"))
+               (cmd "find $GOPATH/src -type d -mindepth 3 -maxdepth 3"))
+           (flet ((display-buffer (&rest args) nil))
+             (shell-command cmd buf buf))
+           )))
+    (candidates-in-buffer)
+    (type . file)))
+
+(defun my:anything-go-src-selection ()
+  (interactive)
+  (let ((sources '(my:anything-c-source-go-src-selection)))
+    (anything-other-buffer sources "*anything go packages*")))
+
 (with-eval-after-load "go-mode"
   (require 'insert-pair-element nil t)
 
@@ -196,7 +217,3 @@
       )
     go-packages-cache)
   )
-
-(defun go-path ()
-  (interactive)
-  (find-file (getenv "GOPATH")))
