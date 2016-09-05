@@ -14,12 +14,31 @@
            (flet ((display-buffer (&rest args) nil))
              (shell-command cmd buf buf))
            )))
+    (real-to-display
+     . (lambda (c) (replace-regexp-in-string "^.+/src/" "" c)))
+    (candidates-in-buffer)
+    (type . file)))
+
+(defvar my:anything-c-std-source-go-src-selection
+  '((name . "Go std src selection")
+    (init
+     . (lambda ()
+         (let ((buf (anything-candidate-buffer " *go std src*"))
+               (cmd "find `go tool dist env | grep GOROOT | cut -d = -f 2 | sed 's/\"//g;'`/src -type d -mindepth 1 -maxdepth 2"))
+           (flet ((display-buffer (&rest args) nil))
+             (shell-command cmd buf buf))
+           )))
+    (real-to-display
+     . (lambda (c) (replace-regexp-in-string "^.+/src/" "" c)))
     (candidates-in-buffer)
     (type . file)))
 
 (defun my:anything-go-src-selection ()
   (interactive)
-  (let ((sources '(my:anything-c-source-go-src-selection)))
+  (let ((sources '(
+                   my:anything-c-std-source-go-src-selection
+                   my:anything-c-source-go-src-selection
+                   )))
     (anything-other-buffer sources "*anything go packages*")))
 
 (with-eval-after-load "go-mode"
@@ -186,6 +205,7 @@
          (define-key go-mode-map (kbd "C-x C-s") 'gofmt)
          (define-key go-mode-map (kbd "C-c C-e") 'my:godoc)
          (define-key go-mode-map (kbd "C-c C-a") 'my:go-import-add)
+         (define-key go-mode-map (kbd "C-c :") 'my:anything-go-src-selection)
          (define-key go-mode-map (kbd "M-.") 'godef-jump)
          (define-key go-mode-map (kbd "M-,") 'pop-tag-mark)
          (set (make-local-variable 'company-backends) '(company-go))
