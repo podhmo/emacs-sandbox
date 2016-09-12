@@ -8,6 +8,7 @@
   )
 
 (progn ;; flycheck
+  (autoload 'flycheck-mode "flycheck" t)
   (eval-after-load 'flycheck
     '(setq flycheck-check-syntax-automatically '(save mode-enabled)))
   )

@@ -1,5 +1,0 @@
-
-In magit-insert-cherry-headers:
-magit-log.el:1176:43:Warning: `magit-insert-pull-branch-header' is an obsolete
-    function (as of Magit 2.4.0); use `magit-insert-upstream-branch-header'
-    instead.
