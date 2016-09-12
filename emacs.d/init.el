@@ -57,7 +57,7 @@
                              (if (> n (car r)) (cons n x) r)))
                           (t r)))
                   memos
-                  :initial-value (cons 0 "memo0.txt"))))
+                  :initial-value (cons -1 "memo0.txt"))))
     (cdr max-n-files-pair)))
 
 ;;; do-execute

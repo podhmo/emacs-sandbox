@@ -163,5 +163,7 @@ It will move point to somewhere in the headers."
 (unless (fboundp 'package-name-or-desc)
   (defun package-name-or-desc (&rest args))
   )
-
+(unless (boundp 'package-name-or-desc)
+  (setq package-name-or-desc nil)
+  )
 (provide 'package+)

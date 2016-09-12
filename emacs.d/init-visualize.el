@@ -35,9 +35,9 @@
 ;;                       (float-time start-time)
 ;;                       (float-time end-time))))))
 
-(initchart-record-execution-time-of load file)
-(initchart-record-execution-time-of require feature)
-(initchart-record-execution-time-of init-loader-load)
+;; (initchart-record-execution-time-of load file)
+;; (initchart-record-execution-time-of require feature)
+;; (initchart-record-execution-time-of init-loader-load)
 ;; (my:initchart-record-execution-all '(blink-cursor-timer-function))
 ;;; (ad-disable-regexp "^initchart-record-execution")
 
