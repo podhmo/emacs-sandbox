@@ -13,7 +13,7 @@
 (add-to-list 'interpreter-mode-alist '("runghc" . haskell-mode))     
 (add-to-list 'interpreter-mode-alist '("runhaskell" . haskell-mode)) 
 
-(with-eval-after-load "haskell-mode"
+(with-eval-after-load 'haskell-mode
   (require 'haskell-cabal)
   (defun my:haskell-cabal-home ()
     (concat (getenv "HOME") "/.cabal"))

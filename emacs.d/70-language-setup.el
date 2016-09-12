@@ -9,10 +9,10 @@
 
 (progn ;; flycheck
   (autoload 'flycheck-mode "flycheck" t)
-  (eval-after-load 'flycheck
-    '(setq flycheck-check-syntax-automatically '(save mode-enabled)))
+  (with-eval-after-load 'flycheck
+    (setq flycheck-check-syntax-automatically '(save mode-enabled)))
   )
-
+(customize-set-value)
 (progn ;; quick-run
   (require'quickrun)
   (defadvice quickrun (around help-mode-after-quickrun activate)

@@ -36,7 +36,7 @@
 
 ;; typescript
 (autoload 'typescript-mode "typescript" nil t)
-(with-eval-after-load "typescript"
+(with-eval-after-load 'typescript
   ;; (require-and-fetch-if-not 'typescript)
   (eval-after-load 'flycheck
     '(add-hook 'flycheck-mode-hook #'flycheck-typescript-tslint-setup))

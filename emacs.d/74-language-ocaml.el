@@ -2,7 +2,7 @@
 ;; (require-and-fetch-if-not 'tuareg)
 
 (autoload 'tuareg-mode "tuareg" nil t)
-(with-eval-after-load "tuareg"
+(with-eval-after-load 'tuareg
   (when (executable-find "ocaml-toplevel")
     (setq tuareg-interactive-program "ocaml-toplevel"))
 

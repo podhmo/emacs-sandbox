@@ -41,7 +41,7 @@
                    )))
     (anything-other-buffer sources "*anything go packages*")))
 
-(with-eval-after-load "go-mode"
+(with-eval-after-load 'go-mode
   (require 'insert-pair-element nil t)
 
   (setq my:golang-key-pair

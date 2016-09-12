@@ -2,7 +2,7 @@
 (autoload 'haxe-mode "haxe-mode" nil t)
 (add-to-list 'auto-mode-alist '("\\.hx$" . haxe-mode))
 
-(with-eval-after-load "haxe-mode"
+(with-eval-after-load 'haxe-mode
   (defconst my-haxe-style
     '("java" (c-offsets-alist . ((case-label . +)
                                  (arglist-intro . +)
