@@ -28,8 +28,11 @@
 (defun char-unicode (char) (encode-char char 'ucs))
 (defun unicode-char (code) (decode-char 'ucs code))
 
+(defun pick-normalize-path (path)
+  (replace-regexp-in-string (format "^%s" (getenv "HOME")) "~" path))
+
 (defun pick-current-directory-name () (interactive)
-  (let1 source default-directory
+  (let1 source (pick-normalize-path default-directory)
     (kill-new source)
     (message "copy: %s" source)))
 
@@ -39,7 +42,7 @@
     (message "copy: %s" source)))
 
 (defun pick-current-file-name () (interactive)
-  (let1 source buffer-file-name
+  (let1 source (pick-normalize-path buffer-file-name)
     (kill-new source)
     (message "copy: %s" source)))
 
