@@ -179,6 +179,10 @@
   (eval-after-load "go-mode"
     '(progn
 
+       (cond ((executable-find "goimports")
+              (setq gofmt-command "goimports"))
+             (t (message "gorimports > gofmt!!")))
+
        ; gopath
        (let ((output (shell-command-to-string "$SHELL --login -i -c 'echo $GOPATH'")))
          (setenv "GOPATH" (car (last (split-string output)))))
