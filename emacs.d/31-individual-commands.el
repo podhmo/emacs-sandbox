@@ -46,6 +46,13 @@
     (kill-new source)
     (message "copy: %s" source)))
 
+(defun kill-no-exists-file-buffers ()
+  (interactive)
+  (loop for b in (buffer-list)
+        unless (or (string-match-p "^ *\\*" (buffer-name b))
+                   (and (buffer-file-name b) (file-exists-p (buffer-file-name b))))
+        do (kill-buffer b)))
+
 (defun browse-current-file () (interactive)
   (let1 source buffer-file-name
     (browse-url source)))
