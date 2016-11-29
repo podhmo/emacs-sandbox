@@ -53,31 +53,10 @@
         )
 
 
-  (defun my:anything-godoc--read-query ()
-    (rlet1 r (anything-comp-read "godoc; "
-                                 (go--old-completion-list-style (go-packages))
-                                 :history go-godoc-history)
-      (push r go-godoc-history)))
-
-  (defun my:godoc ()
-    (interactive)
-    (let ((query (my:anything-godoc--read-query)))
-      (go--godoc query godoc-command)))
-
   (defun my:go-import-add (arg)
     (interactive (list current-prefix-arg))
     (let ((query (my:anything-godoc--read-query)))
       (go-import-add arg query)))
-
-
-  (defun %my:godoc--get-buffer (query)
-    "Get an empty buffer for a godoc query."
-    (let* ((buffer-name "*godoc*")
-           (buffer (get-buffer buffer-name)))
-      ;; Kill the existing buffer if it already exists.
-      (when buffer (kill-buffer buffer))
-      (get-buffer-create buffer-name)))
-
 
   ;; zipper
   (unless (fboundp 'make-zipper)
@@ -220,7 +199,7 @@
          (setq indent-tabs-mode nil)
          (setq c-basic-offset 4)
          (setq tab-width 4))
-
+       (setq go-packages-function 'go-packages-cache)
        (defun my:godoc-mode-setup ()
          (define-key godoc-mode-map (kbd "[") 'my:godoc-backward)
          (define-key godoc-mode-map (kbd "]") 'my:godoc-forward)
@@ -237,10 +216,16 @@
   ;; (add-to-list 'exec-path (expand-file-name "/opt/local/lib/go/bin"))
   ;; (add-to-list 'exec-path (expand-file-name "~/vboxshare/sandbox/go/bin"))
 
+  (defun go-packages-cache--clear ()
+    (interactive)
+    (setq go-packages-cache nil))
   (defvar go-packages-cache nil)
   (defun go-packages-cache ()
     (unless go-packages-cache
-      (setq go-packages-cache (go-packages))
+      (setq go-packages-cache
+            (loop for x in (go-packages-native)
+                  unless (string-match-p "/vendor/" x)
+                  collect x))
       )
     go-packages-cache)
   )
