@@ -19,6 +19,7 @@
             ("M-R" . replace-regexp)
 
             ("C-x C-l" . goto-line)
+            ("C-x C-a" . revert-buffer)
 
             ("C-c C-c" . toggle-file)
             ("C-c C-f" . ffap)
@@ -27,7 +28,7 @@
             ("C-c C-j" . dabbrev-expand) ;;
             ("C-c q" . comment-region)
             ("C-c Q" . uncomment-region)
-            
+
             ("C-c x" . (lambda () (interactive) (find-file (concat keyboard-settings:curdir "/init.el"))))
             ("C-c e" . enclose-element-interactive)
             ("C-c d" . delete-syntax-forward*)
