@@ -47,6 +47,28 @@
   (let ((query (my:anything-godoc--read-query)))
     (go-import-add arg query)))
 
+
+
+;; need pickup-file -- C-x S goimports all modified files
+(defun my:go-pickup-project-directory-path ()
+  (pickup-file ".git"))
+
+(defun my:go-gofmt-modified-buffers-async ()
+  (interactive)
+  (let* ((project-path (file-name-directory (my:go-pickup-project-directory-path)))
+         (tmp-buf (generate-new-buffer " *go-modified-file*"))
+         (cmd (format "git ls-files -m %s | grep -v '/vendor/' | xargs goimports -w" project-path)))
+    (lexical-let ((tmp-buf tmp-buf) (cmd cmd))
+      (set-process-sentinel
+       (start-process-shell-command "go-gofmt-modified-buffers-async" tmp-buf cmd)
+       (lambda (sig status &rest args)
+         (condition-case nil
+             (progn
+               (message (format "%s: %s" (replace-regexp-in-string "\n$" "" status) cmd))
+               (kill-buffer tmp-buf))
+           ((error) (display-buffer tmp-buf))))))))
+
+
 ;; zipper
 (unless (fboundp 'make-zipper)
   (require 'cl)
@@ -194,6 +216,7 @@
          ;; (add-hook 'before-save-hook' 'gofmt-before-save)
          ;; key bindings
          (define-key go-mode-map (kbd "C-x C-s") 'gofmt)
+         (define-key go-mode-map (kbd "C-x S") 'my:go-gofmt-modified-buffers-async)
          (define-key go-mode-map (kbd "C-c C-e") 'my:godoc)
          (define-key go-mode-map (kbd "C-c C-a") 'my:go-import-add)
          (define-key go-mode-map (kbd "C-c :") 'my:anything-go-src-selection)
