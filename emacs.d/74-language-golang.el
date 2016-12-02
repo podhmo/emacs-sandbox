@@ -107,6 +107,10 @@
 
 (defvar my:godoc-history (zipper-make-empty))
 
+(defun my:go-strip-vendor-path (path)
+  (replace-regexp-in-string ".+/vendor/" "" path)
+  )
+
 (defun my:godoc--get-buffer (query)
   (unless (string-equal (zipper-current my:godoc-history) query)
     (setq my:godoc-history (zipper-insert my:godoc-history query)))
@@ -134,10 +138,11 @@
 
 
 (defun my:anything-godoc--read-query ()
-  (rlet1 r (anything-comp-read "godoc; "
+  (let1 r (anything-comp-read "godoc; "
                                (go--old-completion-list-style (go-packages))
                                :history go-godoc-history)
-    (push r go-godoc-history)))
+    (push r go-godoc-history)
+    (my:go-strip-vendor-path r)))
 
 (defun my:godoc (&optional query)
   (interactive)
