@@ -1,9 +1,10 @@
 (autoload 'go-mode "go-mode" nil t)
 (add-to-list 'auto-mode-alist '("\\.go$" . go-mode))
 
-(defun go-path ()
-  (interactive)
-  (find-file (getenv "GOPATH")))
+
+(defun get-go-path ()
+  (let ((output (shell-command-to-string "$SHELL --login -i -c 'echo $GOPATH'")))
+    (car (last (split-string output)))))
 
 (defvar my:anything-c-source-go-src-selection
   '((name . "Go src selection")
@@ -181,6 +182,24 @@
           ("{"  "}" "{")
           ("[" "]" "["))
         )
+
+  (eval-after-load 'flycheck
+    '(progn
+       ;; (flycheck-checker-get 'go-gofmt 'next-checkers)
+       (setf (get 'go-gofmt (flycheck--checker-property-name 'next-checkers))
+             '((warning . go-golint)
+               ;; Fall back, if go-golint doesn't exist
+               (warning . go-vet)
+               ;; Fall back, if go-vet doesn't exist
+               (warning . go-build) (warning . go-test)
+               ; (warning . go-errcheck)
+               ; (warning . go-unconvert)
+               )
+
+             )
+       ))
+
+
 
   (eval-after-load "go-mode"
     '(progn

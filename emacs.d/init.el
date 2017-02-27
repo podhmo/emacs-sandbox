@@ -132,3 +132,20 @@
 (put 'set-goal-column 'disabled nil)
 (add-hook 'text-mode-hook (lambda () (setq auto-fill-mode nil)))
 (add-hook 'html-mode-hook (lambda () (setq auto-fill-mode nil)))
+
+(defun browse-github ()
+  (interactive)
+  (let ((replace-alist `((,(format "%s/src/github.com/\\([^/]+/[^/]+\\)/\\(.+\\)" (get-go-path)) . "https://github.com/\\1/tree/rook/\\2"))))
+    (let ((path buffer-file-name))
+      (loop for (pat . rep) in replace-alist
+            do (setq path (replace-regexp-in-string pat rep path)))
+      (browse-url path)
+      )))
+(defun browse-github-master ()
+  (interactive)
+  (let ((replace-alist `((,(format "%s/src/github.com/\\([^/]+/[^/]+\\)/\\(.+\\)" (get-go-path)) . "https://github.com/\\1/tree/master/\\2"))))
+    (let ((path buffer-file-name))
+      (loop for (pat . rep) in replace-alist
+            do (setq path (replace-regexp-in-string pat rep path)))
+      (browse-url path)
+      )))
