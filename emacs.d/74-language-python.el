@@ -77,13 +77,27 @@
   (unless (looking-at-p "$")
     (insert " ")))
 
+
+;; yapf
+(defun my:py-yapf-buffer ()
+  (interactive)
+  (lexical-let ((yapf (or (pickup-file "bin/yayapf") "yapf")))
+    (flet ((executable-find (cmd) t))
+      (py-yapf-bf--apply-executable-to-buffer
+       "yapf"
+       (lambda (errbuf file)
+         (apply 'call-process yapf nil errbuf nil
+                       (append py-yapf-options `("--in-place", file))))
+       nil "py" t))))
+
 ;;; auto-pair
-(require 'insert-pair-element nil t)  
+(require 'insert-pair-element nil t)
 (setq my:python-key-map
       `(("`" . ,(ilambda (insert "_")))
         ("_" . my:python-insert-comma )
         ("\\" . insert-pair-escaped-after)
         ("," . my:python-insert-comma)
+        ("C-x C-s" . my:py-yapf-buffer)
         ("C-c @" . quickrun-python:compile-only)
         ("C-c C-f" . ffap-python:import-ffap)
         ("C-c C-c" . toggle-file)))
@@ -114,6 +128,8 @@
   (flymake-python-load)
   (define-insert-pair-binding python-mode-map my:python-key-pair)
   (define-many-keys python-mode-map my:python-key-map)
+  (require 'py-yapf)
+
   ;;; hmm
   (save-excursion 
     (goto-char (point-min))
