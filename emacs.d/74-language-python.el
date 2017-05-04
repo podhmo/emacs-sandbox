@@ -89,7 +89,7 @@
          (apply 'call-process yapf nil errbuf nil
                        (append py-yapf-options `("--in-place", file))))
        nil "py" t))))
-
+(autoload 'py-yapf-bf--apply-executable-to-buffer "py-yapf" nil)
 ;;; auto-pair
 (require 'insert-pair-element nil t)
 (setq my:python-key-map
@@ -128,10 +128,9 @@
   (flymake-python-load)
   (define-insert-pair-binding python-mode-map my:python-key-pair)
   (define-many-keys python-mode-map my:python-key-map)
-  (require 'py-yapf)
 
   ;;; hmm
-  (save-excursion 
+  (save-excursion
     (goto-char (point-min))
     (forward-line 30)
     (unless (search-backward "-*- coding:" nil t 1)
