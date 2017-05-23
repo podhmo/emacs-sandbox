@@ -386,6 +386,11 @@
           (insert "\n"))))))
 
 
+(defun my:dired-setup ()
+  (define-key dired-mode-map (kbd "[") 'dired-up-directory)
+  )
+(add-hook 'dired-mode-hook 'my:dired-setup)
+
 ;;
 
 ;; (require 'pophint)
