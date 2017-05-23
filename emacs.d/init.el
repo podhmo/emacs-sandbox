@@ -135,11 +135,11 @@
 
 (defun browse-github ()
   (interactive)
-  (let ((replace-alist `((,(format "%s/src/github.com/\\([^/]+/[^/]+\\)/\\(.+\\)" (get-go-path)) . "https://github.com/\\1/tree/rook/\\2"))))
+  (let ((replace-alist `((,(format "%s/src/github.com/\\([^/]+/[^/]+\\)/\\(.+\\)" (get-go-path)) . "https://github.com/\\1/tree/master/\\2"))))
     (let ((path buffer-file-name))
       (loop for (pat . rep) in replace-alist
             do (setq path (replace-regexp-in-string pat rep path)))
-      (browse-url path)
+      (browse-url (format "%s#L%d" path (line-number-at-pos (point))))
       )))
 (defun browse-github-master ()
   (interactive)
@@ -147,5 +147,5 @@
     (let ((path buffer-file-name))
       (loop for (pat . rep) in replace-alist
             do (setq path (replace-regexp-in-string pat rep path)))
-      (browse-url path)
+      (browse-url (format "%s#L%d" path (line-number-at-pos (point))))
       )))
