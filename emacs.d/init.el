@@ -17,9 +17,7 @@
   (require 'package)
   (setq package-user-dir (concat (current-directory) "3rdparty"))
 
-  (progn ;; marmalade
-    (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
-    (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
+  (progn
     ;; get available packages
     (package-initialize)
     (unless package-archive-contents
@@ -115,6 +113,9 @@
  ;; If there is more than one, they won't work right.
  '(help-at-pt-display-when-idle (quote (flymake-overlay)) nil (help-at-pt))
  '(help-at-pt-timer-delay 0.9)
+ '(package-selected-packages
+   (quote
+    ("flymake-yaml" flymake-yaml yaml-mode toggle-file-mode py-yapf pickup initchart flymake-jshint flymake-eslint ffap-python company-go anything-vcs-project)))
  '(safe-local-variable-values (quote ((encoding . utf-8))))
  '(send-mail-function (quote smtpmail-send-it)))
 (custom-set-faces

@@ -61,14 +61,28 @@
 
 ;;; quick-run
 (progn
-  (setq quickrun/language-alist 
-        (remove* "python" quickrun/language-alist :key 'car :test 'equal))
-  (add-to-list 'quickrun/language-alist
-               '("python" . ((:command . ffap-python:find-python)
-                             (:compile-only . flymake-python:find-program)
-                             (:description . "Run Python script")))
-               )
+  (when (boundp 'quickrun/language-alist)
+    (setq quickrun/language-alist
+          (remove* "python" quickrun/language-alist :key 'car :test 'equal))
+    (add-to-list 'quickrun/language-alist
+                 '("python" . ((:command . ffap-python:find-python)
+                               (:compile-only . flymake-python:find-program)
+                               (:description . "Run Python script")))
+                 )
+
+    )
+  (when (boundp 'quickrun--language-alist)
+    (setq quickrun--language-alist
+          (remove* "python" quickrun--language-alist :key 'car :test 'equal))
+    (add-to-list 'quickrun--language-alist
+                 '("python" . ((:command . ffap-python:find-python)
+                               (:compile-only . flymake-python:find-program)
+                               (:description . "Run Python script")))
+                 )
+
+    )
   )
+
 (defun quickrun-python:compile-only () (interactive)
   (shell-command (format "%s %s" (flymake-python:find-program) buffer-file-name)))
 
