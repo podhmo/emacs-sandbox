@@ -1,3 +1,4 @@
+(require 'cl)
 ;;; Begin 0
 (defun current-directory ()
   (if load-file-name
@@ -115,7 +116,7 @@
  '(help-at-pt-timer-delay 0.9)
  '(package-selected-packages
    (quote
-    ("flymake-yaml" flymake-yaml yaml-mode toggle-file-mode py-yapf pickup initchart flymake-jshint flymake-eslint ffap-python company-go anything-vcs-project)))
+    (flycheck-rust rust-mode mozc go-mode fcitx "flymake-yaml" flymake-yaml yaml-mode toggle-file-mode py-yapf pickup initchart flymake-jshint flymake-eslint ffap-python company-go anything-vcs-project)))
  '(safe-local-variable-values (quote ((encoding . utf-8))))
  '(send-mail-function (quote smtpmail-send-it)))
 (custom-set-faces
@@ -150,3 +151,27 @@
             do (setq path (replace-regexp-in-string pat rep path)))
       (browse-url (format "%s#L%d" path (line-number-at-pos (point))))
       )))
+
+(progn ; mozc (japanese input)
+  (require 'mozc)
+  (defun advice:mozc-key-event-with-ctrl-key--with-ctrl (r)
+    (cond ((and (not (null (cdr r))) (eq (cadr r) 'control) (null (cddr r)))
+           (case (car r)
+             (102 r) ; C-f
+             (98 r) ; C-b
+             (110 '(down)) ; C-n
+             (112 '(up))  ; C-p
+             (t r)
+             ))
+          (t
+           (case (car r)
+             (kana '(enter))
+             (henkan '(enter))
+             (muhenkan '(backspace))
+             (t r)
+             ))))
+
+ (advice-add 'mozc-key-event-to-key-and-modifiers :filter-return 'advice:mozc-key-event-with-ctrl-key--with-ctrl)
+  (setq default-input-method 'japanese-mozc)
+  )
+

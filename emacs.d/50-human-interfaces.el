@@ -16,7 +16,7 @@
 
 (progn ;; key-chord
   (require 'key-chord)
-  (setq key-chord-two-keys-delay 0.01)
+  (setq key-chord-two-keys-delay 0.1)
   (key-chord-mode 1)
   )
 
@@ -129,11 +129,11 @@
   (require 'zlc)
   )
 
-(progn ;; editing
-  (require 'autopair)
-  (setq-default autopair-dont-pair `(:string (?') :comment  (?') :never (?`)))
-  ;; (require-and-fetch-if-not 'paredit)
-  )
+;; (progn ;; editing
+;;   (require 'autopair)
+;;   (setq-default autopair-dont-pair `(:string (?') :comment  (?') :never (?`)))
+;;   ;; (require-and-fetch-if-not 'paredit)
+;;   )
 
 (progn ;; eye-candy
   (progn ;; eldoc
@@ -141,7 +141,7 @@
     (setq eldoc-argument-case 'downcase)
     
     (defadvice  eldoc-get-fnsym-args-string
-      (around eldoc-named-progn-display-section (sym &optional index) activate)
+        (around eldoc-named-progn-display-section (sym &optional index) activate)
       (cond ((eq sym 'named-progn)
              (let ((section-name
                     (save-excursion
@@ -212,7 +212,9 @@
     (add-hook 'on-after-keyboard-setup
               (lambda ()
                 (define-many-keys global-map
-                  '(("<hiragana-katakana>" . anything)
+                  '(("<hiragana-katakana>" . newline)
+                    ("<henkan>" . toggle-input-method)
+                    ("<muhenkan>" . delete-backward-char)
                     ("C-c C-a" . anything)
                     ("C-c C-;" . anything-occur*)
                     ("C-c C-:" . anything-vcs-project)
@@ -254,7 +256,7 @@
   (progn ;; for-buffer-file-permission
     (setq view-read-only t)
     (defadvice find-file
-      (around find-file-switch-to-view-file (file &optional wild) activate)
+        (around find-file-switch-to-view-file (file &optional wild) activate)
       (if (and (not (file-writable-p file))
                (not (file-directory-p file)))
           (view-file file)
@@ -315,13 +317,13 @@
 (progn ;; elscreen
   (progn ;; daily-commands
     (defun elscreen-shell/next-screen () (interactive)
-      "create shell buffer with current directory as pwd"
-      (let1 dir (current-directory)
-        (elscreen-create)
-        (shell)
-        (comint-simple-send (get-buffer-process dir)
-                            (concat "cd " dir))
-        (goto-char (point-max)))))
+           "create shell buffer with current directory as pwd"
+           (let1 dir (current-directory)
+             (elscreen-create)
+             (shell)
+             (comint-simple-send (get-buffer-process dir)
+                                 (concat "cd " dir))
+             (goto-char (point-max)))))
 
   (progn ;; elscreen
     (require 'elscreen)
@@ -374,16 +376,16 @@
   (funcall monologue:header-function))
 
 (defun monologue (message) (interactive "smessage: ")
-  (let ((buf (monologue:get-current-buffer))
-        (header (monologue:header)))
-    (with-current-buffer buf
-      (save-excursion
-        (monologue:start-point)
-        (insert header)
-        (insert message)
-        (insert "\n")
-        (unless (string-match "\n$" message)
-          (insert "\n"))))))
+       (let ((buf (monologue:get-current-buffer))
+             (header (monologue:header)))
+         (with-current-buffer buf
+           (save-excursion
+             (monologue:start-point)
+             (insert header)
+             (insert message)
+             (insert "\n")
+             (unless (string-match "\n$" message)
+               (insert "\n"))))))
 
 
 (defun my:dired-setup ()

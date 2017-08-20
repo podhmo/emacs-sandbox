@@ -60,13 +60,13 @@
 
 (add-to-list 'auto-mode-alist '("\\.es6$" . es6-mode))
 (add-to-list 'quickrun-file-alist '("\\.es6" . "javascript/es6"))
-(add-to-list 'quickrun/language-alist
+(add-to-list 'quickrun--language-alist
              '("javascript/es6"
                (:command . (lambda () (pickup-file "node_modules/.bin/babel-node")))
                (:compile-only . (lambda () (format "%s %%s" (pickup-file "node_modules/.bin/babel"))))
                (:description . "Run es6 file")))
 
 ;; check
-;; (quickrun/decide-file-type "hello.es6")
-;; (quickrun/command-key "hello.es6")
-;; (pop quickrun/language-alist)
+;; (quickrun--decide-file-type "hello.es6")
+;; (quickrun--command-key "hello.es6")
+;; (pop quickrun--language-alist)

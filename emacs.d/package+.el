@@ -151,7 +151,7 @@ It will move point to somewhere in the headers."
         do (add-to-list 'load-path (package--dir name version))))
 
 ;; advices
-(defadvice package-install (around from-url-dispatch last (name dont-select) activate)
+(defadvice package-install (around from-url-dispatch last (name &optional dont-select) activate)
   (cond (my:package-install-url
          (let ((name (if (symbolp name) (symbol-name name) name)))
            (my:package-install-from-url my:package-install-url name)))

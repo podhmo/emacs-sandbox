@@ -1,7 +1,7 @@
 ENV ?= emacs.d
 SHELL = /bin/bash #for popd,pushd
-REALPATH = grealpath
-READLINK = greadlink
+REALPATH = realpath
+READLINK = readlink
 
 check_home:
 	(! test -d ~/.emacs.d) || ${READLINK} ~/.emacs.d

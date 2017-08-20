@@ -204,13 +204,13 @@
   (eval-after-load "go-mode"
     '(progn
 
+       ;; gopath
+       (let ((output (shell-command-to-string "$SHELL --login -i -c 'echo $GOPATH'")))
+         (setenv "GOPATH" (car (last (split-string output)))))
+
        (cond ((executable-find "goimports")
               (setq gofmt-command "goimports"))
              (t (message "gorimports > gofmt!!")))
-
-                                        ; gopath
-       (let ((output (shell-command-to-string "$SHELL --login -i -c 'echo $GOPATH'")))
-         (setenv "GOPATH" (car (last (split-string output)))))
 
        (progn ; godoc
          (require-and-fetch-if-not 'go-eldoc)
@@ -218,7 +218,7 @@
          (setq godoc-command (if (executable-find "godoc") "godoc" "go doc"))
          (setq godoc-use-completing-read t)
 
-                                        ; popwin
+         ;; popwin
          (when (boundp 'popwin:special-display-config)
            (push '("^\\*godoc [^ ]+\\*$" :regexp t) popwin:special-display-config)
            (push '("*godoc*" :dedicated t) popwin:special-display-config)
