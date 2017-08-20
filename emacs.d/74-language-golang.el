@@ -162,7 +162,7 @@
 
 (defun my:anything-godoc--read-query ()
   (let1 r (anything-comp-read "godoc; "
-                               (go--old-completion-list-style (go-packages))
+                               (mapcar #'list (go-packages))
                                :history go-godoc-history)
     (push r go-godoc-history)
     (my:go-strip-vendor-path r)))
