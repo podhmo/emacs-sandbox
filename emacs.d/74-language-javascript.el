@@ -70,3 +70,4 @@
 ;; (quickrun--decide-file-type "hello.es6")
 ;; (quickrun--command-key "hello.es6")
 ;; (pop quickrun--language-alist)
+

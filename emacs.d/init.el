@@ -116,7 +116,7 @@
  '(help-at-pt-timer-delay 0.9)
  '(package-selected-packages
    (quote
-    (flycheck-rust rust-mode mozc go-mode fcitx "flymake-yaml" flymake-yaml yaml-mode toggle-file-mode py-yapf pickup initchart flymake-jshint flymake-eslint ffap-python company-go anything-vcs-project)))
+    (disable-mouse flycheck-rust rust-mode mozc go-mode fcitx "flymake-yaml" flymake-yaml yaml-mode toggle-file-mode py-yapf pickup initchart flymake-jshint flymake-eslint ffap-python company-go anything-vcs-project)))
  '(safe-local-variable-values (quote ((encoding . utf-8))))
  '(send-mail-function (quote smtpmail-send-it)))
 (custom-set-faces
@@ -175,3 +175,8 @@
   (setq default-input-method 'japanese-mozc)
   )
 
+(global-set-key (kbd "<eisu-toggle>") 'ignore)
+
+;; disable-mouse when linux environement
+(require 'disable-mouse)
+(global-disable-mouse-mode)

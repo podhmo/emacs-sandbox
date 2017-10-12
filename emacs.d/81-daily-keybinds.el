@@ -3,7 +3,6 @@
 ;; dict-support
 (setq ffap-url-regexp "\\(dict\\|file\\|ftp\\|https?\\|telnet\\|gopher\\|www\\|wais\\)://")
 
-(global-set-key (kbd "C-c C-f") 'ffap)
 
 (global-set-key (kbd "C-j") ctl-j-map)
 (defvar keyboard-settings:curdir (current-directory))
@@ -38,6 +37,8 @@
             ;; quick-run
             ("C-c @" . quickrun-compile-only)
             ("C-c C-@" . quickrun)
+
+            ("C-c C-w" . monologue)
 
                                         ;elscreen
             ("C-;" . elscreen-previous)
