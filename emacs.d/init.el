@@ -116,7 +116,7 @@
  '(help-at-pt-timer-delay 0.9)
  '(package-selected-packages
    (quote
-    (disable-mouse flycheck-rust rust-mode mozc go-mode fcitx "flymake-yaml" flymake-yaml yaml-mode toggle-file-mode py-yapf pickup initchart flymake-jshint flymake-eslint ffap-python company-go anything-vcs-project)))
+    (scala-mode disable-mouse flycheck-rust rust-mode mozc go-mode fcitx "flymake-yaml" flymake-yaml yaml-mode toggle-file-mode pickup initchart flymake-jshint flymake-eslint ffap-python company-go anything-vcs-project)))
  '(safe-local-variable-values (quote ((encoding . utf-8))))
  '(send-mail-function (quote smtpmail-send-it)))
 (custom-set-faces
@@ -124,7 +124,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(markdown-code-face ((t (:inherit fixed-pitch :background "MediumPurple4")))))
 
 ;; locale settings
 (setenv "LC_ALL" "ja_JP.UTF-8")
@@ -152,7 +152,7 @@
       (browse-url (format "%s#L%d" path (line-number-at-pos (point))))
       )))
 
-(progn ; mozc (japanese input)
+(unless (equal system-type 'darwin) ; mozc (japanese input)
   (require 'mozc)
   (defun advice:mozc-key-event-with-ctrl-key--with-ctrl (r)
     (cond ((and (not (null (cdr r))) (eq (cadr r) 'control) (null (cddr r)))
@@ -173,10 +173,13 @@
 
  (advice-add 'mozc-key-event-to-key-and-modifiers :filter-return 'advice:mozc-key-event-with-ctrl-key--with-ctrl)
   (setq default-input-method 'japanese-mozc)
-  )
 
-(global-set-key (kbd "<eisu-toggle>") 'ignore)
+  (defun my:ignore (&rest args)
+    (interactive)
+    (setq this-command last-command)
+    nil)
+  (global-set-key (kbd "<eisu-toggle>") 'my:ignore)
 
-;; disable-mouse when linux environement
-(require 'disable-mouse)
-(global-disable-mouse-mode)
+  ;; disable-mouse when linux environement
+  (require 'disable-mouse)
+  (global-disable-mouse-mode))

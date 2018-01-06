@@ -157,7 +157,7 @@
 ;; (load-theme 'atom-dark t)
 
 ;;adhoc
-(set-face-attribute 'default nil :height 160)
+(set-face-attribute 'default nil :height 140)
 ;;(describe-face 'font-lock-variable-name-face)
 ;;   (print* (frame-parameters (selected-frame)))
 (set-face-attribute 'font-lock-comment-face nil :weight 'semi-light :foreground "RosyBrown3")

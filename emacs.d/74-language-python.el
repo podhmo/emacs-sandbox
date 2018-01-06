@@ -93,17 +93,15 @@
 
 
 ;; yapf
-(defun my:py-yapf-buffer ()
-  (interactive)
-  (lexical-let ((yapf (or (pickup-file "bin/yayapf") "yapf")))
-    (flet ((executable-find (cmd) t))
-      (py-yapf-bf--apply-executable-to-buffer
-       "yapf"
-       (lambda (errbuf file)
-         (apply 'call-process yapf nil errbuf nil
-                       (append py-yapf-options `("--in-place", file))))
-       nil "py" t))))
-(autoload 'py-yapf-bf--apply-executable-to-buffer "py-yapf" nil)
+(defun my:py-yapf-buffer (beg end)
+  (interactive "r")
+  (unless (region-active-p)
+    (setq beg (point-min))
+    (setq end (point-max))
+    )
+  (let ((yapf (or (pickup-file "bin/yayapf") "yapf")))
+    (my:execute-formatter-command "yayapf" yapf  beg end)))
+
 ;;; auto-pair
 (require 'insert-pair-element nil t)
 (setq my:python-key-map
@@ -153,7 +151,7 @@
   )
 
 (add-hook 'python-mode-hook 'my:python-setup)
-
+(add-to-list 'auto-mode-alist '("\\.py[i]?$" . python-mode))
 (unless (boundp 'python-initialize-settings-once)
   (require 'autoinsert)
   (setq python-initialize-settings-once t)
