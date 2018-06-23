@@ -161,3 +161,10 @@ ndelay")
 
 (defun font-at-cp () (interactive)
   (print (font-at (point))))
+
+
+(defun my:refresh-process-forcely ()
+  (interactive)
+  (dolist (p (process-list)) (delete-process p))
+  (server-start))
+

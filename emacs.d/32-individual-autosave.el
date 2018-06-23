@@ -35,7 +35,7 @@
         do (with-current-buffer buf 
              (save-buffer))))
 
-(defun auto-save-buffer-deactivte-confirm ()
+(defun auto-save-buffer-deactivte-confirm () (interactive)
   (rlet1 status (y-or-n-p "do you deactivate auto-save timer?")
     (when status
       (auto-save-buffer-deactivte))))

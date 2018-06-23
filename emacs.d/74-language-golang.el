@@ -172,6 +172,37 @@
   (let ((query (or query (my:anything-godoc--read-query))))
     (go--godoc query godoc-command)))
 
+(unless (boundp 'my:go-initialize-settings-once)
+  (require 'autoinsert)
+  (setq my:go-initialize-settings-once t)
+
+  (add-to-list
+   'auto-insert-alist
+   `(("main\\.go" . "go main")
+     (concat )
+     ,(mapconcat
+       'identity
+       '(
+"package main"
+""
+"import ("
+"	\"log\""
+")"
+""
+"func main(){"
+"\tif err := run(); err != nil {"
+"\t\tlog.Fatalf(\"%+v\", err)"
+"\t}"
+"}"
+""
+"func run() error {"
+"\treturn nil"
+"}"
+) "\n")))
+  ;; (pop auto-insert-alist)
+  )
+
+
 (with-eval-after-load 'go-mode
   (require 'insert-pair-element nil t)
 
@@ -252,10 +283,17 @@
          (define-key godoc-mode-map (kbd "]") 'my:godoc-forward)
          (define-key godoc-mode-map (kbd "C-c C-e") 'my:godoc)
          )
+       (defun my:go-flycheck-mode ()
+         (let ((filename (file-name-nondirectory (buffer-file-name))))
+           (unless (string-equal filename "magefile.go")
+             (flycheck-mode)
+             ))
+         )
 
        (add-hook 'go-mode-hook 'company-mode)
-       (add-hook 'go-mode-hook 'flycheck-mode)
+       (add-hook 'go-mode-hook 'my:go-flycheck-mode)
        (add-hook 'go-mode-hook 'my:go-mode-setup)
+       (add-hook 'go-mode-hook 'auto-insert)
        (add-hook 'godoc-mode-hook 'my:godoc-mode-setup)
        ))
 

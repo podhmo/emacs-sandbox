@@ -116,7 +116,7 @@
  '(help-at-pt-timer-delay 0.9)
  '(package-selected-packages
    (quote
-    (scala-mode disable-mouse flycheck-rust rust-mode mozc go-mode fcitx "flymake-yaml" flymake-yaml yaml-mode toggle-file-mode pickup initchart flymake-jshint flymake-eslint ffap-python company-go anything-vcs-project)))
+    (company-jedi epc scala-mode disable-mouse flycheck-rust rust-mode mozc go-mode fcitx "flymake-yaml" flymake-yaml yaml-mode toggle-file-mode pickup initchart flymake-jshint flymake-eslint ffap-python company-go anything-vcs-project)))
  '(safe-local-variable-values (quote ((encoding . utf-8))))
  '(send-mail-function (quote smtpmail-send-it)))
 (custom-set-faces

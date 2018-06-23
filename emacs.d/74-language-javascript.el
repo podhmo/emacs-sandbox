@@ -1,4 +1,4 @@
-(require-and-fetch-if-not 'flymake-jshint)
+;; (require-and-fetch-if-not 'flymake-jshint)
 (require-and-fetch-if-not 'flymake-easy)
 (require-and-fetch-if-not 'flymake-eslint :url "https://raw.githubusercontent.com/tjefferson08/flymake-eslint/master/flymake-eslint.el")
 
@@ -26,7 +26,7 @@
         js-indent-offset 2
         tab-width 2)
   (setq js-indent-level 2)
-  (flymake-jshint-load) ;hmm
+  ;; (flymake-jshint-load) ;hmm
   ;; (flymake-eslint-load) ;hmm
   (flymake-mode 1)
   (define-many-keys js-mode-map my:js-key-map)
