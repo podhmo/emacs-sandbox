@@ -2,9 +2,8 @@
 ;;; 74-language-python.el ends here
 
 ;; * todo
-;; ok ** quickrun 
-;; ok ** flymake (pyflake)
-;; ok *** flymake eldoc 
+;; ok ** quickrun
+;; ** flycheck (flake8)
 ;; ok ** ffap module
 ;; *** anything
 ;; ok ** insert auto pair element
@@ -12,8 +11,6 @@
 ;; ok ** automode alist
 ;; ok ** quick syntax delete
 ;; ** toggle file
-;; ** auto magic comment
-;; ** yasnipet
 
 (require-and-fetch-if-not 'pickup)
 
@@ -23,50 +20,51 @@
 (add-to-list 'load-path (concat (current-directory) "python-async-support"))
 (autoload 'python-mode "python" nil t)
 
-
-
 ;;; ffap module
-(require-and-fetch-if-not 'ffap-python :url "https://gist.githubusercontent.com/podhmo/8133843/raw/54f0e1ad64a817b1b3b7315a44493e04cf311650/ffap-python.el")
-(defvar ffap-python-disable-confirm-before-open t)
-;;; flymake
+(with-eval-after-load 'python
+  (require-and-fetch-if-not 'ffap-python :url "https://gist.githubusercontent.com/podhmo/8133843/raw/54f0e1ad64a817b1b3b7315a44493e04cf311650/ffap-python.el")
+  (defvar ffap-python-disable-confirm-before-open t)
+  )
 
-(defun flymake-create-temp--tmpdirectory (file-name prefix)
-  (unless (stringp file-name)
-    (error "Invalid file-name"))
-  (let ((prefix (or prefix "flymake")))
-    (let* ((ext (file-name-extension file-name))
-           (temp-name (file-truename (concat (file-name-sans-extension file-name)
-                                             "_" prefix
-                                             (and ext (concat "." ext)))))
-           (temp-path (concat temporary-file-directory (file-name-nondirectory temp-name))))
-      (flymake-log 3 "create-temp-tmpdirectory: file=%s temp=%s" file-name temp-path)
-      temp-path)))
+;; flycheck
+(with-eval-after-load 'python
+  (require 'flycheck)
 
-(setq flymake-python:program "pyflakes")
-(setq flymake-python:program "flake8")
-(defun flymake-python:find-program ()
-  (or (ffap-python:find-program flymake-python:program)
-      (error "%s is not found in %s" flymake-python:program default-directory)))
+  ;; (flycheck-checker-get 'python-flake8 'next-checkers)
 
-(defun flymake-python-init ()
-  (let* ((temp-file (flymake-init-create-temp-buffer-copy
-                     'flymake-create-temp--tmpdirectory))
-         (check-program (flymake-python:find-program)))
-    (cond ((string-match-p "flake8" check-program)
-           (list check-program (list "--ignore" "E501" temp-file)))
-          (t
-           (list check-program (list temp-file))))))
+  (defun my:python-flycheck-setup ()
+    ;; this is buffer local
+    (setq flycheck-disabled-checkers '(python-pylint python-pycompile))
+    (flycheck-mode 1)
+    )
 
-(add-to-list 'flymake-allowed-file-name-masks '("\\.py$" flymake-python-init))
+  ; virtualenvのflake8を使う
+  (make-local-variable 'my:flake8-path)
+  (my:flycheck-executable-find-function-register
+   "flake8"
+   (lambda ()
+     (cond ((boundp 'my:fake8-path) my:flake8-path)
+           (t (setq my:flake8-path (or (pickup:pickup-file "bin/flake8") "flake8"))
+              my:flake8-path))))
+
+  (add-hook 'python-mode-hook 'my:python-flycheck-setup)
+)
 
 ;;; quick-run
+(setq my:check-python-program "pyflakes")
+(setq my:check-python-program "flake8")
+(defun my:check-python-find-program ()
+  (or (ffap-python:find-program my:check-python-program)
+      (error "%s is not found in %s" my:check-python-program default-directory)))
+
+
 (progn
   (when (boundp 'quickrun/language-alist)
     (setq quickrun/language-alist
           (remove* "python" quickrun/language-alist :key 'car :test 'equal))
     (add-to-list 'quickrun/language-alist
                  '("python" . ((:command . ffap-python:find-python)
-                               (:compile-only . flymake-python:find-program)
+                               (:compile-only . my:check-python-find-program)
                                (:description . "Run Python script")))
                  )
 
@@ -76,7 +74,7 @@
           (remove* "python" quickrun--language-alist :key 'car :test 'equal))
     (add-to-list 'quickrun--language-alist
                  '("python" . ((:command . ffap-python:find-python)
-                               (:compile-only . flymake-python:find-program)
+                               (:compile-only . my:check-python-find-program)
                                (:description . "Run Python script")))
                  )
 
@@ -84,7 +82,7 @@
   )
 
 (defun quickrun-python:compile-only () (interactive)
-  (shell-command (format "%s %s" (flymake-python:find-program) buffer-file-name)))
+  (shell-command (format "%s %s" (my:check-python-find-program) buffer-file-name)))
 
 (defun my:python-insert-comma () (interactive)
   (insert ",")
@@ -165,23 +163,11 @@
         ("[" "]" "["))
       )
 
-(defun flymake-python-load () (interactive)
-  (defadvice flymake-post-syntax-check
-    (before flymake-force-check-was-interrupted)
-    (setq flymake-check-was-interrupted t))
-  (ad-activate 'flymake-post-syntax-check)
-  (flymake-mode t)
-)
-
-
-
 (defun my:python-setup ()
   ;; indentation
   (setq indent-tabs-mode nil
         python-indent-offset 4
         tab-width 4)
-
-  (flymake-python-load)
 
   (define-insert-pair-binding python-mode-map my:python-key-pair)
   (define-many-keys python-mode-map my:python-key-map)

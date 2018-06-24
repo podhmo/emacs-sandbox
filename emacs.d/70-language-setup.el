@@ -9,9 +9,24 @@
 
 (progn ;; flycheck
   (autoload 'flycheck-mode "flycheck" t)
+
+  ;; commandを探す方法をカスタマイズ
+  (defvar my:flycheck-executable-find-function-table (make-hash-table :test 'equal :size 7))
+  (defun my:flycheck-executable-find-function-register (name thunk)
+    (puthash name thunk my:flycheck-executable-find-function-table))
+
+  (defun my:flycheck-executable-find (command)
+    (let ((find-function
+           (gethash command my:flycheck-executable-find-function-table)))
+      (cond (find-function (executable-find (funcall find-function)))
+            (t (executable-find command)))))
+
   (with-eval-after-load 'flycheck
-    (setq flycheck-check-syntax-automatically '(save mode-enabled)))
-  )
+    (custom-set-variables
+     '(flycheck-check-syntax-automatically '(save mode-enabled))
+     '(flycheck-executable-find #'my:flycheck-executable-find) ; risky
+     )
+    ))
 
 (progn ;; quick-run
   (require'quickrun)
