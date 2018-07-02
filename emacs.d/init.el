@@ -182,4 +182,5 @@
 
   ;; disable-mouse when linux environement
   (require 'disable-mouse)
-  (global-disable-mouse-mode))
+  (global-disable-mouse-mode)
+)
