@@ -1,1 +1,0 @@
-/Users/nao/.emacs.d

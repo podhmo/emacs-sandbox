@@ -1,1 +1,0 @@
-/Users/nao/work/myprojects/emacs-sandbox/emacs.d
