@@ -14,12 +14,6 @@
 
 (require-and-fetch-if-not 'pickup)
 
-;; async-io-support
-(defun format-message (fmt &rest args)
-  (message (apply #'format fmt args)))
-(add-to-list 'load-path (concat (current-directory) "python-async-support"))
-(autoload 'python-mode "python" nil t)
-
 ;;; ffap module
 (with-eval-after-load 'python
   (require-and-fetch-if-not 'ffap-python :url "https://gist.githubusercontent.com/podhmo/8133843/raw/54f0e1ad64a817b1b3b7315a44493e04cf311650/ffap-python.el")
