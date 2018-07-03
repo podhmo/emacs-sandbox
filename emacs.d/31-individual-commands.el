@@ -162,9 +162,38 @@ ndelay")
 (defun font-at-cp () (interactive)
   (print (font-at (point))))
 
-
+;;
 (defun my:refresh-process-forcely ()
   (interactive)
   (dolist (p (process-list)) (delete-process p))
   (server-start))
+
+(defvar my:masking-buffer-candidates-alist
+  `(
+    (,(lambda ()
+        (when-let ((it (pickup:pickup-file "/bin/pip")))
+          (replace-regexp-in-string "/bin/pip$" "" it)))
+     . "VENV")
+    (,(getenv "GOPATH") . "$GOPATH")
+    (,(getenv "HOME") . "$HOME")
+    ))
+
+(defun my:masking-buffer (beg end)
+  "あんまり見せたくないpathなどをmaskする"
+  (interactive "r")
+  (unless (region-active-p)
+    (setq beg (point-min))
+    (setq end (point-max)))
+  (save-excursion
+    (save-restriction
+      (narrow-to-region beg end)
+      (cl-loop
+       for (pattern . replacement) in my:masking-buffer-candidates-alist
+       do
+       (progn
+         (when-let ((it (if (functionp pattern) (funcall pattern) pattern)))
+           (message "MASKING-APPLY %s %s" it replacement)
+           (goto-char (point-min))
+           (while (search-forward it nil t 1)
+             (replace-match replacement nil t))))))))
 
