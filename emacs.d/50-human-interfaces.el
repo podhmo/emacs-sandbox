@@ -120,10 +120,9 @@
   (setq popwin:close-popup-window-timer-interval 0.5)
   )
 
-
 ;;; my own
 (progn ;; redo
-  (require 'redo+)
+  (require-and-fetch-if-not 'redo+ :url "https://github.com/emacsmirror/emacswiki.org/raw/master/redo%2b.el")
   )
 (progn ;; zlc
   (require 'zlc)
@@ -156,9 +155,10 @@
 
 
 (progn ;; anything
-  (require 'anything)
-  (require 'anything-config)
-  (require 'anything-match-plugin)
+  (require-and-fetch-if-not 'anything :url "https://github.com/emacsmirror/emacswiki.org/raw/master/anything.el")
+  (require-and-fetch-if-not 'anything-match-plugin :url "https://github.com/emacsmirror/emacswiki.org/raw/master/anything-match-plugin.el")
+  (require-and-fetch-if-not 'anything-config :url "https://github.com/emacsmirror/emacswiki.org/raw/master/anything-config.el")
+
   ;; (require 'anything-complete)
 
   (setq anything-execute-action-at-once-if-one t)

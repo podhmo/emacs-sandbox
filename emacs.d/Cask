@@ -9,6 +9,7 @@
 (depends-on "bm")
 (depends-on "cask")
 (depends-on "dash")
+(depends-on "disable-mouse")
 (depends-on "drag-stuff")
 (depends-on "elscreen")
 (depends-on "exec-path-from-shell")

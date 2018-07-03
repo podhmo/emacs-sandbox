@@ -1,5 +1,5 @@
 ;;pickup
-(require-and-fetch-if-not 'pickup)
+(require-and-fetch-if-not 'pickup :url "https://gist.githubusercontent.com/podhmo/6094461/raw/69e7b38ffa037964f8fd77fda5305101c196ccd1/pickup.el")
 
 
 ;;; debug utiltities

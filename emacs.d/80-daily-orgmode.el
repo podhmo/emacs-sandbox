@@ -1,6 +1,6 @@
 ;; org-mode
 (require 'org-install)
-(require 'org-remember)
+;; (require 'org-remember)
 (add-to-list 'auto-mode-alist '("\\.notes$" . org-mode))
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 (add-to-list 'auto-mode-alist '("memo[0-9]+\\.txt" . org-mode))

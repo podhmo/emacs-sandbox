@@ -1,5 +1,6 @@
 (require 'cl)
 ;;; Begin 0
+
 (defun current-directory ()
   (if load-file-name
       (file-name-directory load-file-name)
@@ -153,6 +154,16 @@
       )))
 
 (unless (equal system-type 'darwin) ; mozc (japanese input)
+  (defun my:ignore (&rest args)
+    (interactive)
+    (setq this-command last-command)
+    nil)
+  (global-set-key (kbd "<eisu-toggle>") 'my:ignore)
+
+  ;; disable-mouse when linux environement
+  (require 'disable-mouse)
+  (global-disable-mouse-mode)
+
   (require 'mozc)
   (defun advice:mozc-key-event-with-ctrl-key--with-ctrl (r)
     (cond ((and (not (null (cdr r))) (eq (cadr r) 'control) (null (cddr r)))
@@ -173,14 +184,4 @@
 
  (advice-add 'mozc-key-event-to-key-and-modifiers :filter-return 'advice:mozc-key-event-with-ctrl-key--with-ctrl)
   (setq default-input-method 'japanese-mozc)
-
-  (defun my:ignore (&rest args)
-    (interactive)
-    (setq this-command last-command)
-    nil)
-  (global-set-key (kbd "<eisu-toggle>") 'my:ignore)
-
-  ;; disable-mouse when linux environement
-  (require 'disable-mouse)
-  (global-disable-mouse-mode)
 )
