@@ -51,3 +51,4 @@
 (depends-on "web-mode")
 (depends-on "yasnippet")
 (depends-on "zlc")
+(depends-on "company-jedi")
