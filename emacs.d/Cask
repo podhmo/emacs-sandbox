@@ -8,6 +8,7 @@
 (depends-on "bind-key")
 (depends-on "bm")
 (depends-on "cask")
+(depends-on "company-jedi")
 (depends-on "dash")
 (depends-on "disable-mouse")
 (depends-on "drag-stuff")
@@ -51,4 +52,3 @@
 (depends-on "web-mode")
 (depends-on "yasnippet")
 (depends-on "zlc")
-(depends-on "company-jedi")
