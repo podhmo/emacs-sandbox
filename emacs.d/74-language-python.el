@@ -45,24 +45,16 @@
 )
 
 ;;; quick-run
-(setq my:check-python-program "pyflakes")
-(setq my:check-python-program "flake8")
-(defun my:check-python-find-program ()
-  (or (ffap-python:find-program my:check-python-program)
-      (error "%s is not found in %s" my:check-python-program default-directory)))
-
-
 (progn
-  (when (boundp 'quickrun/language-alist)
-    (setq quickrun/language-alist
-          (remove* "python" quickrun/language-alist :key 'car :test 'equal))
-    (add-to-list 'quickrun/language-alist
-                 '("python" . ((:command . ffap-python:find-python)
-                               (:compile-only . my:check-python-find-program)
-                               (:description . "Run Python script")))
-                 )
+  (setq my:check-python-program "pyflakes")
+  (setq my:check-python-program "flake8")
+  (defun my:check-python-find-program ()
+    (or (ffap-python:find-program my:check-python-program)
+        (error "%s is not found in %s" my:check-python-program default-directory)))
 
-    )
+  (defun quickrun-python:compile-only () (interactive)
+         (shell-command (format "%s %s" (my:check-python-find-program) buffer-file-name)))
+
   (when (boundp 'quickrun--language-alist)
     (setq quickrun--language-alist
           (remove* "python" quickrun--language-alist :key 'car :test 'equal))
@@ -70,13 +62,8 @@
                  '("python" . ((:command . ffap-python:find-python)
                                (:compile-only . my:check-python-find-program)
                                (:description . "Run Python script")))
-                 )
+                 )))
 
-    )
-  )
-
-(defun quickrun-python:compile-only () (interactive)
-  (shell-command (format "%s %s" (my:check-python-find-program) buffer-file-name)))
 
 (defun my:python-insert-comma () (interactive)
   (insert ",")
@@ -120,6 +107,11 @@
   (when (boundp 'popwin:special-display-config)
     (add-to-list 'popwin:special-display-config '("*jedi:doc*" :noselect))
     )
+
+  ;; python-envorinment
+  (require 'python-environment)
+  (custom-set-variables
+   '(python-environment-virtualenv (list "python" "-m" "venv" "--system-site-packages")))
 
   (require 'jedi-core)
   (setq jedi:complete-on-dot t)
