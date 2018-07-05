@@ -24,16 +24,15 @@
 (with-eval-after-load 'python
   (require 'flycheck)
 
-  ;; (flycheck-checker-get 'python-flake8 'next-checkers)
-
   (defun my:python-flycheck-setup ()
+    (make-local-variable 'my:flake8-path)
+
     ;; this is buffer local
     (setq flycheck-disabled-checkers '(python-pylint python-pycompile))
     (flycheck-mode 1)
     )
 
   ; virtualenvのflake8を使う
-  (make-local-variable 'my:flake8-path)
   (my:flycheck-executable-find-function-register
    "flake8"
    (lambda ()
@@ -41,6 +40,10 @@
            (t (setq my:flake8-path (or (pickup:pickup-file "bin/flake8") "flake8"))
               my:flake8-path))))
 
+  ;; max-length
+  (setq flycheck-flake8-maximum-line-length 100)
+
+  ;; (flycheck-checker-get 'python-flake8 'next-checkers)
   (add-hook 'python-mode-hook 'my:python-flycheck-setup)
 )
 
@@ -86,11 +89,12 @@
   (require 'pickup) ; individual package
 
   (defun my:python-jedi-setup ()
-    (let ((cmds `(,(pickup:pickup-file "bin/python") ,@(cdr jedi:server-command)))
-          (args '("--log-traceback")))
-      (when cmds (set (make-local-variable 'jedi:server-command) cmds))
-      (when args (set (make-local-variable 'jedi:server-args) args))
-      )
+    (when (string-equal (car jedi:server-command) "python")
+      (let ((cmds `(,(pickup:pickup-file "bin/python") ,@(cdr jedi:server-command)))
+            (args '("--log-traceback")))
+        (when cmds (setq-local jedi:server-command cmds))
+        (when args (setq-local jedi:server-args args))
+        ))
     (jedi-mode 1)
 
     (let ((map python-mode-map))
