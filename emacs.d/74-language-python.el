@@ -82,7 +82,7 @@
     (setq end (point-max))
     )
   (let ((yapf (or (pickup-file "bin/yayapf") (pickup-file "bin/yapf") "yapf")))
-    (my:execute-formatter-command "yayapf" yapf  beg end)))
+    (my:execute-formatter-command yapf yapf  beg end)))
 
 ;; jedi
 (with-eval-after-load 'python
