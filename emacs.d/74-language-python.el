@@ -81,7 +81,7 @@
     (setq beg (point-min))
     (setq end (point-max))
     )
-  (let ((yapf (or (pickup-file "bin/yayapf") "yapf")))
+  (let ((yapf (or (pickup-file "bin/yayapf") (pickup-file "bin/yapf") "yapf")))
     (my:execute-formatter-command "yayapf" yapf  beg end)))
 
 ;; jedi

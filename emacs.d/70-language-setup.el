@@ -88,7 +88,7 @@
     ))
 
 (defun my:execute-formatter-command (cmd-name cmd beg end &optional force)
-  (cond ((executable-find cmd)
+  (cond ((executable-find cmd-name)
          (let ((p (point)))
            (save-excursion
             (save-restriction
