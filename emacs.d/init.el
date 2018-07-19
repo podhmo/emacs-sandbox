@@ -141,12 +141,15 @@
 
 (defun browse-github ()
   (interactive)
-  (let ((replace-alist `((,(format "%s/src/github.com/\\([^/]+/[^/]+\\)/\\(.+\\)" (get-go-path)) . "https://github.com/\\1/tree/master/\\2"))))
-    (let ((path buffer-file-name))
-      (loop for (pat . rep) in replace-alist
-            do (setq path (replace-regexp-in-string pat rep path)))
-      (browse-url (format "%s#L%d" path (line-number-at-pos (point))))
-      )))
+  (when-let ((git-config-file (pickup:pickup-file ".git/config")))
+    (let ((buf (find-file-noselect git-config-file)))
+      (with-current-buffer buf
+        (goto-char (point-min))
+        (when (re-search-forward "url = git@github.com:\\(.+\\)\.git" nil t)
+          (let ((user-repository-name (match-string-no-properties 1)))
+            (browse-url (format "https://github.com/%s" user-repository-name)))
+          )))))
+
 (defun browse-github-master ()
   (interactive)
   (let ((replace-alist `((,(format "%s/src/github.com/\\([^/]+/[^/]+\\)/\\(.+\\)" (get-go-path)) . "https://github.com/\\1/tree/master/\\2"))))
