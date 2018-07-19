@@ -341,7 +341,17 @@
                 (setq elscreen-prefix-key (kbd "C-j"))
                 (elscreen-start)))
     )
-  ) 
+  ;;
+  (when (equal system-type 'darwin)
+    (defun my:override-elscreen-setup (key-map)
+      (define-key key-map (kbd "C-'") 'elscreen-next)
+      )
+    (my:override-elscreen-setup global-map)
+    (with-eval-after-load 'org
+      (add-hook 'org-mode-hook (lambda () (my:override-elscreen-setup org-mode-map)))
+      )
+    )
+  )
 
 ;; supress bell sound
 (defun silent-bell () (message "bell!"))

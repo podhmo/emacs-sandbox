@@ -48,6 +48,9 @@
 (put 'narrow-to-region 'disabled nil)
 (setq debug-on-error nil)
 
+(unless (fboundp 'string-to-int)
+  (defalias 'string-to-int 'string-to-number))
+
 (defun current-memo ()
   (let* ((memos (directory-files2 "~/vboxshare/memo" t))
          (max-n-files-pair
