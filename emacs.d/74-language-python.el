@@ -89,12 +89,18 @@
   (require 'pickup) ; individual package
 
   (defun my:python-jedi-setup ()
-    (when (string-equal (car jedi:server-command) "python")
-      (let ((cmds `(,(pickup:pickup-file "bin/python") ,@(cdr jedi:server-command)))
-            (args '("--log-traceback")))
-        (when cmds (setq-local jedi:server-command cmds))
-        (when args (setq-local jedi:server-args args))
-        ))
+    (let ((alternative-python (pickup:pickup-file "bin/python")) ; pickup:pickup-file is magical function (custom defined)
+          (cmds jedi:server-command)
+          (args nil))
+
+      (when alternative-python
+        ;; venv/foo/bin/python -> venv/foo
+        (let ((venv-path (file-name-directory (substring-no-properties (file-name-directory alternative-python) 0 -1))))
+          (setq args (append args `("--virtual-env" ,venv-path))))
+        (setq-local jedi:server-command cmds)
+        (setq-local jedi:server-args args)
+        )
+      )
     (jedi-mode 1)
 
     (let ((map python-mode-map))
@@ -122,16 +128,15 @@
   (setq jedi:use-shortcuts t)
 
   ;; this is work-around
-  (defun my:safe-python-jedi-setup ()
-    (let ((p (start-process "find jedi" nil (pickup:pickup-file "bin/python")  "-c" "import jedi; import epc")))
-      (set-process-sentinel
-       p
-       (lambda (p status)
-         (cond ((= 0 (process-exit-status p)) (my:python-jedi-setup))
-               (t (message "jedi is not found. please install `pip install jedi epc`"))))))
-    )
-  (add-hook 'python-mode-hook 'my:safe-python-jedi-setup)
-  )
+  ;; (defun my:safe-python-jedi-setup ()
+  ;;   (let ((p (start-process "find jedi" nil (pickup:pickup-file "bin/python")  "-c" "import jedi; import epc")))
+  ;;     (set-process-sentinel
+  ;;      p
+  ;;      (lambda (p status)
+  ;;        (cond ((= 0 (process-exit-status p)) (my:python-jedi-setup))
+  ;;              (t (message "jedi is not found. please install `pip install jedi epc`"))))))
+  ;;   )
+  (add-hook 'python-mode-hook 'my:python-jedi-setup))
 
 ;;; auto-pair
 (require 'insert-pair-element nil t)
