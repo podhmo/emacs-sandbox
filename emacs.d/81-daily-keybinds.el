@@ -37,14 +37,16 @@
             ;; quick-run
             ("C-c @" . quickrun-compile-only)
             ("C-c C-@" . quickrun)
+            ("C-c ]" . quickrun-compile-only) ;; for keyboard(en)
+            ("C-c C-]" . quickrun) ;; for keyboard(en)
 
             ("C-c C-w" . monologue)
 
-                                        ;elscreen
+            ;; elscreen
             ("C-;" . elscreen-previous)
             ("C-:" . elscreen-next)
             ("C-j S" . elscreen-shell/next-screen)
-            ("C-j C-f" . elscreen-find-file)              
+            ("C-j C-f" . elscreen-find-file)
 
             ("C-." . redo)
             ("C-/" . undo)

@@ -218,6 +218,7 @@
                     ("C-c C-a" . anything)
                     ("C-c C-;" . anything-occur*)
                     ("C-c C-:" . anything-vcs-project)
+                    ("C-c C-'" . anything-vcs-project)
                     ("M-x" . anything-M-x)
                     ("C-x b" . anything-buffers+)
                     ("M-y" . anything-show-kill-ring)
