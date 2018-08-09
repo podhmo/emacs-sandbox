@@ -8,6 +8,10 @@
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cb" 'org-iswitchb)
+(defun my:org-setup ()
+  (define-key org-mode-map (kbd "C-c C-c") 'toggle-file)
+)
+(add-hook 'org-mode-hook 'my:org-setup)
 
 (defun remember-insert-top-of-the-file ()
   (let ((text (buffer-string))
