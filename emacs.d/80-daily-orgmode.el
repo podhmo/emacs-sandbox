@@ -10,6 +10,7 @@
 (global-set-key "\C-cb" 'org-iswitchb)
 (defun my:org-setup ()
   (define-key org-mode-map (kbd "C-c C-c") 'toggle-file)
+  (define-key org-mode-map (kbd "C-j") nil)
 )
 (add-hook 'org-mode-hook 'my:org-setup)
 
