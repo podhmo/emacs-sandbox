@@ -1,6 +1,6 @@
 ;; (require-and-fetch-if-not 'flymake-jshint)
-(require-and-fetch-if-not 'flymake-easy)
-(require-and-fetch-if-not 'flymake-eslint :url "https://raw.githubusercontent.com/tjefferson08/flymake-eslint/master/flymake-eslint.el")
+;; (require-and-fetch-if-not 'flymake-easy)
+;; (require-and-fetch-if-not 'flymake-eslint :url "https://raw.githubusercontent.com/tjefferson08/flymake-eslint/master/flymake-eslint.el")
 
 (defun my:js-insert-comma () (interactive)
   (insert ",")
@@ -28,7 +28,7 @@
   (setq js-indent-level 2)
   ;; (flymake-jshint-load) ;hmm
   ;; (flymake-eslint-load) ;hmm
-  (flymake-mode 1)
+  ;; (flymake-mode 1)
   (define-many-keys js-mode-map my:js-key-map)
   (define-insert-pair-binding js-mode-map my:js-key-pair))
 

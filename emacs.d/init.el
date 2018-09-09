@@ -123,6 +123,7 @@
  '(package-selected-packages
    (quote
     (racer company-racer use-package company-jedi epc scala-mode disable-mouse flycheck-rust rust-mode mozc go-mode fcitx "flymake-yaml" flymake-yaml yaml-mode toggle-file-mode pickup initchart flymake-jshint flymake-eslint ffap-python company-go anything-vcs-project)))
+ '(python-environment-virtualenv (list "python" "-m" "venv" "--system-site-packages"))
  '(safe-local-variable-values (quote ((encoding . utf-8))))
  '(send-mail-function (quote smtpmail-send-it)))
 (custom-set-faces
@@ -141,16 +142,21 @@
 (add-hook 'text-mode-hook (lambda () (setq auto-fill-mode nil)))
 (add-hook 'html-mode-hook (lambda () (setq auto-fill-mode nil)))
 
-(defun browse-github ()
+(defun my:resolve-github-url (&optional path)
+  (when-let ((git-config-file (pickup:pickup-file ".git/config" :path path)))
+    (cl-block b
+        (let ((buf (find-file-noselect git-config-file)))
+          (with-current-buffer buf
+            (goto-char (point-min))
+            (when (re-search-forward "url = git@github.com:\\(.+\\)\\(?:\\.git\\)?" nil t)
+              (let ((user-repository-name (match-string-no-properties 1)))
+                (cl-return-from b (format "https://github.com/%s" user-repository-name)))))))))
+
+(defun my:browse-github ()
   (interactive)
-  (when-let ((git-config-file (pickup:pickup-file ".git/config")))
-    (let ((buf (find-file-noselect git-config-file)))
-      (with-current-buffer buf
-        (goto-char (point-min))
-        (when (re-search-forward "url = git@github.com:\\(.+\\)\.git" nil t)
-          (let ((user-repository-name (match-string-no-properties 1)))
-            (browse-url (format "https://github.com/%s" user-repository-name)))
-          )))))
+  (when-let ((url (my:resolve-github-url)))
+    (browse-url url)))
+(defalias 'browse-github 'my:browse-github)
 
 (defun browse-github-master ()
   (interactive)

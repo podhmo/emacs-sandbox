@@ -34,6 +34,12 @@
             ("M-r" . replace-string)
             ("M-R" . replace-regexp)
 
+            ;; shell-command
+            ;; M-| shell-command-on-region
+            ;; M-! shell-command
+            ;; M-^ my:shell-command-on-region-and-insert
+            ("M-^" . my:shell-command-on-region-and-insert)
+
             ;; quick-run
             ("C-c @" . quickrun-compile-only)
             ("C-c C-@" . quickrun)

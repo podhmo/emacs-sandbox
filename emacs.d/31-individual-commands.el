@@ -1,28 +1,3 @@
-;; https://gist.github.com/kosh04/568800/raw/d3f0313cf0b80e87c7ed44d74bcc11f66427c054/%5Bemacs%2Cxyzzy%5Dunicode-%7B%2Cun%7Descape-region
-;; #+:Emacs
-(defun unicode-unescape-region (start end)
-  "指定した範囲のUnicodeエスケープ文字(\\uXXXX)をデコードする."
-  (interactive "*r")
-  (save-restriction
-    (narrow-to-region start end)
-    (goto-char (point-min))
-    (while (re-search-forward "\\\\u\\([[:xdigit:]]\\{4\\}\\)" nil t)
-      (replace-match (string (unicode-char
-                              (string-to-number (match-string 1) 16)))
-                     nil t))))
-
-(defun unicode-escape-region (&optional start end)
-  "指定した範囲の文字をUnicodeエスケープする."
-  (interactive "*r")
-  (save-restriction
-    (narrow-to-region start end)
-    (goto-char (point-min))
-    (while (re-search-forward "." nil t)
-      (replace-match (format "\\u%04x"
-                             (char-unicode
-                              (char (match-string 0) 0)))
-                     nil t))))
-
 ;; #+:Emacs
 ;; こちらも参照→ http://github.com/kosh04/emacs-lisp > xyzzy.el
 (defun char-unicode (char) (encode-char char 'ucs))
@@ -196,4 +171,28 @@ ndelay")
            (goto-char (point-min))
            (while (search-forward it nil t 1)
              (replace-match replacement nil t))))))))
+
+(defun my:strip-ansi-color-on-region (beg end)
+  (interactive "r")
+  (unless (region-active-p)
+    (setq beg (point-min))
+    (setq end (point-max)))
+  (save-excursion
+    (save-restriction
+      (narrow-to-region beg end)
+      (goto-char (point-min))
+      (while (re-search-forward "\\[[0-9]+;?[0-9]*m" nil t 1)
+        (replace-match "")
+        ))))
+
+(defun my:shell-command-on-region-and-insert (start end command)
+  (interactive (let (string)
+                 (unless (mark)
+		           (user-error "The mark is not set now, so there is no region"))
+		         (setq string (read-shell-command "Shell command on region(and insert): "))
+		         (list (region-beginning) (region-end) string))
+               )
+  (let ((output-buffer t)
+        (replace t))
+    (shell-command-on-region start end command output-buffer replace)))
 

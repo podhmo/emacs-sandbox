@@ -1,7 +1,7 @@
 (progn ;; flymake 
   (require 'flymake)
-  (require-and-fetch-if-not 'flymake-cursor)
-  (eval-after-load 'flymake '(require 'flymake-cursor))
+  ;; (require-and-fetch-if-not 'flymake-cursor)
+  ;; (eval-after-load 'flymake '(require 'flymake-cursor))
   (custom-set-variables
    '(help-at-pt-timer-delay 0.9)
    '(help-at-pt-display-when-idle '(flymake-overlay)))
