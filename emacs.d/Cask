@@ -37,8 +37,6 @@
 (depends-on "pallet")
 (depends-on "paredit")
 (depends-on "pickup")
-(depends-on "pophint")
-(depends-on "popwin")
 (depends-on "prodigy")
 (depends-on "py-yapf")
 (depends-on "quickrun")

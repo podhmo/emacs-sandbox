@@ -76,49 +76,6 @@
 ;;               (goto-char (point-max))
 ;;               (delete-blank-lines))))
 
-(progn ;; popwin
-  (require 'popwin)
-  (setq display-buffer-function 'popwin:display-buffer)
-
-  ;; quickrunここがただしい？
-  (setq popwin:special-display-config
-        '(("*anything*" :height 20)
-          ("*quickrun*" :noselect t)
-          help-mode
-          ;; (completion-list-mode :noselect t)
-          ;; (compilation-mode :noselect t)
-          (grep-mode :noselect t)
-          (occur-mode :noselect t)
-          ("*Pp Macroexpand Output*" :noselect t)
-          "*Shell Command Output*" "*vc-diff*" "*vc-change-log*"
-          (" *undo-tree*" :width 60 :position right)
-          ("^\\*anything.*\\*$" :regexp t)
-          "*slime-apropos*" "*slime-macroexpansion*" "*slime-description*"
-          ("*slime-compilation*" :noselect t)
-          "*slime-xref*"
-          (sldb-mode :stick t)
-          ("*quickrun*" :noselect t)
-          slime-repl-mode slime-connection-list-mode))
-  
-  (progn ;; patch ;; for bag fix
-    (when (>= 1 (length (patch:function-arguments 'called-interactively-p)))
-      (defun popwin:called-interactively-p ()
-        (called-interactively-p))))
-
-  ;; suppress: memory and cpu leak (ad-hoc)
-  ;; todo   (or popwin:close-popup-window-timer
-  ;; (defadvice popwin:start-close-popup-window-timer (before suppress-timer-leak activate)
-  ;;   (when (and (not popwin:popup-window) (not (popwin:popup-window-live-p)))
-  ;;     (when (< 0 (random 2))
-  ;;       (dolist (tm timer-list)
-  ;;         (when (and (eq 'popwin:close-popup-window-timer (timer--function tm))
-  ;;                    (not (eq popwin:close-popup-window-timer tm)))
-  ;;           (cancel-timer tm)))
-  ;;         ) 
-  ;;     )
-  ;;   )
-  (setq popwin:close-popup-window-timer-interval 0.5)
-  )
 
 ;;; my own
 (progn ;; redo
@@ -203,11 +160,6 @@
        execute-persistent-action
        (anything-bm-list)))
     )
-  (progn ;; popwin
-    (when (boundp 'popwin:special-display-config)
-      (setq anything-samewindow nil)
-      (add-to-list 'popwin:special-display-config '("*anything*" :height 20))))
-
   (progn ;; key-settings/anything
     (add-hook 'on-after-keyboard-setup
               (lambda ()

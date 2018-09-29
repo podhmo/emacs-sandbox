@@ -113,11 +113,6 @@
     (company-mode-on)
     )
 
-  ;; popwin
-  (when (boundp 'popwin:special-display-config)
-    (add-to-list 'popwin:special-display-config '("*jedi:doc*" :noselect))
-    )
-
   ;; python-envorinment
   (require 'python-environment)
   (custom-set-variables

@@ -249,12 +249,6 @@
          (setq godoc-command (if (executable-find "godoc") "godoc" "go doc"))
          (setq godoc-use-completing-read t)
 
-         ;; popwin
-         (when (boundp 'popwin:special-display-config)
-           (push '("^\\*godoc [^ ]+\\*$" :regexp t) popwin:special-display-config)
-           (push '("*godoc*" :dedicated t) popwin:special-display-config)
-           )
-         )
        (defalias 'godoc 'my:godoc)
        (defalias 'godoc--get-buffer 'my:godoc--get-buffer)
 
