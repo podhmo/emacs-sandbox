@@ -7,3 +7,6 @@ abbrev_defs
 tramp
 recentf
 .python-environments
+bookmarks
+elpa/
+eshell/history
