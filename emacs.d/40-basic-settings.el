@@ -45,6 +45,9 @@
 (setq completion-ignore-case t)
 (setq read-file-name-completion-ignore-case t)
 
+;; auto-revert
+(global-auto-revert-mode t)
+
 ;;(get-language-info current-language-environment 'exit-function)
 ;;(get-language-info current-language-environment 'coding-priority)
 ;; (set-language-environment "Japanese")
