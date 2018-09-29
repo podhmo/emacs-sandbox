@@ -2,7 +2,7 @@
 (define-key paredit-mode-map (kbd "C-j") ctl-j-map)
 
 
-(defun* elisp-output-with-comment (&key (place-holder "; => "))
+(defun* my:elisp-output-with-comment (&key (place-holder ";; => "))
   (interactive)
   (let ((output (call-interactively 'eval-last-sexp)))
     (let ((output-found
@@ -15,6 +15,36 @@
         (goto-char (point-at-eol))
         (insert place-holder (prin1-to-string output))))))
 
+(defun my:elisp-format (start end arg)
+  (interactive "r\nP")
+  (unless (region-active-p)
+    (save-excursion
+      (end-of-defun)
+      (setq end (point))
+      (beginning-of-defun)
+      (setq start (point))
+      )
+    )
+
+  (save-excursion
+    (save-restriction
+      (condition-case err
+          (progn
+            (narrow-to-region start end)
+            (goto-char (point-min))
+            (indent-region (point-min) (point-max) arg)
+
+            ;; trim white space of eol
+            (goto-char (point-min))
+            (while (re-search-forward "[ 	]+$" nil t 1)
+              (replace-match "")
+              )
+            )
+        (error (widen) (message err))
+        )
+      ))
+  )
+
 (defun my:emacs-lisp-setup ()
   (define-many-keys emacs-lisp-mode-map
     '(("C-c C-j" . lisp-complete-symbol)
@@ -22,7 +52,8 @@
       ("C-c M-R" . paredit-forward-barf-sexp)
       ("C-c M-l" . paredit-backward-slurp-sexp)
       ("C-c M-L" . paredit-backward-barf-sexp)
-      ("C-c C-i" . elisp-output-with-comment)
+      ("C-c C-i" . my:elisp-output-with-comment)
+      ("C-x C-s" . my:elisp-format)
       ))
 
   (when (require 'company nil t)
@@ -34,5 +65,5 @@
    'paredit-backward-delete
    'paredit-close-round)
   (paredit-mode +1)
-  )    
+  )
 (add-hook 'emacs-lisp-mode-hook 'my:emacs-lisp-setup)
