@@ -56,7 +56,7 @@
         (error "%s is not found in %s" my:check-python-program default-directory)))
 
   (defun quickrun-python:compile-only () (interactive)
-         (shell-command (format "%s %s" (my:check-python-find-program) buffer-file-name)))
+         (async-shell-command (format "%s %s" (my:check-python-find-program) buffer-file-name)))
 
   (when (boundp 'quickrun--language-alist)
     (setq quickrun--language-alist
