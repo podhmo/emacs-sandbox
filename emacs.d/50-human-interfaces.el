@@ -20,19 +20,6 @@
   (key-chord-mode 1)
   )
 
-(progn ;; multiple-cursors
-  (require 'multiple-cursors)
-  (progn ;; key-settings/multiple-cursors
-    (add-hook 'on-after-keyboard-setup
-              (lambda ()
-                (define-many-keys global-map
-                  '(
-                    ("C-x r t" . mc/mark-all-dwim)
-                    )
-                  )))
-    )
-  )
-
 
 ;; from: https://github.com/wakaran/config/blob/master/dot.emacs.d.server/init/90-last-setting.el
 (progn ;; shell-settings
