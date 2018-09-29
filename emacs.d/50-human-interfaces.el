@@ -201,7 +201,7 @@
                (not (file-directory-p file)))
           (view-file file)
         ad-do-it))
-    
+
     (defvar view-mode-force-exit nil)
     (defmacro do-not-exit-view-mode-unless-writable-advice (f)
       `(defadvice ,f (around do-not-exit-view-mode-unless-writable activate)
@@ -251,7 +251,7 @@
     (add-hook 'view-mode-hook
               (lambda ()
                 (define-many-keys view-mode-map pager-keysettings)))
-    
+
     ))
 
 (progn ;; elscreen
@@ -338,25 +338,39 @@
                (insert "\n"))))))
 
 
-(defun my:dired-setup ()
-  (define-many-keys dired-mode-map
-    `(
-      ("[" . dired-up-directory) ;; ^
-      ("]" . my:dired-do-redisplay-or-down-directory)
-      ("h" . dired-up-directory) ;; ^
-      ("l" . my:dired-do-redisplay-or-down-directory)
-      ("j" . dired-next-line)
-      ("k" . dired-previous-line)
-      ("J" . dired-next-dirline) ;; >
-      ("K" . dired-prev-dirline) ;; <
-      ))
+(progn ;; dired
+  (defun my:dired-setup ()
+    (define-many-keys dired-mode-map
+      `(
+        ("[" . dired-up-directory) ;; ^
+        ("]" . my:dired-do-redisplay-or-down-directory)
+        ("h" . dired-up-directory) ;; ^
+        ("l" . my:dired-do-redisplay-or-down-directory)
+        ("j" . dired-next-line)
+        ("k" . dired-previous-line)
+        ("J" . dired-next-dirline) ;; >
+        ("K" . dired-prev-dirline) ;; <
+        ))
+    )
+
+  (defun my:dired-do-redisplay-or-down-directory ()
+    (interactive)
+    (let ((fpath (dired-get-file-for-visit)))
+      (cond ((file-directory-p fpath) (call-interactively 'dired-find-file))
+            (t (call-interactively 'dired-do-redisplay)))
+      )
+    )
+  (add-hook 'dired-mode-hook 'my:dired-setup)
   )
 
-(defun my:dired-do-redisplay-or-down-directory ()
-  (interactive)
-  (let ((fpath (dired-get-file-for-visit)))
-    (cond ((file-directory-p fpath) (call-interactively 'dired-find-file))
-          (t (call-interactively 'dired-do-redisplay)))
+(progn ;; help
+  (defun my:help-setup ()
+    (define-many-keys help-mode-map
+      `(
+        ("[" . help-go-back)
+        ("]" . help-go-forward)
+        ))
     )
+  (add-hook 'help-mode-hook 'my:help-setup)
   )
-(add-hook 'dired-mode-hook 'my:dired-setup)
+  )
