@@ -339,6 +339,24 @@
 
 
 (defun my:dired-setup ()
-  (define-key dired-mode-map (kbd "[") 'dired-up-directory)
+  (define-many-keys dired-mode-map
+    `(
+      ("[" . dired-up-directory) ;; ^
+      ("]" . my:dired-do-redisplay-or-down-directory)
+      ("h" . dired-up-directory) ;; ^
+      ("l" . my:dired-do-redisplay-or-down-directory)
+      ("j" . dired-next-line)
+      ("k" . dired-previous-line)
+      ("J" . dired-next-dirline) ;; >
+      ("K" . dired-prev-dirline) ;; <
+      ))
+  )
+
+(defun my:dired-do-redisplay-or-down-directory ()
+  (interactive)
+  (let ((fpath (dired-get-file-for-visit)))
+    (cond ((file-directory-p fpath) (call-interactively 'dired-find-file))
+          (t (call-interactively 'dired-do-redisplay)))
+    )
   )
 (add-hook 'dired-mode-hook 'my:dired-setup)
