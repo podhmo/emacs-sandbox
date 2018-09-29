@@ -199,3 +199,4 @@
  (advice-add 'mozc-key-event-to-key-and-modifiers :filter-return 'advice:mozc-key-event-with-ctrl-key--with-ctrl)
   (setq default-input-method 'japanese-mozc)
 )
+(put 'dired-find-alternate-file 'disabled nil)
