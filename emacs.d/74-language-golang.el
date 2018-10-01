@@ -223,8 +223,8 @@
                (warning . go-vet)
                ;; Fall back, if go-vet doesn't exist
                (warning . go-build) (warning . go-test)
-               ; (warning . go-errcheck)
-               ; (warning . go-unconvert)
+                                        ; (warning . go-errcheck)
+                                        ; (warning . go-unconvert)
                )
 
              )
@@ -232,64 +232,63 @@
 
 
 
-  (eval-after-load "go-mode"
-    '(progn
+  ;; gopath
+  (let ((output (shell-command-to-string "$SHELL --login -i -c 'echo $GOPATH'")))
+    (setenv "GOPATH" (car (last (split-string output)))))
 
-       ;; gopath
-       (let ((output (shell-command-to-string "$SHELL --login -i -c 'echo $GOPATH'")))
-         (setenv "GOPATH" (car (last (split-string output)))))
+  (cond ((executable-find "goimports")
+         (setq gofmt-command "goimports"))
+        (t (message "gorimports > gofmt!!")))
 
-       (cond ((executable-find "goimports")
-              (setq gofmt-command "goimports"))
-             (t (message "gorimports > gofmt!!")))
+  (progn ; godoc
+    (require-and-fetch-if-not 'go-eldoc)
+    (add-hook 'go-mode-hook 'go-eldoc-setup)
+    (setq godoc-command (if (executable-find "godoc") "godoc" "go doc"))
+    (setq godoc-use-completing-read t)
 
-       (progn ; godoc
-         (require-and-fetch-if-not 'go-eldoc)
-         (add-hook 'go-mode-hook 'go-eldoc-setup)
-         (setq godoc-command (if (executable-find "godoc") "godoc" "go doc"))
-         (setq godoc-use-completing-read t)
+    (defalias 'godoc 'my:godoc)
+    (defalias 'godoc--get-buffer 'my:godoc--get-buffer)
 
-       (defalias 'godoc 'my:godoc)
-       (defalias 'godoc--get-buffer 'my:godoc--get-buffer)
+    (define-insert-pair-binding go-mode-map my:golang-key-pair)
 
-       (define-insert-pair-binding go-mode-map my:golang-key-pair)
+    (require-and-fetch-if-not 'company-go) ;; require gocode
 
-       (require-and-fetch-if-not 'company-go) ;; require gocode
+    (defun my:go-mode-setup ()
+      ;; (add-hook 'before-save-hook' 'gofmt-before-save)
+      ;; key bindings
+      (define-key go-mode-map (kbd "C-x C-s") 'gofmt)
+      (define-key go-mode-map (kbd "C-x S") 'my:go-gofmt-modified-buffers-async)
+      (define-key go-mode-map (kbd "C-c C-e") 'my:godoc)
+      (define-key go-mode-map (kbd "C-c C-a") 'my:go-import-add)
+      (define-key go-mode-map (kbd "C-c :") 'my:anything-go-src-selection)
+      (define-key go-mode-map (kbd "M-.") 'godef-jump)
+      (define-key go-mode-map (kbd "M-,") 'pop-tag-mark)
+      (set (make-local-variable 'company-backends) '(company-go))
+      (company-mode)
+      (setq indent-tabs-mode nil)
+      (setq c-basic-offset 4)
+      (setq tab-width 4))
 
-       (defun my:go-mode-setup ()
-         ;; (add-hook 'before-save-hook' 'gofmt-before-save)
-         ;; key bindings
-         (define-key go-mode-map (kbd "C-x C-s") 'gofmt)
-         (define-key go-mode-map (kbd "C-x S") 'my:go-gofmt-modified-buffers-async)
-         (define-key go-mode-map (kbd "C-c C-e") 'my:godoc)
-         (define-key go-mode-map (kbd "C-c C-a") 'my:go-import-add)
-         (define-key go-mode-map (kbd "C-c :") 'my:anything-go-src-selection)
-         (define-key go-mode-map (kbd "M-.") 'godef-jump)
-         (define-key go-mode-map (kbd "M-,") 'pop-tag-mark)
-         (set (make-local-variable 'company-backends) '(company-go))
-         (company-mode)
-         (setq indent-tabs-mode nil)
-         (setq c-basic-offset 4)
-         (setq tab-width 4))
-       (setq go-packages-function 'go-packages-cache)
-       (defun my:godoc-mode-setup ()
-         (define-key godoc-mode-map (kbd "[") 'my:godoc-backward)
-         (define-key godoc-mode-map (kbd "]") 'my:godoc-forward)
-         (define-key godoc-mode-map (kbd "C-c C-e") 'my:godoc)
-         )
-       (defun my:go-flycheck-mode ()
-         (let ((filename (file-name-nondirectory (buffer-file-name))))
-           (unless (string-equal filename "magefile.go")
-             (flycheck-mode)
-             ))
-         )
+    (setq go-packages-function 'go-packages-cache)
+    (defun my:godoc-mode-setup ()
+      (define-key godoc-mode-map (kbd "[") 'my:godoc-backward)
+      (define-key godoc-mode-map (kbd "]") 'my:godoc-forward)
+      (define-key godoc-mode-map (kbd "C-c C-e") 'my:godoc)
+      )
 
-       (add-hook 'go-mode-hook 'company-mode)
-       (add-hook 'go-mode-hook 'my:go-flycheck-mode)
-       (add-hook 'go-mode-hook 'my:go-mode-setup)
-       (add-hook 'go-mode-hook 'auto-insert)
-       (add-hook 'godoc-mode-hook 'my:godoc-mode-setup)
-       ))
+    (defun my:go-flycheck-mode ()
+      (let ((filename (file-name-nondirectory (buffer-file-name))))
+        (unless (string-equal filename "magefile.go")
+          (flycheck-mode)
+          ))
+      )
+
+    (add-hook 'go-mode-hook 'company-mode)
+    (add-hook 'go-mode-hook 'my:go-flycheck-mode)
+    (add-hook 'go-mode-hook 'my:go-mode-setup)
+    (add-hook 'go-mode-hook 'auto-insert)
+    (add-hook 'godoc-mode-hook 'my:godoc-mode-setup)
+    )
 
                                         ;export GOPATH=~/vboxshare/sandbox/go
   ;; (add-to-list 'exec-path (expand-file-name "/opt/local/lib/go/bin"))
