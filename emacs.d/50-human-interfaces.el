@@ -373,4 +373,46 @@
     )
   (add-hook 'help-mode-hook 'my:help-setup)
   )
+
+
+(progn ;; font-size
+
+  (setq my:font-height-candidates '(140 220))
+
+  (lexical-let ((i 0))
+    (defun* my:font-height (&optional incp &key candidates)
+      (when incp
+        (setq i (+ i (if (numberp incp) incp 1))))
+
+      (let* ((candidates (or candidates my:font-height-candidates))
+             (height (nth i candidates)))
+        (cond ((numberp height) height)
+              (t
+               (setq i 0)
+               (nth i candidates))))))
+
+  (defun my:adjust-font-height (arg)
+    (interactive "p")
+    (let* ((incp (+ 1 (/ arg 4)))
+           (font-height (my:font-height incp)))
+      (message "remap my font height %d (inc %s)" font-height incp)
+      (face-remap-add-relative 'default :height font-height)
+      ))
+
+  (defun my:adjust-font-height-globally ()
+    (interactive)
+    (let* ((incp nil)
+           (font-height (my:font-height incp)))
+      (message "remap my font height %d globally (inc %s)" font-height incp)
+
+      ;; clear all temporary remapping setting
+      (dolist (b (buffer-list))
+        (with-current-buffer b
+          (when face-remapping-alist
+            (setq-local face-remapping-alist nil)
+            )
+          ))
+
+      (set-face-attribute 'default nil :height font-height)
+      ))
   )

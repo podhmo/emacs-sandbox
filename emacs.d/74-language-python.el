@@ -180,6 +180,6 @@
   (add-to-list 'auto-insert-alist
                '(("\\.py\\'" . "python skeleton")
                  (concat )
-                 "# -*- coding:utf-8 -*-\nimport logging\nlogger = logging.getLogger(__name__)\n"))
+                 "import logging\nlogger = logging.getLogger(__name__)\n"))
   ;; (pop auto-insert-alist)
   )

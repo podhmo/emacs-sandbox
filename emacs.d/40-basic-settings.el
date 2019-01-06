@@ -130,15 +130,9 @@
 ;;                      collect i))
 
 
-(defvar myfont "-*-*-*-*-*-*-*-*-*-*-*-*-fontset-default")
-(set-fontset-font myfont
-                  'japanese-jisx0208
-;                  (font-spec :family "Hiragino Kaku Gothic ProN")
-                  (font-spec :family "Hiragino Maru Gothic Pro")) ;; font
-
 (setq default-frame-alist
       `(
-        ;; (top . 10) 
+        ;; (top . 10)
         ;; (left . 10)
       	;; (width . 106)
       	;; (height . 40)
@@ -151,8 +145,24 @@
         ;; (background-color . "black")
         (background-color . "dark slate gray")
         (foreground-color . "white")
-        (font . ,myfont)
         ,@default-frame-alist))
+
+(let ((sysname (symbol-name system-type)))
+  (cond ((string-match-p "darwin" sysname)
+         ;; todo create font
+         (defvar myfont "-*-*-*-*-*-*-*-*-*-*-*-*-fontset-default")
+         (set-fontset-font
+          myfont
+          'japanese-jisx0208
+          ;;                  (font-spec :family "Hiragino Kaku Gothic ProN")
+          (font-spec :family "Hiragino Maru Gothic Pro"))
+         (add-to-list 'deault-frame-alist `(font . ,myfont))
+         )
+        ((string-match-p "linux" sysname)
+
+         )
+        (t )))
+
 
 ;; (unless (package-installed-p 'atom-dark-theme)
 ;;   (package-install 'atom-dark-theme))

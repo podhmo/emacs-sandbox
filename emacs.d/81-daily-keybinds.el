@@ -61,12 +61,17 @@
             ("<f12>" . (lambda () (interactive)
                          (message "reflesh")
                          (setq extended-command-history nil)))
+
+            ;; font-size C-x +, C- -
+            ("C-x \\" . my:adjust-font-height)
+            ("C-x |" . my:adjust-font-height-globally)
             )
+
           )
     (define-many-keys (current-global-map) global-individual-key-mapping))
   (progn ;; key-chord
     (key-chord-define-global "jk" 'view-mode)
-;    (key-chord-define-global "po" 'org-remember)
+                                        ;    (key-chord-define-global "po" 'org-remember)
     (key-chord-define-global "po" 'monologue)
     )
   )
