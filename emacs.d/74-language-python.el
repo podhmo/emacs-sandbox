@@ -74,7 +74,7 @@
     (insert " ")))
 
 
-;; yapf
+;; formatter
 (defun my:py-yapf-buffer (beg end)
   (interactive "r")
   (unless (region-active-p)
@@ -83,6 +83,16 @@
     )
   (let ((yapf (or (pickup-file "bin/yayapf") (pickup-file "bin/yapf") "yapf")))
     (my:execute-formatter-command yapf yapf  beg end)))
+(defun my:py-black-buffer (beg end)
+  (interactive "r")
+  (unless (region-active-p)
+    (setq beg (point-min))
+    (setq end (point-max))
+    )
+  (let* ((cmd-name (or (pickup-file "bin/black") "black"))
+         (cmd (format "%s %s" cmd-name "-")))
+    (my:execute-formatter-command cmd-name cmd  beg end)))
+(defalias 'my:py-formatter-buffer (symbol-function 'my:py-black-buffer))
 
 ;; jedi
 (with-eval-after-load 'python
@@ -140,7 +150,7 @@
         ("_" . my:python-insert-comma )
         ("\\" . insert-pair-escaped-after)
         ("," . my:python-insert-comma)
-        ("C-x C-s" . my:py-yapf-buffer)
+        ("C-x C-s" . my:py-formatter-buffer)
         ("C-c @" . quickrun-python:compile-only)
         ("C-c C-f" . ffap-python:import-ffap)
         ("C-c C-c" . toggle-file)))
