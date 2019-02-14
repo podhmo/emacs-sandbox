@@ -130,6 +130,7 @@
 ;;                      collect i))
 
 
+
 (setq default-frame-alist
       `(
         ;; (top . 10)
@@ -156,7 +157,7 @@
           'japanese-jisx0208
           ;;                  (font-spec :family "Hiragino Kaku Gothic ProN")
           (font-spec :family "Hiragino Maru Gothic Pro"))
-         (add-to-list 'deault-frame-alist `(font . ,myfont))
+         (add-to-list 'default-frame-alist `(font . ,myfont))
          )
         ((string-match-p "linux" sysname)
 
