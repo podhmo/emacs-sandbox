@@ -6,7 +6,9 @@
       (file-name-directory load-file-name)
     default-directory))
 
-(require 'cask "~/.cask/cask.el")
+(or  (require 'cask "~/.cask/cask.el" t)
+     (require 'cask "/opt/local/share/cask/cask.el"))
+
 (cask-initialize)
 (require 'pallet)
 

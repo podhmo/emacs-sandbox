@@ -65,9 +65,6 @@
 
 
 ;;; my own
-(progn ;; redo
-  (require-and-fetch-if-not 'redo+ :url "https://github.com/emacsmirror/emacswiki.org/raw/master/redo%2b.el")
-  )
 (progn ;; zlc
   (require 'zlc)
   )
@@ -99,9 +96,9 @@
 
 
 (progn ;; anything
-  (require-and-fetch-if-not 'anything :url "https://github.com/emacsmirror/emacswiki.org/raw/master/anything.el")
-  (require-and-fetch-if-not 'anything-match-plugin :url "https://github.com/emacsmirror/emacswiki.org/raw/master/anything-match-plugin.el")
-  (require-and-fetch-if-not 'anything-config :url "https://github.com/emacsmirror/emacswiki.org/raw/master/anything-config.el")
+  (require-and-fetch-if-not 'anything :url "https://raw.githubusercontent.com/emacsattic/anything/master/anything.el")
+  (require-and-fetch-if-not 'anything-match-plugin :url "https://raw.githubusercontent.com/emacsattic/anything/master/anything-match-plugin.el")
+  (require-and-fetch-if-not 'anything-config :url "https://raw.githubusercontent.com/emacsattic/anything/master/anything-config.el")
 
   ;; (require 'anything-complete)
 
@@ -415,4 +412,9 @@
 
       (set-face-attribute 'default nil :height font-height)
       ))
+  )
+
+;;
+(progn ;; redo
+  (require-and-fetch-if-not 'redo+ :url "https://gist.githubusercontent.com/podhmo/2c1faa57d279b84c18cd9f40de2e4fe3/raw/5f6b930b719bd43906823fc5c8dd6f18a3430aa4/redo+.el")
   )
