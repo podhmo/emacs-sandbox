@@ -4,7 +4,12 @@
 
 (defun get-go-path ()
   (let ((output (shell-command-to-string "$SHELL --login -i -c 'echo $GOPATH'")))
-    (car (last (split-string output)))))
+    (or (car (last (split-string output)))
+        (progn
+          (unless (member (expand-file-name "~/go/bin") exec-path)
+            (push (expand-file-name "~/go/bin") exec-path)
+            )
+        (expand-file-name "~/go")))))
 
 (defvar my:anything-c-source-go-src-selection
   '((name . "Go src selection")
