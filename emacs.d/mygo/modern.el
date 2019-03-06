@@ -1,4 +1,10 @@
-;; with-eglot
+;; with-eglot and ivy
+(use-package ivy
+  :ensure t
+  :config
+  (setq ivy-use-virtual-buffers t)
+  )
+
 (use-package go-mode
   :defer t
   :commands (go-mode)
@@ -19,6 +25,7 @@
 
   (defun my:go-mode-setup ()
     (eglot-ensure)
+    (ivy-mode 1)
     (define-insert-pair-binding go-mode-map my:golang-key-pair)
 
     ;; TODO: eldoc more fancy UI?

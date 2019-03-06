@@ -2,8 +2,8 @@
   :ensure t
   :commands (paredit-mode)
   :config
+  (define-key paredit-mode-map (kbd "C-j") ctl-j-map)
   (bind-keys :map paredit-mode-map
-             ("C-j" . ctl-j-map)
              ("M-r" . replace-string)))
 
 (defun* my:elisp-output-with-comment (&key (place-holder ";; => "))
