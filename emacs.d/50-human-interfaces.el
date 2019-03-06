@@ -66,6 +66,11 @@
 (use-package zlc
   :ensure t
   :config
+  (bind-keys :map minibuffer-local-map
+             ("C-f" . zlc-select-next)
+             ("C-b" . zlc-select-previous)
+             ("C-p" . zlc-select-previous-vertical)
+             ("C-n" . zlc-select-next-vertical))
   (zlc-mode t))
 
 ;; (progn ;; editing
