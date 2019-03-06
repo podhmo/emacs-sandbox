@@ -1,5 +1,3 @@
-;; #+:Emacs
-;; こちらも参照→ http://github.com/kosh04/emacs-lisp > xyzzy.el
 (defun char-unicode (char) (encode-char char 'ucs))
 (defun unicode-char (code) (decode-char 'ucs code))
 

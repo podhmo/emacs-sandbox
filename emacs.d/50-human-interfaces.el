@@ -262,9 +262,9 @@
                                  (concat "cd " dir))
              (goto-char (point-max)))))
 
-  (progn ;; elscreen
-    (require 'elscreen)
-
+  (use-package elscreen
+    :ensure t
+    :init
     (defun global-j-define-key (&optional kmap)
       (and-let* ((kmap (or kmap (current-local-map))))
         (define-key kmap "\C-j" nil))) ;; experimental
