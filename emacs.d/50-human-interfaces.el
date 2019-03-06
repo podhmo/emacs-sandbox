@@ -13,13 +13,11 @@
     (lambda ()
       ,@body)))
 
-
-(progn ;; key-chord
-  (require 'key-chord)
+(use-package key-chord
+  :ensure t
+  :config
   (setq key-chord-two-keys-delay 0.1)
-  (key-chord-mode 1)
-  )
-
+  (key-chord-mode 1))
 
 ;; from: https://github.com/wakaran/config/blob/master/dot.emacs.d.server/init/90-last-setting.el
 (progn ;; shell-settings
@@ -65,9 +63,10 @@
 
 
 ;;; my own
-(progn ;; zlc
-  (require 'zlc)
-  )
+(use-package zlc
+  :ensure t
+  :config
+  (zlc-mode t))
 
 ;; (progn ;; editing
 ;;   (require 'autopair)
@@ -79,7 +78,7 @@
   (progn ;; eldoc
     (require 'eldoc)
     (setq eldoc-argument-case 'downcase)
-    
+
     (defadvice  eldoc-get-fnsym-args-string
         (around eldoc-named-progn-display-section (sym &optional index) activate)
       (cond ((eq sym 'named-progn)
@@ -135,7 +134,8 @@
      (anything-occur)))
 
   (progn ;; bookmarking-current-buffer
-    (require 'bm)
+    (use-package bm
+      :ensure t)
 
     (defun anything-bm-list* ()
       "Preconfigured `anything' for visible bookmarks."

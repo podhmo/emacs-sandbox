@@ -6,11 +6,10 @@
       (file-name-directory load-file-name)
     default-directory))
 
-(or  (require 'cask "~/.cask/cask.el" t)
-     (require 'cask "/opt/local/share/cask/cask.el"))
-
-(cask-initialize)
-(require 'pallet)
+(setq package-archives
+      '(("gnu" . "http://elpa.gnu.org/packages/")
+        ("melpa" . "http://melpa.org/packages/")
+        ))
 
 ;;; Begin 0.5 this is temporary
 (add-to-list 'load-path (concat (current-directory) "3rdparty"))
@@ -30,23 +29,28 @@
     )) 
 
 
-(load (concat (current-directory) "init-visualize")) ;; hmm
+;(load (concat (current-directory) "init-visualize")) ;; hmm
 ;(initchart-visualize-init-sequence "/tmp/b.svg")
 
 ;;; Begin 1
-(require 'init-loader)
-(setq init-loader-show-log-after-init nil)
-;; suppress Warinig
-(setq *curdir* (current-directory))
-(defadvice init-loader-load (after suppress-warning activate)
-  (setq load-path
-        (remove-if (lambda (x) (string-equal x *curdir*)) load-path))
-  )
-(init-loader-load (current-directory))
+(use-package init-loader
+  :ensure t
+  :config
+  (setq init-loader-show-log-after-init nil)
+
+  ;; suppress Warinig
+  (setq *curdir* (current-directory))
+  (defadvice init-loader-load (after suppress-warning activate)
+    (setq load-path
+          (remove-if (lambda (x) (string-equal x *curdir*)) load-path))
+    )
+
+  (init-loader-load (current-directory))
+)
+
 
 
 ;;; Begin 2
-
 (put 'narrow-to-region 'disabled nil)
 (setq debug-on-error nil)
 
@@ -89,30 +93,13 @@
 (setq-default ring-bell-function
               (lambda () (message "ding")))
 
-;; temporary
-;; (defun setup-sp-toggle-on-org ()
-;;   (define-key org-mode-map "\C-c\C-c" 'toggle-file)
-;;   )
-;; (add-hook 'org-mode-hook 'setup-sp-toggle-on-org)
-
 (let ((pair (rassoc 'image-file-handler file-name-handler-alist)))
   (and pair
        (setcar pair "\\.\\(GIF\\|JP\\(?:E?G\\)\\|P\\(?:BM\\|GM\\|N[GM]\\|PM\\)\\|TIFF?\\|X\\(?:[BP]M\\)\\|gif\\|jp\\(?:e?g\\)\\|p\\(?:bm\\|gm\\|n[gm]\\|pm\\)\\|tiff?\\|x\\(?:[bp]m\\)\\)\\'"))
   )
 
-;; gauche
-(add-to-list 'Info-default-directory-list "/opt/local/share/info")
-;(setenv "INFOPATH" "/opt/local/share/info/:$INFOPATH")
 (put 'upcase-region 'disabled nil)
 
-;; temporary
-(defun rst-htmlize () (interactive)
-       (when (executable-find "htmlize")
-         (shell-command (format "htmlize -b -t 1 %s" (buffer-file-name)))))
-
-(eval-after-load "rst"
-  '(add-hook 'rst-mode-hook
-             (lambda () (define-key rst-mode-map "\C-c\C-c\C-l" 'rst-htmlize))))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -124,7 +111,7 @@
  '(help-at-pt-timer-delay 0.9)
  '(package-selected-packages
    (quote
-    (eglot undo-tree jsonrpc json-rpc dash-functional lsp-mode shackle racer company-racer use-package company-jedi epc scala-mode disable-mouse flycheck-rust rust-mode go-mode fcitx "flymake-yaml" flymake-yaml yaml-mode toggle-file-mode pickup initchart flymake-jshint flymake-eslint ffap-python company-go anything-vcs-project)))
+    (bm: init-loader eglot undo-tree jsonrpc json-rpc dash-functional lsp-mode shackle racer company-racer use-package company-jedi epc scala-mode disable-mouse flycheck-rust rust-mode go-mode fcitx "flymake-yaml" flymake-yaml yaml-mode toggle-file-mode pickup initchart flymake-jshint flymake-eslint ffap-python company-go anything-vcs-project)))
  '(python-environment-virtualenv (list "python" "-m" "venv" "--system-site-packages"))
  '(safe-local-variable-values (quote ((encoding . utf-8))))
  '(send-mail-function (quote smtpmail-send-it)))
@@ -150,7 +137,7 @@
     (setq this-command last-command)
     nil)
   (global-set-key (kbd "<eisu-toggle>") 'my:ignore)
-  
+
   ;; disable-mouse when linux environement
   (require 'disable-mouse)
   (global-disable-mouse-mode)
