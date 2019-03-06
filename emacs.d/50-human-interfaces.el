@@ -17,26 +17,24 @@
   :ensure t
   :config
   (setq key-chord-two-keys-delay 0.1)
-  (key-chord-mode 1))
+  (key-chord-mode 1)
 
-;; from: https://github.com/wakaran/config/blob/master/dot.emacs.d.server/init/90-last-setting.el
-(progn ;; shell-settings
-;;;; shell-modeで上下でヒストリ補完
-  ;; C-p/C-nでヒストリを辿る (デフォルトでもM-p, M-nで出来る)
-  (add-hook 'on-after-keyboard-setup
-            (lambda ()
-              (add-hook
-               'shell-mode-hook
-               (function (lambda ()
-                           (define-key shell-mode-map [up] 'comint-previous-input)
-                           (define-key shell-mode-map [down] 'comint-next-input)
-                           (define-key shell-mode-map "\C-p" 'comint-previous-input)
-                           (define-key shell-mode-map "\C-n" 'comint-next-input)))))))
+  (key-chord-define-global "jk" 'view-mode)
+  ;; (key-chord-define-global "po" 'org-remember)
+  (key-chord-define-global "po" 'monologue)
+)
 
-;; ;; kill-ring に同じ内容の文字列を複数入れない
-;; ;; kill-ring-save 等した時にその内容が既に kill-ring にある場合、その文字列が kill-ring の先頭に 1 つにまとめられます
-;; (defadvice kill-new (before ys:no-kill-new-duplicates disable)
-;;   (setq kill-ring (delete (ad-get-arg 0) kill-ring)))
+(use-package shell
+  :init
+  (defun my:shell-mode-setup ()
+    (bind-keys :map shell-mode-map
+               ("C-p" . comint-previous-input)
+               ("C-n" . comint-next-input)
+               ([up] . comint-previous-input)
+               ([down] . comint-next-input)))
+  (add-hook 'shell-mode-hook 'my:shell-mode-setup)
+  )
+
 
 ;;C-gを押したときに現在の入力がヒストリーに記録されるようになる。間違ってC-gを押してしまった場合は、再び同じコマンドを起動してM-pで前の入力を呼び戻せる
 (defadvice abort-recursive-edit (before minibuffer-save activate)
@@ -47,22 +45,6 @@
 ;; スクリプトを保存するとき()ファイルの先頭に #! が含まれているとき)，自動的に chmod +x を行う
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 
-;; 新規作成したファイルを未編集でも保存できるようにする
-;; http://stackoverflow.com/questions/2592095/how-do-i-create-an-empty-file-in-emacs
-;; (add-hook 'find-file-hooks 'assume-new-is-modified)
-;; (defun assume-new-is-modified ()
-;;   (when (not (file-exists-p (buffer-file-name)))
-;;     (set-buffer-modified-p t)))
-
-;; 連続する文末の空行を削除
-;; (add-hook 'before-save-hook
-;;           (lambda ()
-;;             (save-excursion
-;;               (goto-char (point-max))
-;;               (delete-blank-lines))))
-
-
-;;; my own
 (use-package zlc
   :ensure t
   :config
@@ -73,31 +55,21 @@
              ("C-n" . zlc-select-next-vertical))
   (zlc-mode t))
 
-;; (progn ;; editing
-;;   (require 'autopair)
-;;   (setq-default autopair-dont-pair `(:string (?') :comment  (?') :never (?`)))
-;;   ;; (require-and-fetch-if-not 'paredit)
-;;   )
+(use-package eldoc
+  :config
+  (setq eldoc-argument-case 'downcase)
 
-(progn ;; eye-candy
-  (progn ;; eldoc
-    (require 'eldoc)
-    (setq eldoc-argument-case 'downcase)
-
-    (defadvice  eldoc-get-fnsym-args-string
-        (around eldoc-named-progn-display-section (sym &optional index) activate)
-      (cond ((eq sym 'named-progn)
-             (let ((section-name
-                    (save-excursion
-                      (eldoc-beginning-of-sexp)
-                      (goto-char (scan-sexps (point) 1))
-                      (skip-syntax-forward "^w_")
-                      (thing-at-point 'symbol))))
-               (message "progn ;; -- %s --" section-name)))
-            (t ad-do-it)))
-    )
-  )
-
+  (defadvice  eldoc-get-fnsym-args-string
+      (around eldoc-named-progn-display-section (sym &optional index) activate)
+    (cond ((eq sym 'named-progn)
+           (let ((section-name
+                  (save-excursion
+                    (eldoc-beginning-of-sexp)
+                    (goto-char (scan-sexps (point) 1))
+                    (skip-syntax-forward "^w_")
+                    (thing-at-point 'symbol))))
+             (message "progn ;; -- %s --" section-name)))
+          (t ad-do-it))))
 
 (progn ;; anything
   (require-and-fetch-if-not 'anything :url "https://raw.githubusercontent.com/emacsattic/anything/master/anything.el")
@@ -169,30 +141,6 @@
     )
   )  
 
-;; (progn ;; scroll-buffer 
-;;   (require-and-fetch-if-not 'deferred)
-;;   (require 'inertial-scroll)
-;;   (setq inertias-initial-velocity 50)
-;;   (setq inertias-friction 120)
-;;   (setq inertias-update-time 50)
-;;   (setq inertias-rest-coef 0)
-;;   (setq inertias-global-minor-mode-map 
-;;         (inertias-define-keymap
-;;        '(
-;;          ;; Mouse wheel scrolling
-;;          ("<wheel-up>"   . inertias-down-wheel)
-;;          ("<wheel-down>" . inertias-up-wheel)
-;;          ("<mouse-4>"    . inertias-down-wheel)
-;;          ("<mouse-5>"    . inertias-up-wheel)
-;;          ;; Scroll keys
-;;          ("<next>"  . inertias-up)
-;;          ("<prior>" . inertias-down)
-;;          ("C-v"     . inertias-up)
-;;          ("M-v"     . inertias-down)
-;;          ) inertias-prefix-key))
-;;   (setq inertias-rebound-flash nil)
-;;   (inertias-global-minor-mode 1)
-;;   )
 
 (progn ;; viewer-mode-settings
   (progn ;; for-buffer-file-permission
@@ -300,45 +248,10 @@
 (setq ring-bell-function 'silent-bell)
 
 ;; monologue
-(defvar monologue:current-buffer-name-function 'current-memo)
-(defvar monologue:monologue-partation-string
-  "-monologue----------------------------------------\n")
-
-(defun monologue:get-current-buffer ()
-  (let ((bufname (funcall monologue:current-buffer-name-function)))
-    (find-file-noselect bufname)))
-
-(defun monologue:start-point ()
-  (goto-char (point-max))
-  (let ((paration-string monologue:monologue-partation-string))
-    (cond ((re-search-backward paration-string nil t 1) (forward-line 1))
-          (t (progn
-               (goto-char (point-max))
-               (insert paration-string))))))
-
-(require 'time-stamp)
-(defun monologue:header-default ()
-  (format "%s [%s]\n" 
-          (time-stamp-string "%Y/%:m/%:d %:H:%:M")
-          (or (buffer-file-name) (buffer-name)))
-  )
-
-(defvar monologue:header-function 'monologue:header-default)
-(defun monologue:header ()
-  (funcall monologue:header-function))
-
-(defun monologue (message) (interactive "smessage: ")
-       (let ((buf (monologue:get-current-buffer))
-             (header (monologue:header)))
-         (with-current-buffer buf
-           (save-excursion
-             (monologue:start-point)
-             (insert header)
-             (insert message)
-             (insert "\n")
-             (unless (string-match "\n$" message)
-               (insert "\n"))))))
-
+(use-package monologue ;; mine
+  :commands (monologue)
+  :bind (("C-c C-w" . monologue))
+)
 
 (progn ;; dired
   (defun my:dired-setup ()

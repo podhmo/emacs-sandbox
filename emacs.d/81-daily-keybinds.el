@@ -46,8 +46,6 @@
             ("C-c ]" . quickrun-compile-only) ;; for keyboard(en)
             ("C-c C-]" . quickrun) ;; for keyboard(en)
 
-            ("C-c C-w" . monologue)
-
             ;; elscreen
             ("C-;" . elscreen-previous)
             ("C-:" . elscreen-next)
@@ -69,9 +67,4 @@
 
           )
     (define-many-keys (current-global-map) global-individual-key-mapping))
-  (progn ;; key-chord
-    (key-chord-define-global "jk" 'view-mode)
-                                        ;    (key-chord-define-global "po" 'org-remember)
-    (key-chord-define-global "po" 'monologue)
-    )
   )

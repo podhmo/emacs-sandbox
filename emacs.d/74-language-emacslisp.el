@@ -1,6 +1,10 @@
-(require 'paredit)
-(define-key paredit-mode-map (kbd "C-j") ctl-j-map)
-
+(use-package paredit
+  :ensure t
+  :commands (paredit-mode)
+  :config
+  (bind-keys :map paredit-mode-map
+             ("C-j" . ctl-j-map)
+             ("M-r" . replace-string)))
 
 (defun* my:elisp-output-with-comment (&key (place-holder ";; => "))
   (interactive)
@@ -46,15 +50,15 @@
   )
 
 (defun my:emacs-lisp-setup ()
-  (define-many-keys emacs-lisp-mode-map
-    '(("C-c C-j" . lisp-complete-symbol)
-      ("C-c M-r" . paredit-forward-slurp-sexp)
-      ("C-c M-R" . paredit-forward-barf-sexp)
-      ("C-c M-l" . paredit-backward-slurp-sexp)
-      ("C-c M-L" . paredit-backward-barf-sexp)
-      ("C-c C-i" . my:elisp-output-with-comment)
-      ("C-x C-s" . my:elisp-format)
-      ))
+  (bind-keys :map emacs-lisp-mode-map
+             ("C-c C-j" . lisp-complete-symbol)
+             ("C-c M-r" . paredit-forward-slurp-sexp)
+             ("C-c M-R" . paredit-forward-barf-sexp)
+             ("C-c M-l" . paredit-backward-slurp-sexp)
+             ("C-c M-L" . paredit-backward-barf-sexp)
+             ("C-c C-i" . my:elisp-output-with-comment)
+             ("C-x C-s" . my:elisp-format)
+             )
 
   (when (require 'company nil t)
     (company-mode)
