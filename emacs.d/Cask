@@ -1,7 +1,6 @@
 (source gnu)
 (source melpa)
 
-(depends-on "undo-tree")
 (depends-on "anything")
 (depends-on "anything-match-plugin")
 (depends-on "anything-vcs-project")
@@ -47,6 +46,7 @@
 (depends-on "smex")
 (depends-on "tuareg")
 (depends-on "typescript")
+(depends-on "undo-tree")
 (depends-on "use-package")
 (depends-on "web-mode")
 (depends-on "yasnippet")

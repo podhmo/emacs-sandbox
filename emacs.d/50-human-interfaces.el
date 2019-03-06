@@ -414,12 +414,11 @@
       ))
   )
 
-;;
 
-(progn
-  (require 'undo-tree)
-  (global-undo-tree-mode)
+(use-package undo-tree
+  :ensure t
+  :config
   ;; C-x u undo-tree-visualize
   ;; C-. redo
   ;; C-/ undo
-  )
+  (global-undo-tree-mode))
