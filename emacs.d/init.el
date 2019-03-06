@@ -111,7 +111,7 @@
  '(help-at-pt-timer-delay 0.9)
  '(package-selected-packages
    (quote
-    (elscreen bm: init-loader eglot undo-tree jsonrpc json-rpc dash-functional lsp-mode shackle racer company-racer use-package company-jedi epc scala-mode disable-mouse flycheck-rust rust-mode go-mode fcitx "flymake-yaml" flymake-yaml yaml-mode toggle-file-mode pickup initchart flymake-jshint flymake-eslint ffap-python company-go anything-vcs-project)))
+    (markdown-mode zlc go-eldoc elscreen bm: init-loader eglot undo-tree jsonrpc json-rpc dash-functional lsp-mode shackle racer company-racer use-package company-jedi epc scala-mode disable-mouse flycheck-rust rust-mode go-mode fcitx "flymake-yaml" flymake-yaml yaml-mode toggle-file-mode pickup initchart flymake-jshint flymake-eslint ffap-python company-go anything-vcs-project)))
  '(python-environment-virtualenv (list "python" "-m" "venv" "--system-site-packages"))
  '(safe-local-variable-values (quote ((encoding . utf-8))))
  '(send-mail-function (quote smtpmail-send-it)))
