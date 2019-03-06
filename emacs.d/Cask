@@ -1,6 +1,7 @@
 (source gnu)
 (source melpa)
 
+(depends-on "undo-tree")
 (depends-on "anything")
 (depends-on "anything-match-plugin")
 (depends-on "anything-vcs-project")

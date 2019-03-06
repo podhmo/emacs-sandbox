@@ -415,6 +415,11 @@
   )
 
 ;;
-(progn ;; redo
-  (require-and-fetch-if-not 'redo+ :url "https://gist.githubusercontent.com/podhmo/2c1faa57d279b84c18cd9f40de2e4fe3/raw/5f6b930b719bd43906823fc5c8dd6f18a3430aa4/redo+.el")
+
+(progn
+  (require 'undo-tree)
+  (global-undo-tree-mode)
+  ;; C-x u undo-tree-visualize
+  ;; C-. redo
+  ;; C-/ undo
   )
