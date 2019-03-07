@@ -1,4 +1,3 @@
-
 ;; with-eglot and ivy
 (use-package ivy
   :ensure t
@@ -8,6 +7,7 @@
 
 (use-package go-mode
   :defer t
+  :ensure t
   :commands (go-mode)
   :mode (("\\.go" . go-mode))
   :init

@@ -28,8 +28,11 @@
      )
     ))
 
-(progn ;; quick-run
-  (require'quickrun)
+(use-package quickrun
+  :ensure t
+  :commands
+  (quickrun quickrun-compile-only)
+  :config
   (defadvice quickrun (around help-mode-after-quickrun activate)
     (lexical-let ((before-buf (current-buffer)))
       ad-do-it
