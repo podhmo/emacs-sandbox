@@ -141,10 +141,12 @@ ndelay")
   (dolist (p (process-list)) (delete-process p))
   (server-start))
 
+;; TODO: package
+(require 'subr-x)
 (defvar my:masking-buffer-candidates-alist
   `(
     (,(lambda ()
-        (when-let ((it (pickup:pickup-file "/bin/pip")))
+        (when-let* ((it (pickup:pickup-file "/bin/pip")))
           (replace-regexp-in-string "/bin/pip$" "" it)))
      . "VENV")
     (,(getenv "GOPATH") . "$GOPATH")
@@ -164,7 +166,7 @@ ndelay")
        for (pattern . replacement) in my:masking-buffer-candidates-alist
        do
        (progn
-         (when-let ((it (if (functionp pattern) (funcall pattern) pattern)))
+         (when-let* ((it (if (functionp pattern) (funcall pattern) pattern)))
            (message "MASKING-APPLY %s %s" it replacement)
            (goto-char (point-min))
            (while (search-forward it nil t 1)
@@ -195,7 +197,7 @@ ndelay")
     (shell-command-on-region start end command output-buffer replace)))
 
 (defun my:resolve-github-url (&optional path)
-  (when-let ((git-config-file (pickup:pickup-file ".git/config" :path path)))
+  (when-let* ((git-config-file (pickup:pickup-file ".git/config" :path path)))
     (cl-block b
         (let ((buf (find-file-noselect git-config-file)))
           (with-current-buffer buf
@@ -207,7 +209,7 @@ ndelay")
 (defun* my:browse-github (&key (branch nil) (rel-path nil) (line-no nil))
   (interactive)
   (destructuring-bind (_ . path) (project-current)
-    (when-let ((url (my:resolve-github-url path)))
+    (when-let* ((url (my:resolve-github-url path)))
       (let* ((branch (or branch (car (vc-git-branches))))
              (rel-path (or rel-path (replace-regexp-in-string (expand-file-name path) "" (buffer-file-name))))
              (line-no (or line-no (line-number-at-pos)))

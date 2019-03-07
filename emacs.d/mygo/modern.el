@@ -1,3 +1,4 @@
+
 ;; with-eglot and ivy
 (use-package ivy
   :ensure t
@@ -12,6 +13,7 @@
   :init
 
   (with-eval-after-load 'eglot
+    (add-to-list 'exec-path (format "%s/bin" (or (getenv "GOPATH") "~/go")))
     (add-to-list 'eglot-server-programs '(go-mode "bingo" "-format-style" "goimports"))
     )
 
