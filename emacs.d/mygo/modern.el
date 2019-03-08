@@ -5,6 +5,15 @@
   (setq ivy-use-virtual-buffers t)
   )
 
+(use-package counsel
+  :ensure t
+  :bind (;("C-x C-f" . counsel-find-file)
+         ("C-h f" . counsel-describe-function)
+         ("C-h v" . counsel-describe-variable))
+  :config
+  (setq ffap-file-finder 'counsel-find-file)
+)
+
 (use-package go-mode
   :defer t
   :ensure t
