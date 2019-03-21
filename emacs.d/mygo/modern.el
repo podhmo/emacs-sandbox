@@ -3,6 +3,11 @@
   :ensure t
   :config
   (setq ivy-use-virtual-buffers t)
+
+  (defun my:ivy-mode-setup ()
+    (setq completing-read-function 'completing-read-default)
+    )
+  (add-hook 'ivy-mode-hook 'my:ivy-mode-setup)
   )
 
 (use-package counsel

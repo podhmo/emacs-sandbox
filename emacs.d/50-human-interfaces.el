@@ -28,8 +28,8 @@
   :init
   (defun my:shell-mode-setup ()
     (bind-keys :map shell-mode-map
-               ("C-p" . comint-previous-input)
-               ("C-n" . comint-next-input)
+               ;; ("C-p" . comint-previous-input)
+               ;; ("C-n" . comint-next-input)
                ([up] . comint-previous-input)
                ([down] . comint-next-input)))
   (add-hook 'shell-mode-hook 'my:shell-mode-setup)
@@ -49,8 +49,8 @@
   :ensure t
   :config
   (bind-keys :map minibuffer-local-map
-             ("C-f" . zlc-select-next)
-             ("C-b" . zlc-select-previous)
+             ;; ("C-f" . zlc-select-next)
+             ;; ("C-b" . zlc-select-previous)
              ("C-p" . zlc-select-previous-vertical)
              ("C-n" . zlc-select-next-vertical))
   (zlc-mode t))
