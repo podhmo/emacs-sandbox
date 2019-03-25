@@ -16,7 +16,7 @@
          ("C-h f" . counsel-describe-function)
          ("C-h v" . counsel-describe-variable))
   :config
-  (setq ffap-file-finder 'counsel-find-file)
+  ;; (setq ffap-file-finder 'counsel-find-file)
 )
 
 (use-package go-mode
