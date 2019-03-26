@@ -4,17 +4,20 @@
 (defun pick-normalize-path (path)
   (replace-regexp-in-string (format "^%s" (getenv "HOME")) "~" path))
 
-(defun pick-current-directory-name () (interactive)
+(defun pick-current-directory-name ()
+  (interactive)
   (let1 source (pick-normalize-path default-directory)
     (kill-new source)
     (message "copy: %s" source)))
 
-(defun pick-current-word () (interactive)
+(defun pick-current-word ()
+  (interactive)
   (let1 source (current-word)
     (kill-new source)
     (message "copy: %s" source)))
 
-(defun pick-current-file-name () (interactive)
+(defun pick-current-file-name ()
+  (interactive)
   (let1 source (pick-normalize-path buffer-file-name)
     (kill-new source)
     (message "copy: %s" source)))
@@ -26,37 +29,43 @@
                    (and (buffer-file-name b) (file-exists-p (buffer-file-name b))))
         do (kill-buffer b)))
 
-(defun browse-current-file () (interactive)
+(defun browse-current-file ()
+  (interactive)
   (let1 source buffer-file-name
     (browse-url source)))
 
-(defun open-shell-with-pwd () (interactive)
+(defun open-shell-with-pwd ()
+  (interactive)
   (let1 dir (current-directory)
     (shell)
     (comint-simple-send (get-buffer-process dir)
                         (concat "cd " dir))
     (goto-char (point-max))))
 
-(defun find-decreased-file () (interactive)
-  (let ((fname buffer-file-name)
-        (num-rx "[0-9]+"))
-    (when (string-match num-rx fname)
-      (let* ((num (- (string-to-number (match-string 0 fname)) 1))
-             (decreased-filename 
-              (replace-regexp-in-string num-rx (number-to-string num) fname)))
-        (find-file decreased-filename)))))
+(cl-defun find-increased-file (&key (n 1) (default 1))
+  (interactive)
+  (let* ((fname (file-name-nondirectory buffer-file-name))
+         (num-rx "[0-9]+")
+         (new-name fname))
+    (cond ((string-match num-rx fname)
+           (let* ((num (+ (string-to-number (match-string 0 fname)) n)))
+             (setq new-name
+                   (replace-regexp-in-string num-rx (number-to-string num) fname))))
+          (t
+           (setq new-name
+                 replace-regexp-in-string
+                 ((regexp-quote (file-name-sans-extension fname))
+                  (format "%s%d" (file-name-sans-extension fname) default)
+                  fname))))
+    (find-file (concat (file-name-directory buffer-file-name) new-name))))
 
-(defun find-increased-file () (interactive)
-  (let ((fname buffer-file-name)
-        (num-rx "[0-9]+"))
-    (when (string-match num-rx fname)
-      (let* ((num (+ 1 (string-to-number (match-string 0 fname))))
-             (increased-filename 
-              (replace-regexp-in-string num-rx (number-to-string num) fname)))
-        (find-file increased-filename)))))
+(defun find-decreased-file ()
+  (interactive)
+  (find-increased-file :n -1 :default 1))
 
 
-(defun current-hook-change-to-empty () (interactive)
+(defun current-hook-change-to-empty ()
+  (interactive)
   (let ((hook (symbol-at-point)))
     (cond ((boundp hook)
            (unwind-protect
@@ -72,8 +81,9 @@
 (progn ;; for-follow-mode
   (defvar split-window-function
     'split-window-horizontally)
-  
-  (defun follow-with-n-window (n) (interactive "p")
+
+  (defun follow-with-n-window (n)
+    (interactive "p")
     "start follow-mode with n-window. n is prefix argument.
 so. c-u 3 follow-with-n-window, then a frame splitted 3window
 "
@@ -96,7 +106,7 @@ so. c-u 3 follow-with-n-window, then a frame splitted 3window
 
   (defun junks-create-directory-if-force (force-p)
     (unless (and force-p
-                 (file-exists-p junks-directory-path) 
+                 (file-exists-p junks-directory-path)
                  (file-directory-p junks-directory-path))
       (make-directory junks-directory-path)))
 
@@ -107,7 +117,7 @@ so. c-u 3 follow-with-n-window, then a frame splitted 3window
       (dolist (s strings)
         (insert s "\n"))))
 
-  (defun move-junks (&rest contents) 
+  (defun move-junks (&rest contents)
     (let* ((timestamp (format-time-string "%Y-%m-%d" (current-time)))
            (fname (format "%s/junks.%s" junks-directory-path timestamp)))
       (junks-create-directory-if-force  junks-directory-force-create-p)
@@ -115,16 +125,16 @@ so. c-u 3 follow-with-n-window, then a frame splitted 3window
         (junks-insert-content contents))))
 
   (defun move-junks-region (beg end comment) (interactive "r\nscomment:")
-    (move-junks
-     comment
-     (delete-and-extract-region beg end)))
+         (move-junks
+          comment
+          (delete-and-extract-region beg end)))
   )
 
 
-(defun simple-timer (n d &optional color) (interactive "nwait
-ndelay")
-  (run-with-timer 
-   n nil 
+(defun simple-timer (n d &optional color)
+  (interactive "nwait\nndelay")
+  (run-with-timer
+   n nil
    (lexical-let ((d d) (color (or color "#8d8d8d")))
      (lambda (&rest args)
        (lexical-let ((original-color (background-color-at-point)))
@@ -132,7 +142,8 @@ ndelay")
          (run-with-timer d nil (lambda (&rest args) (set-background-color original-color)))
          )))))
 
-(defun font-at-cp () (interactive)
+(defun font-at-current-point ()
+  (interactive)
   (print (font-at (point))))
 
 ;;
@@ -186,12 +197,13 @@ ndelay")
         ))))
 
 (defun my:shell-command-on-region-and-insert (start end command)
-  (interactive (let (string)
-                 (unless (mark)
-		           (user-error "The mark is not set now, so there is no region"))
-		         (setq string (read-shell-command "Shell command on region(and insert): "))
-		         (list (region-beginning) (region-end) string))
-               )
+  (interactive
+   (let (string)
+     (unless (mark)
+	   (user-error "The mark is not set now, so there is no region"))
+	 (setq string (read-shell-command "Shell command on region(and insert): "))
+	 (list (region-beginning) (region-end) string))
+   )
   (let ((output-buffer t)
         (replace t))
     (shell-command-on-region start end command output-buffer replace)))
@@ -199,14 +211,14 @@ ndelay")
 (defun my:resolve-github-url (&optional path)
   (when-let* ((git-config-file (pickup:pickup-file ".git/config" :path path)))
     (cl-block b
-        (let ((buf (find-file-noselect git-config-file)))
-          (with-current-buffer buf
-            (goto-char (point-min))
-            (when (re-search-forward "url = git@github.com:\\(.+\\)\\(?:\\.git\\)?" nil t)
-              (let ((user-repository-name (string-trim-right (match-string-no-properties 1) "\\.git$")))
-                (cl-return-from b (format "https://github.com/%s" user-repository-name)))))))))
+      (let ((buf (find-file-noselect git-config-file)))
+        (with-current-buffer buf
+          (goto-char (point-min))
+          (when (re-search-forward "url = git@github.com:\\(.+\\)\\(?:\\.git\\)?" nil t)
+            (let ((user-repository-name (string-trim-right (match-string-no-properties 1) "\\.git$")))
+              (cl-return-from b (format "https://github.com/%s" user-repository-name)))))))))
 
-(defun* my:browse-github (&key (branch nil) (rel-path nil) (line-no nil))
+(cl-defun my:browse-github (&key (branch nil) (rel-path nil) (line-no nil))
   (interactive)
   (destructuring-bind (_ . path) (project-current)
     (when-let* ((url (my:resolve-github-url path)))
