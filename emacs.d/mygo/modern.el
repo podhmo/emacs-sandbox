@@ -27,7 +27,10 @@
   :init
 
   (with-eval-after-load 'eglot
+    (unless (getenv "GOPATH")
+      (setenv "GOPATH" (my:go-path)))
     (add-to-list 'exec-path (format "%s/bin" (or (getenv "GOPATH") "~/go")))
+    ;; go get -v -u github.com/saibing/bingo
     (add-to-list 'eglot-server-programs '(go-mode "bingo" "-format-style" "goimports"))
     )
 
@@ -40,7 +43,7 @@
     )
 
   (defun my:go-mode-setup ()
-    (eglot-ensure)
+    (my:eglot-ensure)
     (ivy-mode 1)
     (define-insert-pair-binding go-mode-map my:golang-key-pair)
 

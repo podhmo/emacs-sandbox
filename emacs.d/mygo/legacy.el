@@ -1,16 +1,6 @@
 (autoload 'go-mode "go-mode" nil t)
 (add-to-list 'auto-mode-alist '("\\.go$" . go-mode))
 
-
-(defun get-go-path ()
-  (let ((output (shell-command-to-string "$SHELL --login -i -c 'echo $GOPATH'")))
-    (or (car (last (split-string output)))
-        (progn
-          (unless (member (expand-file-name "~/go/bin") exec-path)
-            (push (expand-file-name "~/go/bin") exec-path)
-            )
-        (expand-file-name "~/go")))))
-
 (defvar my:anything-c-source-go-src-selection
   '((name . "Go src selection")
     (init
