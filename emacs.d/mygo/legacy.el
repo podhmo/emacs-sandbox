@@ -22,6 +22,7 @@
          (let ((buf (anything-candidate-buffer " *go std src*"))
                (cmd "find `go tool dist env | grep GOROOT | cut -d = -f 2 | sed 's/\"//g;'`/src -type d -mindepth 1 -maxdepth 2"))
            (flet ((display-buffer (&rest args) nil))
+
              (shell-command cmd buf buf))
            )))
     (real-to-display

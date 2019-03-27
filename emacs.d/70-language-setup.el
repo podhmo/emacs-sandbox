@@ -115,43 +115,32 @@
            (when (= (point) (point-min)) (goto-char p))))
         (t (message (format "%s is not found" cmd-name)))))
 
-;; 
-;; (progn ;; auto-complete ;;move-it
-;;   (require 'auto-complete)
-;;   (setq ac-use-menu-map t)
-;;   (define-key ac-menu-map "\C-n" 'ac-next)
-;;   (define-key ac-menu-map "\C-p" 'ac-previous)
-;;   )
 
+;; new completion interface
+(use-package ivy
+  :ensure t
+  :config
+  (setq ivy-use-virtual-buffers t)
+  ;; please set enable-recursive-minibuffers to t
+  (setq ivy-extra-directories nil)
 
-;; yasnippet
-;; (progn
-;;   (require 'yasnippet)
-;;   (yas-load-directory "~/.emacs.d/snippets")
+  (defun my:ivy-mode-setup ()
+    (setq completing-read-function 'completing-read-default)
+    )
+  (add-hook 'ivy-mode-hook 'my:ivy-mode-setup)
+  )
 
-;;   use "M-o" to expand, not "TAB"
-;;   (define-key yas-minor-mode-map (kbd "M-o") 'yas-expand)
-;;   (define-key yas-minor-mode-map (kbd "TAB") nil)
+(use-package swiper
+  :ensure t
+  :bind (("C-s" . swiper))
+  )
 
-;;   ;; anything interface
-;;   (eval-after-load "anything-config"
-;;     '(progn
-;;        (defun my-yas/prompt (prompt choices &optional display-fn)
-;;          (let* ((names (loop for choice in choices
-;;                              collect (or (and display-fn (funcall display-fn choice))
-;;                                          choice)))
-;;                 (selected (anything-other-buffer
-;;                            `(((name . ,(format "%s" prompt))
-;;                               (candidates . names)
-;;                               (action . (("Insert snippet" . (lambda (arg) arg))))))
-;;                            "*anything yas/prompt*")))
-;;            (if selected
-;;                (let ((n (position selected names :test 'equal)))
-;;                  (nth n choices))
-;;              (signal 'quit "user quit!"))))
-;;        (custom-set-variables '(yas/prompt-functions '(my-yas/prompt)))
-;;        (define-key anything-command-map (kbd "y") 'yas/insert-snippet)))
+(use-package counsel
+  :ensure t
+  :bind (;("C-x C-f" . counsel-find-file)
+         ("C-h f" . counsel-describe-function)
+         ("C-h v" . counsel-describe-variable))
+  :config
+  ;; (setq ffap-file-finder 'counsel-find-file)
+)
 
-;;   ;; snippet-mode for *.yasnippet files
-;;   (add-to-list 'auto-mode-alist '("\\.yasnippet$" . snippet-mode))
-;;   )

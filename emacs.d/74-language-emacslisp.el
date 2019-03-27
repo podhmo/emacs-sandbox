@@ -60,6 +60,10 @@
              ("C-x C-s" . my:elisp-format)
              )
 
+  ;; todo: use ivy?
+  ;; M-x counsel-describe-function
+  ;; M-x counsel-describe-variable
+  ;; M-x counsel-find-library
   (when (require 'company nil t)
     (company-mode)
     (define-key emacs-lisp-mode-map (kbd "C-M-i") 'company-complete)
