@@ -27,7 +27,6 @@
 
   (defun my:go-mode-setup ()
     (my:eglot-ensure)
-    (ivy-mode 1)
     (define-insert-pair-binding go-mode-map my:golang-key-pair)
 
     ;; TODO: eldoc more fancy UI?

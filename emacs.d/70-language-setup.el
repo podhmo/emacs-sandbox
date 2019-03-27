@@ -1,4 +1,4 @@
-(progn ;; flymake 
+(progn ;; flymake
   (require 'flymake)
   ;; (require-and-fetch-if-not 'flymake-cursor)
   ;; (eval-after-load 'flymake '(require 'flymake-cursor))
@@ -44,12 +44,12 @@
 (progn ;; font-lock-language-plugin
   ;; (defmacro language:define-plugin (name args &rest body)
   ;;   (declare (indent 2))
-  ;;   `(defun* ,name ,args 
+  ;;   `(defun* ,name ,args
   ;;      (add-to-list 'language:activated-plugins ',name)
   ;;      ,@body))
   (font-lock-add-keywords
-   'emacs-lisp-mode 
-   '(("(\\([^\t ]*?:define-plugin\\) " (1 font-lock-keyword-face) 
+   'emacs-lisp-mode
+   '(("(\\([^\t ]*?:define-plugin\\) " (1 font-lock-keyword-face)
       ("[^\t ]+?" nil nil (0 font-lock-function-name-face))))))
 
 (progn ;; company
@@ -94,24 +94,24 @@
   (cond ((executable-find cmd-name)
          (let ((p (point)))
            (save-excursion
-            (save-restriction
-              (narrow-to-region beg end)
-              (let ((buf (my:get-fresh-buffer-create (format "*%s*" cmd-name)))
-                    (err-buf (my:get-fresh-buffer-create (format "*%s error*" cmd-name))))
-                (let ((status
-                       ;; xxx
-                       (flet ((display-message-or-buffer (&rest args) nil))
-                         (shell-command-on-region (point-min) (point-max) cmd buf nil err-buf)
-                         )))
-                  (cond ((= 0 status)
-                         (let ((replaced (with-current-buffer buf (buffer-string))))
-                           (cond ((string= replaced "")
-                                  (message "succeeded with no output"))
-                                 (t
-                                  (delete-region (point-min) (point-max))
-                                  (insert replaced)
-                                  ))))
-                        (t (message (with-current-buffer err-buf (buffer-string)))))))))
+             (save-restriction
+               (narrow-to-region beg end)
+               (let ((buf (my:get-fresh-buffer-create (format "*%s*" cmd-name)))
+                     (err-buf (my:get-fresh-buffer-create (format "*%s error*" cmd-name))))
+                 (let ((status
+                        ;; xxx
+                        (flet ((display-message-or-buffer (&rest args) nil))
+                          (shell-command-on-region (point-min) (point-max) cmd buf nil err-buf)
+                          )))
+                   (cond ((= 0 status)
+                          (let ((replaced (with-current-buffer buf (buffer-string))))
+                            (cond ((string= replaced "")
+                                   (message "succeeded with no output"))
+                                  (t
+                                   (delete-region (point-min) (point-max))
+                                   (insert replaced)
+                                   ))))
+                         (t (message (with-current-buffer err-buf (buffer-string)))))))))
            (when (= (point) (point-min)) (goto-char p))))
         (t (message (format "%s is not found" cmd-name)))))
 
@@ -128,6 +128,16 @@
     (setq completing-read-function 'completing-read-default)
     )
   (add-hook 'ivy-mode-hook 'my:ivy-mode-setup)
+
+  ;; Notice: not in ivy-mode, the setting for display-function is not activated, yet
+  ;; (when calling ivy-posframe-display-at-point, and the help message is displayed for current cursor symbol, then move to this)
+  (use-package ivy-posframe
+    :ensure t
+    :config
+    (setq ivy-display-function nil) ; default
+    (add-to-list 'ivy-display-functions-alist '(complete-symbol . ivy-posframe-display-at-point))
+    ;; (ivy-mode)
+    (ivy-posframe-enable))
   )
 
 (use-package swiper
@@ -142,5 +152,5 @@
          ("C-h v" . counsel-describe-variable))
   :config
   ;; (setq ffap-file-finder 'counsel-find-file)
-)
+  )
 
