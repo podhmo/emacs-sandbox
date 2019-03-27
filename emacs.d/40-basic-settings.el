@@ -24,9 +24,9 @@
 (setq dabbrev-case-replace nil)
 (setq dabbrev-case-distinction nil)
 
-(add-hook 'server-switch-hook 
+(add-hook 'server-switch-hook
           (lambda ()
-            (local-set-key (kbd "C-x k") 
+            (local-set-key (kbd "C-x k")
                            (ilambda
                             (if server-buffer-clients
                                 (server-edit)
@@ -58,7 +58,7 @@
 (set-keyboard-coding-system 'utf-8)
 (set-buffer-file-coding-system 'utf-8)
 
-;; hmm. 
+;; hmm.
 (setq auto-coding-functions nil)
 
 ;; 行末の空白を強調表示
@@ -111,10 +111,10 @@
 (transient-mark-mode t)
 
 (setq search-highlight t)
-(setq query-replace-highlight t) 
+(setq query-replace-highlight t)
 
 (auto-image-file-mode t)
-(setq resize-mini-windows t) 
+(setq resize-mini-windows t)
 
 (add-hook 'shell-mode-hook
           'ansi-color-for-comint-mode-on)
@@ -125,7 +125,7 @@
 (setq-default default-tab-width 4
               tab-width 4
               indent-tabs-mode nil)
-;; (set-default 'tab-stop-list 
+;; (set-default 'tab-stop-list
 ;;                (loop for i from 4 to 120 by 4
 ;;                      collect i))
 
@@ -142,7 +142,7 @@
   :ensure t
   :config
   (set-face-attribute 'default nil :height 140)
-)
+  )
 
 (let ((sysname (symbol-name system-type)))
   (cond ((string-match-p "darwin" sysname)
