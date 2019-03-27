@@ -130,23 +130,19 @@
 ;;                      collect i))
 
 
-
 (setq default-frame-alist
       `(
         ;; (top . 10)
         ;; (left . 10)
       	;; (width . 106)
       	;; (height . 40)
-        (frame-cursor-color . "steelblue")
-        (scroll-bar-background . "grey75")
-        (scroll-bar-foreground)
-        (border-color . "black")
-        (cursor-color . "Steelblue")
-        (mouse-color . "gold")
-        ;; (background-color . "black")
-        (background-color . "dark slate gray")
-        (foreground-color . "white")
         ,@default-frame-alist))
+
+(use-package dracula-theme
+  :ensure t
+  :config
+  (set-face-attribute 'default nil :height 140)
+)
 
 (let ((sysname (symbol-name system-type)))
   (cond ((string-match-p "darwin" sysname)
@@ -164,21 +160,5 @@
          )
         (t )))
 
-
-;; (unless (package-installed-p 'atom-dark-theme)
-;;   (package-install 'atom-dark-theme))
-;; (load-theme 'atom-dark t)
-
-;;adhoc
-(set-face-attribute 'default nil :height 140)
-;;(describe-face 'font-lock-variable-name-face)
-;;   (print* (frame-parameters (selected-frame)))
-(set-face-attribute 'default nil :foreground "White")
-(set-face-attribute 'font-lock-comment-face nil :weight 'semi-light :foreground "RosyBrown3")
-;; (set-face-attribute 'help-argument-name nil :slant 'normal)
-(set-face-attribute 'font-lock-string-face nil :foreground "RosyBrown3" :weight 'bold)
-(set-face-attribute 'font-lock-keyword-face nil :foreground "PaleGreen3" :weight 'bold)
-(set-face-attribute 'font-lock-builtin-face nil :foreground "SlateBlue3" :weight 'bold)
-(set-face-attribute 'font-lock-variable-name-face nil :foreground "plum3" :slant 'normal :weight 'bold)
-(set-face-attribute 'font-lock-function-name-face nil :foreground "plum3" :weight 'bold)
-(set-face-attribute 'font-lock-type-face nil :foreground "DarkSlateGray4":weight 'bold)
+;; emoji
+;; install symbola-font or google-noto-emoji-font and fc-cache -vf
