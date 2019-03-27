@@ -1,5 +1,7 @@
-;;pickup
-(require-and-fetch-if-not 'pickup :url "https://gist.githubusercontent.com/podhmo/6094461/raw/69e7b38ffa037964f8fd77fda5305101c196ccd1/pickup.el")
+;;pickup (mine)
+(use-package pickup
+  :commands (pickup-file pickup-file-clipboard)
+)
 
 
 ;;; debug utiltities
@@ -114,12 +116,10 @@
   (require 'uniquify)
   (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
 
-(progn ;; toggle-file-mode
-  (require-and-fetch-if-not 'toggle-file-mode :url "https://gist.githubusercontent.com/podhmo/2600353/raw/9a5d6965bc075c2c967b8fbb832cc4800abc14dc/toggle-file-mode.el"))
-
-;; (progn ;; speedbar
-;;   (require-and-fetch-if-not 'sr-speedbar)
-;;   )
+;; toggle-file-mode (mine)
+(use-package toggle-file-mode
+  :commands (toggle-file toggle-file-mode)
+  )
 
 (defadvice anything-M-x (before keep-history-size-more-than-one activate)
   (while (null (cdr extended-command-history))

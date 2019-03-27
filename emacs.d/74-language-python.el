@@ -16,8 +16,11 @@
 
 ;;; ffap module
 (with-eval-after-load 'python
-  (require-and-fetch-if-not 'ffap-python :url "https://gist.githubusercontent.com/podhmo/8133843/raw/54f0e1ad64a817b1b3b7315a44493e04cf311650/ffap-python.el")
-  (defvar ffap-python-disable-confirm-before-open t)
+  (use-package ffap-python  ;; mine
+    :commands (ffap-python)
+    :config
+    (setq ffap-python-disable-confirm-before-open t)
+    )
   )
 
 ;; flycheck

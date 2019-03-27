@@ -28,6 +28,7 @@
 (defun monologue:header ()
   (funcall monologue:header-function))
 
+;;;###autoload
 (defun monologue (message) (interactive "smessage: ")
        (let ((buf (monologue:get-current-buffer))
              (header (monologue:header)))
