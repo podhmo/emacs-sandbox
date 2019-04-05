@@ -123,8 +123,11 @@
   (setq ivy-use-virtual-buffers t)
   ;; please set enable-recursive-minibuffers to t
   (setq ivy-extra-directories nil)
+  (setq ivy-height 10)
+  (setq ivy-format-function #'ivy-format-function-arrow)
 
   (defun my:ivy-mode-setup ()
+    ;; for find-file-at-point
     (setq completing-read-function 'completing-read-default)
     )
   (add-hook 'ivy-mode-hook 'my:ivy-mode-setup)

@@ -42,6 +42,7 @@
 (set-face-attribute 'default nil :foreground "White")
 (set-face-attribute 'font-lock-comment-face nil :weight 'semi-light :foreground "RosyBrown3")
 ;; (set-face-attribute 'help-argument-name nil :slant 'normal)
+
 (set-face-attribute 'font-lock-string-face nil :foreground "RosyBrown3" :weight 'bold)
 (set-face-attribute 'font-lock-keyword-face nil :foreground "PaleGreen3" :weight 'bold)
 (set-face-attribute 'font-lock-builtin-face nil :foreground "SlateBlue3" :weight 'bold)
