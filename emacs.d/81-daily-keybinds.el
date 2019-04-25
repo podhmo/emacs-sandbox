@@ -46,7 +46,7 @@
             ("C-c ]" . quickrun-compile-only) ;; for keyboard(en)
             ("C-c C-]" . quickrun) ;; for keyboard(en)
 
-            ;; elscreen
+            ;; elsc'reen
             ("C-;" . elscreen-previous)
             ("C-:" . elscreen-next)
             ("C-j S" . elscreen-shell/next-screen)

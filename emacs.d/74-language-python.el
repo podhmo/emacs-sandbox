@@ -122,6 +122,7 @@
       (define-key map (kbd "C-c C-d") 'jedi:show-doc)
       )
 
+    (require 'company-jedi)
     (add-to-list 'company-backends 'company-jedi)
     (company-mode-on)
     )

@@ -9,10 +9,12 @@
 
   (with-eval-after-load 'eglot
     (unless (getenv "GOPATH")
-      (setenv "GOPATH" (my:go-path)))
+      (setenv "GOPATH" (replace-regexp-in-string "~" (getenv "HOME") (my:go-path))))
     (add-to-list 'exec-path (format "%s/bin" (or (getenv "GOPATH") "~/go")))
     ;; go get -v -u github.com/saibing/bingo
-    (add-to-list 'eglot-server-programs '(go-mode "bingo" "-format-style" "goimports"))
+    ;; (add-to-list 'eglot-server-programs '(go-mode "bingo" "-format-style" "goimports"))
+    ;; go get -u -v golang.org/x/tools/cmd/gopls
+    (add-to-list 'eglot-server-programs '(go-mode "gopls"))
     )
 
   (defvar my:golang-key-pair

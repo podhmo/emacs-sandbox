@@ -66,13 +66,13 @@
 (set-face-background 'trailing-whitespace "#b14770")
 
 ;; hmm.
-(if (equal system-type 'darwin)
-    (if (>= emacs-major-version 23)
-        (set-file-name-coding-system 'utf-8-nfd)
-      (progn
-        (require 'utf-8m)
-        (set-file-name-coding-system 'utf-8m)))
-  (setq file-name-coding-system 'utf-8-unix))
+;; (if (equal system-type 'darwin)
+;;     (if (>= emacs-major-version 23)
+;;         (set-file-name-coding-system 'utf-8-nfd) 
+;;       (progn
+;;         (require 'utf-8m)
+;;         (set-file-name-coding-system 'utf-8m)))
+(setq file-name-coding-system 'utf-8-unix)
 
 (auto-compression-mode t)
 (setq x-select-enable-clipboard t)
