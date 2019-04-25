@@ -33,7 +33,8 @@
     ;; TODO: eldoc more fancy UI?
     ;; flymake TODO: too heavy?
     (bind-keys :map go-mode-map
-               ("C-x C-s" . eglot-format-buffer)
+               ("C-x C-s" . gofmt) ;; TODO: remove (tentative)
+               ;; ("C-x C-s" . eglot-format-buffer)
                ("M-." . xref-find-definitions)
                ("M-," . pop-tag-mark)
                ("C-c C-j" . xref-find-definitions)
@@ -42,4 +43,5 @@
     )
   (add-hook 'go-mode-hook 'my:go-mode-setup)
   :config
+  (my:go-setup-gofmt-command) ;; TODO: remove (tentative)
   )
