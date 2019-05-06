@@ -39,6 +39,7 @@
                ("C-c C-j" . xref-find-definitions)
                ("C-M-i" . completion-at-point) ;; TODO: more fancy UI?
                )
+    (my:go-setup-format-buffer)
     )
   (add-hook 'go-mode-hook 'my:go-mode-setup)
   :config

@@ -156,8 +156,8 @@
          (add-to-list 'default-frame-alist `(font . ,myfont))
          )
         ((string-match-p "linux" sysname)
-
-         )
+         (set-fontset-font nil 'unicode
+                           (font-spec :family "Noto Sans Mono CJK JP" :weight 'normal :slant 'normal :style "Regular" :size 18)))
         (t )))
 
 ;; emoji

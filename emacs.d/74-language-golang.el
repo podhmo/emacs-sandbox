@@ -35,6 +35,16 @@
             )
           (expand-file-name "~/go")))))
 
+(defvar my:go-format-buffer-function 'gofmt)
+(defun my:go-toggle-format-buffer-key-bind ()
+  (interactive)
+  (let ((cmd (intern
+              (completing-read "bind-key(C-x C-s): " (list "eglot-format-buffer" "gofmt")))))
+    (define-key go-mode-map (kbd "C-x C-s") cmd)
+    (my:go-setup-format-buffer)))
+
+(defun my:go-setup-format-buffer ()
+  (define-key go-mode-map (kbd "C-x C-s") my:go-format-buffer-function))
 
 (defun my:go-setup-gofmt-command ()
   ;; gopath

@@ -246,13 +246,14 @@
     (defun my:go-mode-setup ()
       ;; (add-hook 'before-save-hook' 'gofmt-before-save)
       ;; key bindings
-      (define-key go-mode-map (kbd "C-x C-s") 'gofmt)
       (define-key go-mode-map (kbd "C-x S") 'my:go-gofmt-modified-buffers-async)
       (define-key go-mode-map (kbd "C-c C-e") 'my:godoc)
       (define-key go-mode-map (kbd "C-c C-a") 'my:go-import-add)
       (define-key go-mode-map (kbd "C-c :") 'my:anything-go-src-selection)
       (define-key go-mode-map (kbd "M-.") 'godef-jump)
       (define-key go-mode-map (kbd "M-,") 'pop-tag-mark)
+      (my:go-setup-format-buffer)
+
       (set (make-local-variable 'company-backends) '(company-go))
       (company-mode)
       (setq indent-tabs-mode nil)
