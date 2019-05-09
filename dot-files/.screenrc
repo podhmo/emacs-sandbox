@@ -1,3 +1,4 @@
+autodetach on
 defutf8 on
 defencoding utf8
 encoding utf8 utf8
@@ -12,7 +13,6 @@ vbell off
 # $ brew install screen
 defbce on
 term xterm-256color
-
 
 # ステータスライン
 hardstatus alwayslastline "%{= cd} %-w%{= wk} %n %t* %{-}%+w %= LoadAVG [%l] "
@@ -31,3 +31,6 @@ altscreen on
 
 # デフォルトシェル
 shell $SHELL
+
+# マウスでフォーカスを変えられるように
+mousetrack on
