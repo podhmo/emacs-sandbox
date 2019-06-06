@@ -48,9 +48,11 @@
          (num-rx "[0-9]+")
          (new-name fname))
     (cond ((string-match num-rx fname)
-           (let* ((num (+ (string-to-number (match-string 0 fname)) n)))
+           (let* ((s (match-string 0 fname))
+                  (num (+ (string-to-number s) n))
+                  (new-s (format (format "%%0%dd" (length s)) num)))
              (setq new-name
-                   (replace-regexp-in-string num-rx (number-to-string num) fname))))
+                   (replace-regexp-in-string num-rx new-s fname))))
           (t
            (setq new-name
                  replace-regexp-in-string
