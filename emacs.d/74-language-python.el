@@ -17,7 +17,7 @@
 ;;; ffap module
 (with-eval-after-load 'python
   (use-package ffap-python  ;; mine
-    :commands (ffap-python)
+    :commands (ffap-python ffap-python:find-program)
     :config
     (setq ffap-python-disable-confirm-before-open t)
     )
