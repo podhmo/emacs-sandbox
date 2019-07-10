@@ -218,7 +218,12 @@ so. c-u 3 follow-with-n-window, then a frame splitted 3window
           (goto-char (point-min))
           (when (re-search-forward "url = git@github.com:\\(.+\\)\\(?:\\.git\\)?" nil t)
             (let ((user-repository-name (string-trim-right (match-string-no-properties 1) "\\.git$")))
-              (cl-return-from b (format "https://github.com/%s" user-repository-name)))))))))
+              (cl-return-from b (format "https://github.com/%s" user-repository-name))))
+          (goto-char (point-min))
+          (when (re-search-forward "url = https://github.com/\\(.+\\)\\(?:\\.git\\)?" nil t)
+            (let ((user-repository-name (string-trim-right (match-string-no-properties 1) "\\.git$")))
+              (cl-return-from b (format "https://github.com/%s" user-repository-name))))
+          )))))
 
 (cl-defun my:browse-github (&key (branch nil) (rel-path nil) (line-no nil))
   (interactive)
