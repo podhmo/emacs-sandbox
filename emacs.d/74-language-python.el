@@ -15,32 +15,31 @@
 (require-and-fetch-if-not 'pickup)
 
 ;;; ffap module
-(with-eval-after-load 'python
-  (use-package ffap-python  ;; mine
-    :commands (ffap-python ffap-python:find-program ffap-python:find-python)
-    :config
-    (setq ffap-python-disable-confirm-before-open t)
+(use-package ffap-python  ;; mine
+  :commands (ffap-python ffap-python:find-program ffap-python:find-python)
+  :init
+  (with-eval-after-load 'quickrun
+    (setq my:check-python-program "pyflakes")
+    (setq my:check-python-program "flake8")
+    (defun my:check-python-find-program ()
+      (or (ffap-python:find-program my:check-python-program)
+          (error "%s is not found in %s" my:check-python-program default-directory)))
 
-    ;; quick-run
-    (progn
-      (setq my:check-python-program "pyflakes")
-      (setq my:check-python-program "flake8")
-      (defun my:check-python-find-program ()
-        (or (ffap-python:find-program my:check-python-program)
-            (error "%s is not found in %s" my:check-python-program default-directory)))
+    (defun quickrun-python:compile-only () (interactive)
+           (async-shell-command (format "%s %s" (my:check-python-find-program) buffer-file-name)))
 
-      (defun quickrun-python:compile-only () (interactive)
-             (async-shell-command (format "%s %s" (my:check-python-find-program) buffer-file-name)))
+    (unless (boundp 'quickrun--language-alist)
+      (error "quickrun ins not activated yet"))
 
-      (when (boundp 'quickrun--language-alist)
-        (setq quickrun--language-alist
-              (remove* "python" quickrun--language-alist :key 'car :test 'equal))
-        (add-to-list 'quickrun--language-alist
-                     '("python" . ((:command . ffap-python:find-python)
-                                   (:compile-only . my:check-python-find-program)
-                                   (:description . "Run Python script")))
-                     )))
-    )
+    (setq quickrun--language-alist
+          (remove* "python" quickrun--language-alist :key 'car :test 'equal))
+    (add-to-list 'quickrun--language-alist
+                 '("python" . ((:command . ffap-python:find-python)
+                               (:compile-only . my:check-python-find-program)
+                               (:description . "Run Python script")))
+                 ))
+  :config
+  (setq ffap-python-disable-confirm-before-open t)
   )
 
 ;; flycheck
@@ -71,9 +70,9 @@
   )
 
 (defun my:python-insert-comma () (interactive)
-  (insert ",")
-  (unless (looking-at-p "$")
-    (insert " ")))
+       (insert ",")
+       (unless (looking-at-p "$")
+         (insert " ")))
 
 
 ;; formatter
