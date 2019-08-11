@@ -26,10 +26,12 @@
     (package-initialize)
     (unless package-archive-contents
       (package-refresh-contents))
-   ;; (package-list-packages)
+    ;; (package-list-packages)
     )
+
+  (setq use-package-compute-statistics t)
   (require-and-fetch-if-not 'use-package)
-) 
+  )
 
 
 ;(load (concat (current-directory) "init-visualize")) ;; hmm
