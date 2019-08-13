@@ -55,10 +55,10 @@
                    (replace-regexp-in-string num-rx new-s fname))))
           (t
            (setq new-name
-                 replace-regexp-in-string
-                 ((regexp-quote (file-name-sans-extension fname))
+                 (replace-regexp-in-string
+                  (regexp-quote (file-name-sans-extension fname))
                   (format "%s%d" (file-name-sans-extension fname) default)
-                  fname))))
+                   fname))))
     (find-file (concat (file-name-directory buffer-file-name) new-name))))
 
 (defun find-decreased-file ()
