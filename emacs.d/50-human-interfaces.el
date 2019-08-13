@@ -348,4 +348,21 @@
   :custom
   (highlight-indent-guides-auto-enabled t)
   (highlight-indent-guides-responsive t)
-  (highlight-indent-guides-method 'character)) ; column
+  (highlight-indent-guides-method 'character) ; column
+  )
+
+(use-package volatile-highlights
+  :ensure t
+  :diminish
+  :hook
+  (after-init . volatile-highlights-mode)
+  :custom-face
+  (vhl/default-face ((nil (:foreground "#FF3333" :background "#FFCDCD"))))
+  :config
+  (with-eval-after-load 'undo-tree
+    (vhl/define-extension 'undo-tree 'undo-tree-yank 'undo-tree-move 'undo-tree-redo  'undo-tree-undo)
+    (vhl/install-extension 'undo-tree)
+    )
+  (volatile-highlights-mode t)
+  )
+
