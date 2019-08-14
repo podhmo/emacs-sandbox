@@ -131,9 +131,9 @@
                     ("C-c C-a" . anything)
                     ("C-c C-;" . anything-vcs-project)
                     ("C-c C-:" . anything-vcs-project)
-                    ("M-x" . anything-M-x)
+                    ;; ("M-x" . anything-M-x) ;; use counsel-M-x
                     ("C-x b" . anything-buffers+)
-                    ("M-y" . anything-show-kill-ring)
+                    ;; ("M-y" . anything-show-kill-ring) use counsel-yank-pop
                     ("C-j C-j" . anything-bm-list*)
                     ("C-j j" . bm-toggle)
                     ))))
@@ -365,5 +365,66 @@
     (vhl/install-extension 'undo-tree)
     )
   (volatile-highlights-mode t)
+  )
+
+(use-package which-key
+  :ensure t
+  (which-key-mode)
+  (which-key-setup-side-window-bottom)
+  )
+
+;; ivy families
+;; new completion interface
+(use-package ivy
+  :ensure t
+  :config
+  (setq ivy-use-virtual-buffers t)
+  ;; please set enable-recursive-minibuffers to t
+  (setq ivy-extra-directories nil)
+  (setq ivy-height 7)
+  (setq ivy-format-function #'ivy-format-function-arrow)
+
+  (defun my:ivy-mode-setup ()
+    ;; for find-file-at-point
+    (setq completing-read-function 'completing-read-default)
+    (ivy-rich-mode 1)
+    )
+  (add-hook 'ivy-mode-hook 'my:ivy-mode-setup)
+
+  (use-package ivy-rich
+    :ensure t
+    :commands (ivy-rich-mode)
+    )
+
+  ;; Notice: not in ivy-mode, the setting for display-function is not activated, yet
+  ;; (when calling ivy-posframe-display-at-point, and the help message is displayed for current cursor symbol, then move to this)
+  (use-package ivy-posframe
+    :ensure t
+    :commands (ivy-postframe-enable)
+    :after ivy
+    :config
+    (setq ivy-display-function nil) ; default
+    (add-to-list 'ivy-display-functions-alist '(complete-symbol . ivy-posframe-display-at-point))
+    )
+  )
+
+(use-package swiper
+  :ensure t
+  :bind (("M-s" . swiper))
+  )
+
+(use-package counsel
+  :ensure t
+  :bind (;("C-x C-f" . counsel-find-file)
+         ("C-h f" . counsel-describe-function)
+         ("C-h v" . counsel-describe-variable)
+         ("C-x m" . counsel-imenu)
+         ("M-x" . counsel-M-x)
+         ("M-y" . counsel-yank-pop)
+         )
+  :config
+  ;; (setq ffap-file-finder 'counsel-find-file)
+  :custom
+  (counsel-yank-pop-separator "\n----------------------------------------\n")
   )
 
