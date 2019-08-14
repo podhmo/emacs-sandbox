@@ -141,7 +141,7 @@
   (setq ivy-use-virtual-buffers t)
   ;; please set enable-recursive-minibuffers to t
   (setq ivy-extra-directories nil)
-  (setq ivy-height 10)
+  (setq ivy-height 7)
   (setq ivy-format-function #'ivy-format-function-arrow)
 
   (defun my:ivy-mode-setup ()
@@ -154,16 +154,17 @@
   ;; (when calling ivy-posframe-display-at-point, and the help message is displayed for current cursor symbol, then move to this)
   (use-package ivy-posframe
     :ensure t
+    :commands (ivy-postframe-enable)
+    :after ivy
     :config
     (setq ivy-display-function nil) ; default
     (add-to-list 'ivy-display-functions-alist '(complete-symbol . ivy-posframe-display-at-point))
-    ;; (ivy-mode)
-    (ivy-posframe-enable))
+    )
   )
 
 (use-package swiper
   :ensure t
-  :bind (("C-s" . swiper))
+  :bind (("M-s" . swiper))
   )
 
 (use-package counsel
