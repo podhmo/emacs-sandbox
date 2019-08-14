@@ -1,14 +1,28 @@
-(progn ;; flymake
-  (require 'flymake)
-  ;; (require-and-fetch-if-not 'flymake-cursor)
-  ;; (eval-after-load 'flymake '(require 'flymake-cursor))
+(use-package flymake
+  :ensure t
+  :config
+  ;; renewal version (1.0.x)
+  (assert (<= 1 (car (pkg-info-package-version 'flymake))))
+
+  ;; :emergency :error :warning :debug
+  ;; (setq warning-minimum-log-level :warning)
+
   (custom-set-variables
-   '(help-at-pt-timer-delay 0.9)
-   '(help-at-pt-display-when-idle '(flymake-overlay)))
+   '(flymake-start-on-newline nil) ;; for auto-save-buffers.el
+   '(flymake-start-on-save-buffer t)
+   '(flymake-start-on-flymake-mode t)
+   '(flymake-no-changes-timeout nil) ;; for performance
+   )
   )
 
-(progn ;; flycheck
-  (autoload 'flycheck-mode "flycheck" t)
+(use-package flycheck
+  :ensure t
+  :commands (flycheck-mode flycheck-mode-on-safe)
+  :config
+
+  ;; NOTE:
+  ;; after new checker is installed,
+  ;; M-x flycheck-verify-setup, flycheck-verify-checker
 
   ;; commandを探す方法をカスタマイズ
   (defvar my:flycheck-executable-find-function-table (make-hash-table :test 'equal :size 7))
@@ -21,12 +35,16 @@
       (cond (find-function (executable-find (funcall find-function)))
             (t (executable-find command)))))
 
-  (with-eval-after-load 'flycheck
-    (custom-set-variables
-     '(flycheck-check-syntax-automatically '(save mode-enabled))
-     '(flycheck-executable-find #'my:flycheck-executable-find) ; risky
-     )
-    ))
+  (setq flycheck-hooks-alist
+        (delq (assoc 'after-change-functions flycheck-hooks-alist)
+              flycheck-hooks-alist))
+
+  (custom-set-variables
+   '(flycheck-check-syntax-automatically '(save mode-enabled)) ;; for-performance
+   '(flycheck-executable-find #'my:flycheck-executable-find) ; risky
+   )
+  )
+
 
 (use-package quickrun
   :ensure t
