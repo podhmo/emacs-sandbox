@@ -90,8 +90,11 @@
 (global-font-lock-mode t)
 
 ;;show line number
-(require 'linum)
-(global-linum-mode t)
+(cond ((version<= "26.0.50" emacs-version)
+       (global-display-line-numbers-mode))
+      (t
+       (require 'linum)
+       (global-linum-mode t)))
 
 ;;tramp
 (require 'tramp)
