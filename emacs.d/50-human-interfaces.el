@@ -334,6 +334,14 @@
 
 (use-package undo-tree
   :ensure t
+  ;; https://emacs.stackexchange.com/questions/47940/undo-tree-mode-only-goes-back-a-small-number-of-steps-when-using-ensime-then
+  :init (setq undo-tree-visualizer-timestamps t
+              undo-tree-visualizer-diff t
+              ;; 10X bump of the undo limits to avoid issues with premature
+              ;; Emacs GC which truncages the undo history very aggresively
+              undo-limit 800000
+              undo-strong-limit 12000000
+              undo-outer-limit 120000000)
   :config
   ;; C-x u undo-tree-visualize
   ;; C-. redo
@@ -369,6 +377,7 @@
 
 (use-package which-key
   :ensure t
+  :config
   (which-key-mode)
   (which-key-setup-side-window-bottom)
   )
@@ -404,6 +413,7 @@
     :after ivy
     :config
     (setq ivy-display-function nil) ; default
+
     (add-to-list 'ivy-display-functions-alist '(complete-symbol . ivy-posframe-display-at-point))
     )
   )

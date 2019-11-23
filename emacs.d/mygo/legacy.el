@@ -213,6 +213,9 @@
   (eval-after-load 'flycheck
     '(progn
        ;; (flycheck-checker-get 'go-gofmt 'next-checkers)
+       ;; use
+       ;; (flycheck-disable-checker 'go-errcheck)
+       ;; (flycheck-disable-checker 'go-unconvert)
        (setf (get 'go-gofmt (flycheck--checker-property-name 'next-checkers))
              '((warning . go-golint)
                ;; Fall back, if go-golint doesn't exist

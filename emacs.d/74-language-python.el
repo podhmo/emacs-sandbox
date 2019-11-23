@@ -48,19 +48,28 @@
 
   (defun my:python-flycheck-setup ()
     (make-local-variable 'my:flake8-path)
+    (make-local-variable 'my:mypy-path)
 
     ;; this is buffer local
-    (setq flycheck-disabled-checkers '(python-pylint python-pycompile))
+    (setq flycheck-disabled-checkers '(python-pycompile python-mypy python-pylint))
     (flycheck-mode 1)
     )
 
-                                        ; virtualenvのflake8を使う
+  ;; virtualenvのflake8を使う
   (my:flycheck-executable-find-function-register
    "flake8"
    (lambda ()
-     (cond ((boundp 'my:fake8-path) my:flake8-path)
+     (cond ((boundp 'my:flake8-path) my:flake8-path)
            (t (setq my:flake8-path (or (pickup:pickup-file "bin/flake8") "flake8"))
               my:flake8-path))))
+
+  ;; TODO: use dmypy or mypyc
+  (my:flycheck-executable-find-function-register
+   "mypy"
+   (lambda ()
+     (cond ((boundp 'my:mypy-path) my:mypy-path)
+           (t (setq my:mypy-path (or (pickup:pickup-file "bin/mypy") "mypy"))
+              my:mypy-path))))
 
   ;; max-length
   (setq flycheck-flake8-maximum-line-length 100)

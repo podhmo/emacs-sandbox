@@ -39,9 +39,17 @@
         (delq (assoc 'after-change-functions flycheck-hooks-alist)
               flycheck-hooks-alist))
 
+  ;; call command with full path
+  (defun my:flycheck-wrapper-function--use-fullpath-command (command)
+    ;; command :: (<cmd name> ,@args)
+    (cons (funcall flycheck-executable-find (car command))
+          (cdr command))
+    )
+
   (custom-set-variables
    '(flycheck-check-syntax-automatically '(save mode-enabled)) ;; for-performance
    '(flycheck-executable-find #'my:flycheck-executable-find) ; risky
+   '(flycheck-command-wrapper-function #'my:flycheck-wrapper-function--use-fullpath-command) ; risky
    )
   )
 

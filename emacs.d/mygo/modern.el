@@ -28,7 +28,8 @@
   (defun my:go-mode-setup ()
     (my:eglot-ensure)
     (define-insert-pair-binding go-mode-map my:golang-key-pair)
-
+    (when (fboundp 'ivy-mode)
+      (ivy-mode 1))
     ;; TODO: eldoc more fancy UI?
     ;; flymake TODO: too heavy?
     (bind-keys :map go-mode-map
