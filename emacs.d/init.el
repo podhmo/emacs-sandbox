@@ -141,15 +141,20 @@
 (add-hook 'text-mode-hook (lambda () (setq auto-fill-mode nil)))
 (add-hook 'html-mode-hook (lambda () (setq auto-fill-mode nil)))
 
-(unless (equal system-type 'darwin) ; mozc (japanese input)
-  (defun my:ignore (&rest args)
-    (interactive)
-    (setq this-command last-command)
-    nil)
-  (global-set-key (kbd "<eisu-toggle>") 'my:ignore)
+(cond ((equal system-type 'darwin)
+       nil)
+      ((equal system-type 'windows-nt)
+       nil)
+      (t
+       (defun my:ignore (&rest args)
+         (interactive)
+         (setq this-command last-command)
+         nil)
+       (global-set-key (kbd "<eisu-toggle>") 'my:ignore)
 
-  ;; disable-mouse when linux environement
-  (require 'disable-mouse)
-  (global-disable-mouse-mode)
-  )
+       ;; disable-mouse when linux environement
+       (require 'disable-mouse)
+       (global-disable-mouse-mode)
+       ))
+
 (put 'dired-find-alternate-file 'disabled nil)

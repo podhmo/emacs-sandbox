@@ -2,7 +2,7 @@
   :ensure t
   :config
   ;; renewal version (1.0.x)
-  (assert (<= 1 (car (pkg-info-package-version 'flymake))))
+  ;; (assert (<= 1 (car (pkg-info-package-version 'flymake))))
 
   ;; :emergency :error :warning :debug
   ;; (setq warning-minimum-log-level :warning)

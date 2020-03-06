@@ -157,14 +157,32 @@ so. c-u 3 follow-with-n-window, then a frame splitted 3window
 ;; TODO: package
 (require 'subr-x)
 (defvar my:masking-buffer-candidates-alist
-  `(
-    (,(lambda ()
-        (when-let* ((it (pickup:pickup-file "/bin/pip")))
-          (replace-regexp-in-string "/bin/pip$" "" it)))
-     . "VENV")
-    (,(getenv "GOPATH") . "$GOPATH")
-    (,(getenv "HOME") . "$HOME")
-    ))
+  (lexical-let ((r
+                 `(
+                   (,(lambda ()
+                       (when-let* ((it (pickup:pickup-file "/bin/pip")))
+                         (replace-regexp-in-string "/bin/pip$" "" it)))
+                    . "VENV")
+                   (,(getenv "GOPATH") . "$GOPATH")
+                   (,(getenv "HOME") . "$HOME")
+                   )))
+    (when (equal system-type 'windows-nt)
+      (let ((home-dir (replace-regexp-in-string "AppData\\Roaming$" "" (getenv "HOME"))))
+        (push `(,home-dir . "$HOME") r)
+        (push `(,(replace-regexp-in-string "^c:/" "C:\\\\" home-dir) . "$HOME") r))
+
+      ;; / -> \\
+      (setq r (append r
+                      (cl-loop for (pattern . replacement) in r
+                               when (stringp pattern)
+                               collect
+                               (cons
+                                (replace-regexp-in-string "/" "\\\\" pattern)
+                                replacement)
+                               )))
+      )
+    r))
+
 
 (defun my:masking-buffer (beg end)
   "あんまり見せたくないpathなどをmaskする"

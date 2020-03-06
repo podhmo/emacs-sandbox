@@ -3,7 +3,8 @@
 ;; (require 'org-remember)
 (add-to-list 'auto-mode-alist '("\\.notes$" . org-mode))
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
-(add-to-list 'auto-mode-alist '("memo[0-9]+\\.txt" . org-mode))
+;; (add-to-list 'auto-mode-alist '("memo[0-9]+\\.txt" . org-mode))
+
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-ca" 'org-agenda)

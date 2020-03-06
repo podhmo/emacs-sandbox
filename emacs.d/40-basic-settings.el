@@ -15,9 +15,29 @@
   (let ((output (shell-command-to-string "$SHELL --login -i -c 'echo $PATH'")))
     (car (last (split-string output)))))
 
-(let ((path-from-shell (get-exec-path-from-shell)))
-  (setenv "PATH" path-from-shell)
-  (setq exec-path (split-string path-from-shell path-separator)))
+(cond
+ ((equal system-type 'windows-nt)
+  (setenv "HOME" (replace-regexp-in-string "/AppData/Roaming" "" (expand-file-name "~")))
+  ;; tenative
+  (setq exec-path
+          (mapcar #'expand-file-name
+                  (list
+                   "~/scoop/apps/python/current"
+                   "~/scoop/apps/python/current/Scripts"
+                   "C:/windows/system32"
+                   "C:/windows"
+                   "C:/windows/System32/Wbem"
+                   "C:/windows/System32/WindowsPowerShell/v1.0/"
+                   "C:/windows/System32/OpenSSH/"
+                   "~/scoop/shims"
+                   "~/AppData/Local/Microsoft/WindowsApps"
+                   "~/scoop/apps/emacs/current/libexec/emacs/26.3/x86_64-w64-mingw32"
+                   ))))
+ (t
+  (let ((path-from-shell (get-exec-path-from-shell)))
+    (setenv "PATH" path-from-shell)
+    (setq exec-path (split-string path-from-shell path-separator)))
+  ))
 
 
 ;;dabbrev
