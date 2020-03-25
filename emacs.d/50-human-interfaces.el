@@ -348,6 +348,7 @@
   ;; C-/ undo
   (global-undo-tree-mode))
 
+; high cost
 (use-package highlight-indent-guides
   :ensure t
   :diminish
@@ -355,7 +356,7 @@
   ((prog-mode yaml-mode) . highlight-indent-guides-mode)
   :custom
   (highlight-indent-guides-auto-enabled t)
-  (highlight-indent-guides-responsive t)
+  (highlight-indent-guides-responsive nil)
   (highlight-indent-guides-method 'character) ; column
   )
 

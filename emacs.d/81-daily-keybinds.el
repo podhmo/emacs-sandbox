@@ -12,8 +12,8 @@
    'on-before-keyboard-setup)
 
   (progn ;; global-key-settings ;; or human-interfaces.el
-    (setq global-individual-key-mapping
-          '(("C-c C-l" . eval-buffer)
+    (setq my:global-individual-key-mapping
+          `(("C-c C-l" . eval-buffer)
             ("M-r" . replace-string)
             ("M-R" . replace-regexp)
 
@@ -41,14 +41,26 @@
             ("M-^" . my:shell-command-on-region-and-insert)
 
             ;; quick-run
-            ("C-c @" . quickrun-compile-only)
-            ("C-c C-@" . quickrun)
-            ("C-c ]" . quickrun-compile-only) ;; for keyboard(en)
-            ("C-c C-]" . quickrun) ;; for keyboard(en)
+            ,@(pcase my:keyboard-layout
+                (en `(
+                      ("C-c ]" . quickrun-compile-only) ;; for keyboard(en)
+                      ("C-c C-]" . quickrun) ;; for keyboard(en)
+                      ))
+                (_ `(
+                     ("C-c @" . quickrun-compile-only)
+                     ("C-c C-@" . quickrun)
+                     )))
 
-            ;; elsc'reen
-            ("C-;" . elscreen-previous)
-            ("C-:" . elscreen-next)
+            ;; elscreen
+            ,@(pcase my:keyboard-layout
+                (en `(
+                     ("C-;" . elscreen-previous)
+                     ("C-'" . elscreen-next) ;; not worked (why?)
+                      ))
+                (_ `(
+                     ("C-;" . elscreen-previous)
+                     ("C-:" . elscreen-next)
+                     )))
             ("C-j S" . elscreen-shell/next-screen)
             ("C-j C-f" . elscreen-find-file)
 
@@ -57,14 +69,13 @@
             ("C-j S" . open-shell-with-pwd)
             ("<f5>" . revert-buffer)
             ("<f12>" . (lambda () (interactive)
-                         (message "reflesh")
+                         (message "refresh")
                          (setq extended-command-history nil)))
 
             ;; font-size C-x +, C- -
             ("C-x \\" . my:adjust-font-height)
             ("C-x |" . my:adjust-font-height-globally)
             )
-
           )
-    (define-many-keys (current-global-map) global-individual-key-mapping))
+    (define-many-keys (current-global-map) my:global-individual-key-mapping))
   )

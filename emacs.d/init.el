@@ -11,6 +11,26 @@
         ("melpa" . "http://melpa.org/packages/")
         ))
 
+;;; Begin 0.25 custom environment setting (loading git-ignored file if existed)
+(progn
+  (defgroup my nil
+    "My custom settings"
+    :prefix "my:")
+
+  (defcustom my:keyboard-layout 'ja
+    "My keyboard layout setting. This can be `en' or `ja'."
+    :type '(choice (const en) (const ja))
+    :group 'my
+    )
+
+  (let ((target-file (concat (current-directory) "00custom-environment.el")))
+    (when (file-exists-p target-file)
+      (message "%s is existedd, loading" target-file)
+      (load-file target-file))
+    )
+)
+
+
 ;;; Begin 0.5 this is temporary
 (add-to-list 'load-path (concat (current-directory) "3rdparty"))
 (add-to-list 'load-path (concat (current-directory) "mine"))
@@ -120,7 +140,7 @@
  '(help-at-pt-timer-delay 0.9)
  '(package-selected-packages
    (quote
-    (ivy-rich which-key-posframe magit ivy-postframe ivy-posframe jedi-core python-environment dracula-theme flycheck ivy counsel quickrun swiper paredit anything-match-plugin anything-config anything key-chord markdown-mode zlc go-eldoc elscreen bm init-loader eglot undo-tree jsonrpc json-rpc dash-functional lsp-mode shackle racer company-racer use-package company-jedi epc scala-mode disable-mouse flycheck-rust rust-mode go-mode fcitx "flymake-yaml" flymake-yaml yaml-mode toggle-file-mode pickup initchart flymake-jshint flymake-eslint ffap-python company-go anything-vcs-project)))
+    (typescript-mode which-key ivy-rich which-key-posframe magit ivy-postframe ivy-posframe jedi-core python-environment dracula-theme flycheck ivy counsel quickrun swiper paredit anything-match-plugin anything-config anything key-chord markdown-mode zlc go-eldoc elscreen bm init-loader eglot undo-tree jsonrpc json-rpc dash-functional lsp-mode shackle racer company-racer use-package company-jedi epc scala-mode disable-mouse flycheck-rust rust-mode go-mode fcitx "flymake-yaml" flymake-yaml yaml-mode toggle-file-mode pickup initchart flymake-jshint flymake-eslint ffap-python company-go anything-vcs-project)))
  '(python-environment-virtualenv (list "python" "-m" "venv" "--system-site-packages"))
  '(safe-local-variable-values (quote ((encoding . utf-8))))
  '(send-mail-function (quote smtpmail-send-it)))

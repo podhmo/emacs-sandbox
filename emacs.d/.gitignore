@@ -10,3 +10,5 @@ recentf
 bookmarks
 elpa/
 eshell/history
+
+00custom-environment.el

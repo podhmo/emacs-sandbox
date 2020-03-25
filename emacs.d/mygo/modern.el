@@ -15,6 +15,8 @@
     ;; (add-to-list 'eglot-server-programs '(go-mode "bingo" "-format-style" "goimports"))
     ;; go get -u -v golang.org/x/tools/cmd/gopls
     (add-to-list 'eglot-server-programs '(go-mode "gopls"))
+
+    (setq eglot-connect-timeout nil) ;; xxx
     )
 
   (defvar my:golang-key-pair
