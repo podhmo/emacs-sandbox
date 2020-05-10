@@ -161,11 +161,25 @@
       	;; (height . 40)
         ,@default-frame-alist))
 
-(use-package dracula-theme
+
+;; (use-package dracula-theme
+;;   :ensure t
+;;   :config
+;;   (set-face-attribute 'default nil :height 140)
+;;   )
+;; (use-package iceberg-theme
+;;   :ensure t
+;;   :config
+;;   (iceberg-theme-create-theme-file)
+;;   (load-theme 'solarized-iceberg-dark t)
+;;   )
+(use-package solarized-theme
   :ensure t
   :config
+  (load-theme 'solarized-wombat-dark t)
   (set-face-attribute 'default nil :height 140)
   )
+
 
 (let ((sysname (symbol-name system-type)))
   (cond ((string-match-p "darwin" sysname)
