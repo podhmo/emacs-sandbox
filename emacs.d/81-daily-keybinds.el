@@ -42,7 +42,7 @@
 
             ;; quick-run
             ,@(pcase my:keyboard-layout
-                (en `(
+                ('en `(
                       ("C-c ]" . quickrun-compile-only) ;; for keyboard(en)
                       ("C-c C-]" . quickrun) ;; for keyboard(en)
                       ))
@@ -53,7 +53,7 @@
 
             ;; elscreen
             ,@(pcase my:keyboard-layout
-                (en `(
+                ('en `(
                      ("C-;" . elscreen-previous)
                      ("C-'" . elscreen-next) ;; not worked (why?)
                       ))
@@ -69,7 +69,7 @@
             ("C-j S" . open-shell-with-pwd)
             ("<f5>" . revert-buffer)
             ("<f12>" . (lambda () (interactive)
-                         (message "refresh")
+                         (message "reflesh")
                          (setq extended-command-history nil)))
 
             ;; font-size C-x +, C- -
@@ -79,3 +79,4 @@
           )
     (define-many-keys (current-global-map) my:global-individual-key-mapping))
   )
+
