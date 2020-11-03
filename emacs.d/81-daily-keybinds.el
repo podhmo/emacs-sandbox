@@ -66,7 +66,7 @@
 
             ("C-." . redo)
             ("C-/" . undo)
-            ("C-j S" . open-shell-with-pwd)
+            ("C-j S" . my:shell-on-current-dir)
             ("<f5>" . revert-buffer)
             ("<f12>" . (lambda () (interactive)
                          (message "reflesh")
