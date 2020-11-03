@@ -144,7 +144,14 @@
 (cond ((equal system-type 'darwin)
        nil)
       ((equal system-type 'windows-nt)
-       nil)
+       (use-package disable-mouse
+         :ensure t
+         :config
+         (global-disable-mouse-mode)
+         :init
+         (put 'dired-find-alternate-file 'disabled nil)
+         )
+       )
       (t
        (defun my:ignore (&rest args)
          (interactive)
@@ -153,8 +160,13 @@
        (global-set-key (kbd "<eisu-toggle>") 'my:ignore)
 
        ;; disable-mouse when linux environement
-       (require 'disable-mouse)
-       (global-disable-mouse-mode)
+       (use-package disable-mouse
+         :ensure t
+         :config
+         (global-disable-mouse-mode)
+         :init
+         (put 'dired-find-alternate-file 'disabled nil)
+         )
        ))
 
-(put 'dired-find-alternate-file 'disabled nil)
+
