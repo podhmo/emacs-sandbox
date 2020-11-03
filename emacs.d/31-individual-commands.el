@@ -34,13 +34,27 @@
   (let1 source buffer-file-name
     (browse-url source)))
 
-(defun open-shell-with-pwd ()
-  (interactive)
-  (let1 dir (current-directory)
-    (shell)
-    (comint-simple-send (get-buffer-process dir)
-                        (concat "cd " dir))
+(defun my:shell-on-current-dir (&optional arg)
+  (interactive "P")
+  (let ((dir (current-directory)))
+    (cond ((equal system-type 'windows-nt)
+           (my:eshell-on-dir dir arg))
+          (t
+           (my:shell-on-dir dir arg)))))
+
+(defun my:eshell-on-dir (dir &optional arg)
+  (cl-letf (((symbol-function 'pop-to-buffer-same-window)
+             (lambda (buf)
+               (pop-to-buffer buf))))
+    (eshell arg)
+    (cd dir)
+    (eshell-emit-prompt)
     (goto-char (point-max))))
+
+(defun my:shell-on-dir (dir &optional arg)
+  (comint-simple-send (get-buffer-process dir)
+                      (concat "cd " dir))
+  (goto-char (point-max)))
 
 (cl-defun find-increased-file (&key (n 1) (default 1))
   (interactive)
