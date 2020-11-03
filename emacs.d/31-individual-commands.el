@@ -181,17 +181,28 @@ so. c-u 3 follow-with-n-window, then a frame splitted 3window
                    (,(getenv "HOME") . "$HOME")
                    )))
     (when (equal system-type 'windows-nt)
-      (let ((home-dir (replace-regexp-in-string "AppData\\Roaming$" "" (getenv "HOME"))))
-        (push `(,home-dir . "$HOME") r)
-        (push `(,(replace-regexp-in-string "^c:/" "C:\\\\" home-dir) . "$HOME") r))
-
+      (setq r (cl-loop for (path . replacement) in r
+                       when (stringp path)
+                       collect
+                       (cons
+                        (replace-regexp-in-string "\\\\" "/" path)
+                        replacement)
+                       ))
+      (let ((home-dir
+             (replace-regexp-in-string
+              "/AppData/Roaming$" ""
+              (replace-regexp-in-string
+               "\\\\" "/"
+               (getenv "HOME")))))
+        (add-to-list 'r `(,home-dir . "$HOME"))
+        )
       ;; / -> \\
       (setq r (append r
-                      (cl-loop for (pattern . replacement) in r
-                               when (stringp pattern)
+                      (cl-loop for (path . replacement) in r
+                               when (stringp path)
                                collect
                                (cons
-                                (replace-regexp-in-string "/" "\\\\" pattern)
+                                (replace-regexp-in-string "/" "\\\\" path)
                                 replacement)
                                )))
       )
