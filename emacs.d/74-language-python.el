@@ -188,7 +188,7 @@
     (goto-char (point-min))
     (forward-line 30)
     (unless (search-backward "-*- coding:" nil t 1)
-      (flet ((y-or-n-p (x) t))
+      (cl-letf (((symbol-function 'y-or-n-p) (lambda (x) t)))
         (auto-insert))))
   )
 

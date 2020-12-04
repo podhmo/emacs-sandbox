@@ -126,7 +126,7 @@
                      (err-buf (my:get-fresh-buffer-create (format "*%s error*" cmd-name))))
                  (let ((status
                         ;; xxx
-                        (flet ((display-message-or-buffer (&rest args) nil))
+                        (cl-letf (((symbol-function 'display-message-or-buffer) (lambda (&rest args) nil)))
                           (shell-command-on-region (point-min) (point-max) cmd buf nil err-buf)
                           )))
                    (cond ((= 0 status)

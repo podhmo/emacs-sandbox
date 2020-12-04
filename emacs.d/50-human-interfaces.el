@@ -97,16 +97,16 @@
        (ad-activate 'anything-next-line)
        (ad-enable-advice 'anything-previous-line 'after ',advice-name)
        (ad-activate 'anything-previous-line)
-       (flet ((message (&rest args)))
-         (unwind-protect
-             ,action
-           (progn (ad-deactivate 'anything-previous-line)
-                  (ad-deactivate 'anything-next-line))))))
+       (cl-letf (((symbol-function 'message) (lambda (&rest args)))
+                 (unwind-protect
+                     ,action
+                   (progn (ad-deactivate 'anything-previous-line)
+                          (ad-deactivate 'anything-next-line)))))))
 
-  (defun anything-occur* () 
+  (defun anything-occur* ()
     "Preconfigured Anything for Occur source."
     (interactive)
-    (with-anything-line-move-advice 
+    (with-anything-line-move-advice
      execute-persistent-action
      (anything-occur)))
 
@@ -117,7 +117,7 @@
     (defun anything-bm-list* ()
       "Preconfigured `anything' for visible bookmarks."
       (interactive)
-      (with-anything-line-move-advice 
+      (with-anything-line-move-advice
        execute-persistent-action
        (anything-bm-list)))
     )
@@ -138,7 +138,7 @@
                     ("C-j j" . bm-toggle)
                     ))))
     )
-  )  
+  )
 
 
 (progn ;; viewer-mode-settings
