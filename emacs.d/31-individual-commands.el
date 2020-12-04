@@ -52,9 +52,15 @@
     (goto-char (point-max))))
 
 (defun my:shell-on-dir (dir &optional arg)
-  (comint-simple-send (get-buffer-process dir)
-                      (concat "cd " dir))
-  (goto-char (point-max)))
+  (condition-case err
+      (progn
+        (comint-simple-send (get-buffer-process dir)
+                            (concat "cd " dir))
+        (goto-char (point-max)))
+    (error
+     (let ((default-directory dir))
+       (call-interactively 'shell)))
+    ))
 
 (cl-defun find-increased-file (&key (n 1) (default 1))
   (interactive)
