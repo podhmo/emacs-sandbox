@@ -130,7 +130,15 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(counsel-yank-pop-separator "
+----------------------------------------
+")
+ '(custom-safe-themes
+   (quote
+    ("13a8eaddb003fd0d561096e11e1a91b029d3c9d64554f8e897b2513dbf14b277" "d362eed16f74bfa8e49df0185a9336184d479e120c41837a5e6f020e0336bf7f" default)))
  '(flycheck-check-syntax-automatically (quote (save mode-enabled)))
+ '(flycheck-command-wrapper-function
+   (function my:flycheck-wrapper-function--use-fullpath-command))
  '(flycheck-executable-find (function my:flycheck-executable-find))
  '(flymake-no-changes-timeout nil)
  '(flymake-start-on-flymake-mode t)
@@ -149,6 +157,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(bm-face ((t (:background "knobColor" :overline "#8c8b85"))))
+ '(markdown-code-face ((t (:inherit fixed-pitch :background "Black"))))
  '(vhl/default-face ((nil (:foreground "#FF3333" :background "#FFCDCD")))))
 
 ;; locale settings
