@@ -130,25 +130,142 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(flycheck-check-syntax-automatically (quote (save mode-enabled)))
- '(flycheck-executable-find (function my:flycheck-executable-find))
+ '(counsel-yank-pop-separator "
+----------------------------------------
+")
+ '(custom-safe-themes
+   '("81c3de64d684e23455236abde277cda4b66509ef2c28f66e059aa925b8b12534" "274fa62b00d732d093fc3f120aca1b31a6bb484492f31081c1814a858e25c72e" default))
+ '(flycheck-check-syntax-automatically '(save mode-enabled))
+ '(flycheck-command-wrapper-function #'my:flycheck-wrapper-function--use-fullpath-command)
+ '(flycheck-executable-find #'my:flycheck-executable-find)
  '(flymake-no-changes-timeout nil)
  '(flymake-start-on-flymake-mode t)
  '(flymake-start-on-newline nil)
  '(flymake-start-on-save-buffer t)
- '(help-at-pt-display-when-idle (quote (flymake-overlay)) nil (help-at-pt))
+ '(help-at-pt-display-when-idle '(flymake-overlay) nil (help-at-pt))
  '(help-at-pt-timer-delay 0.9)
+ '(highlight-indent-guides-auto-enabled t)
+ '(highlight-indent-guides-method 'character)
+ '(highlight-indent-guides-responsive nil)
  '(package-selected-packages
-   (quote
-    (typescript-mode which-key ivy-rich which-key-posframe magit ivy-postframe ivy-posframe jedi-core python-environment dracula-theme flycheck ivy counsel quickrun swiper paredit anything-match-plugin anything-config anything key-chord markdown-mode zlc go-eldoc elscreen bm init-loader eglot undo-tree jsonrpc json-rpc dash-functional lsp-mode shackle racer company-racer use-package company-jedi epc scala-mode disable-mouse flycheck-rust rust-mode go-mode fcitx "flymake-yaml" flymake-yaml yaml-mode toggle-file-mode pickup initchart flymake-jshint flymake-eslint ffap-python company-go anything-vcs-project)))
+   '(typescript-mode solarized-theme which-key-posframe ivy-postframe python-environment dracula-theme counsel anything-match-plugin anything-config anything zlc go-eldoc elscreen bm eglot jsonrpc json-rpc dash-functional lsp-mode shackle racer company-racer company-jedi epc scala-mode disable-mouse flycheck-rust rust-mode fcitx "flymake-yaml" flymake-yaml toggle-file-mode pickup initchart flymake-jshint flymake-eslint ffap-python company-go anything-vcs-project yaml-mode with-editor which-key volatile-highlights use-package undo-tree transient terraform-mode quickrun posframe pkg-info paredit markdown-mode magit key-chord ivy-rich ivy-posframe init-loader hcl-mode git-commit flycheck epl dash bind-key async))
  '(python-environment-virtualenv (list "python" "-m" "venv" "--system-site-packages"))
- '(safe-local-variable-values (quote ((encoding . utf-8))))
- '(send-mail-function (quote smtpmail-send-it)))
+ '(safe-local-variable-values
+   '((fci-rule-column . 140)
+     (c-comment-only-line-offset 0 . 0)
+     (eval progn
+           (defun my/point-in-defun-declaration-p nil
+             (let
+                 ((bod
+                   (save-excursion
+                     (c-beginning-of-defun)
+                     (point))))
+               (<= bod
+                   (point)
+                   (save-excursion
+                     (goto-char bod)
+                     (re-search-forward "{")
+                     (point)))))
+           (defun my/is-string-concatenation-p nil "Returns true if the previous line is a string concatenation"
+                  (save-excursion
+                    (let
+                        ((start
+                          (point)))
+                      (forward-line -1)
+                      (if
+                          (re-search-forward " \\+$" start t)
+                          t nil))))
+           (defun my/inside-java-lambda-p nil "Returns true if point is the first statement inside of a lambda"
+                  (save-excursion
+                    (c-beginning-of-statement-1)
+                    (let
+                        ((start
+                          (point)))
+                      (forward-line -1)
+                      (if
+                          (search-forward " -> {" start t)
+                          t nil))))
+           (defun my/trailing-paren-p nil "Returns true if point is a training paren and semicolon"
+                  (save-excursion
+                    (end-of-line)
+                    (let
+                        ((endpoint
+                          (point)))
+                      (beginning-of-line)
+                      (if
+                          (re-search-forward "[ ]*);$" endpoint t)
+                          t nil))))
+           (defun my/prev-line-call-with-no-args-p nil "Return true if the previous line is a function call with no arguments"
+                  (save-excursion
+                    (let
+                        ((start
+                          (point)))
+                      (forward-line -1)
+                      (if
+                          (re-search-forward ".($" start t)
+                          t nil))))
+           (defun my/arglist-cont-nonempty-indentation
+               (arg)
+             (if
+                 (my/inside-java-lambda-p)
+                 '+
+               (if
+                   (my/is-string-concatenation-p)
+                   16
+                 (unless
+                     (my/point-in-defun-declaration-p)
+                   '++))))
+           (defun my/statement-block-intro
+               (arg)
+             (if
+                 (and
+                  (c-at-statement-start-p)
+                  (my/inside-java-lambda-p))
+                 0 '+))
+           (defun my/block-close
+               (arg)
+             (if
+                 (my/inside-java-lambda-p)
+                 '- 0))
+           (defun my/arglist-close
+               (arg)
+             (if
+                 (my/trailing-paren-p)
+                 0 '--))
+           (defun my/arglist-intro
+               (arg)
+             (if
+                 (my/prev-line-call-with-no-args-p)
+                 '++ 0))
+           (c-set-offset 'inline-open 0)
+           (c-set-offset 'topmost-intro-cont '+)
+           (c-set-offset 'statement-block-intro 'my/statement-block-intro)
+           (c-set-offset 'block-close 'my/block-close)
+           (c-set-offset 'knr-argdecl-intro '+)
+           (c-set-offset 'substatement-open '+)
+           (c-set-offset 'substatement-label '+)
+           (c-set-offset 'case-label '+)
+           (c-set-offset 'label '+)
+           (c-set-offset 'statement-case-open '+)
+           (c-set-offset 'statement-cont '++)
+           (c-set-offset 'arglist-intro 'my/arglist-intro)
+           (c-set-offset 'arglist-cont-nonempty
+                         '(my/arglist-cont-nonempty-indentation c-lineup-arglist))
+           (c-set-offset 'arglist-close 'my/arglist-close)
+           (c-set-offset 'inexpr-class 0)
+           (c-set-offset 'access-label 0)
+           (c-set-offset 'inher-intro '++)
+           (c-set-offset 'inher-cont '++)
+           (c-set-offset 'brace-list-intro '+)
+           (c-set-offset 'func-decl-cont '++))
+     (encoding . utf-8)))
+ '(send-mail-function 'smtpmail-send-it))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(markdown-code-face ((t (:inherit fixed-pitch :background "MediumPurple4"))))
  '(vhl/default-face ((nil (:foreground "#FF3333" :background "#FFCDCD")))))
 
 ;; locale settings
@@ -161,6 +278,7 @@
 (add-hook 'html-mode-hook (lambda () (setq auto-fill-mode nil)))
 
 (cond ((equal system-type 'darwin)
+       (setenv "GIT_PAGER" "")
        nil)
       ((equal system-type 'windows-nt)
        (use-package disable-mouse

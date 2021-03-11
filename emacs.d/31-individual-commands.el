@@ -59,7 +59,11 @@
         (goto-char (point-max)))
     (error
      (let ((default-directory dir))
-       (call-interactively 'shell)))
+       (call-interactively 'shell)
+       (comint-simple-send (get-buffer-process dir)
+                           (concat "cd " dir))
+       (goto-char (point-max))
+       ))
     ))
 
 (cl-defun find-increased-file (&key (n 1) (default 1))
