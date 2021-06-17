@@ -1,5 +1,22 @@
 ;; with-eglot and ivy
 
+(defvar my:go-insert-template-dir (current-directory))
+(defun my:go-insert-template-if-needed ()
+  (let ((template-path (expand-file-name
+                        (file-name-nondirectory buffer-file-name)
+                        my:go-insert-template-dir
+                        )))
+    (cond ((file-exists-p template-path)
+           (when (string-equal (buffer-string) "")
+             (insert (with-current-buffer (find-file-noselect template-path)
+                       (buffer-string)
+                       ))))
+          (t (let ((package-name
+                    (file-name-nondirectory (substring-no-properties default-directory 0 (1- (length default-directory))))))
+               (when (string-equal (buffer-string) "")
+                 (insert (format "package %s\n" (replace-regexp-in-string "-" "" package-name))))))
+          )))
+
 (use-package go-mode
   :defer t
   :ensure t
@@ -29,6 +46,7 @@
 
   (defun my:go-mode-setup ()
     (my:eglot-ensure)
+    (my:go-insert-template-if-needed)
     (define-insert-pair-binding go-mode-map my:golang-key-pair)
     (when (fboundp 'ivy-mode)
       (ivy-mode 1))
@@ -44,6 +62,7 @@
                )
     (my:go-setup-format-buffer)
     )
+
   (add-hook 'go-mode-hook 'my:go-mode-setup)
   :config
   (my:go-setup-gofmt-command) ;; TODO: remove (tentative)

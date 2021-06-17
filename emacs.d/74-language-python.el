@@ -95,7 +95,7 @@
     (my:execute-formatter-command yapf yapf  beg end)))
 (defun my:py-black-buffer (beg end)
   (interactive "r")
-  (unless (region-active-p)
+  (unless (or (region-active-p) (= 0 (abs (- end beg))))
     (setq beg (point-min))
     (setq end (point-max))
     )
