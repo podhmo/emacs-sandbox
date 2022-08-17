@@ -61,7 +61,7 @@
 (use-package init-loader
   :ensure t
   :config
-  (setq init-loader-show-log-after-init nil)
+  (setq init-loader-show-log-after-init nil) ;; M-x init-loader-show-log
 
   ;; suppress Warinig
   (setq *curdir* (current-directory))
@@ -71,7 +71,7 @@
     )
 
   (init-loader-load (current-directory))
-)
+  )
 
 
 
@@ -134,30 +134,27 @@
 ----------------------------------------
 ")
  '(custom-safe-themes
-   (quote
-    ("13a8eaddb003fd0d561096e11e1a91b029d3c9d64554f8e897b2513dbf14b277" "d362eed16f74bfa8e49df0185a9336184d479e120c41837a5e6f020e0336bf7f" default)))
- '(flycheck-check-syntax-automatically (quote (save mode-enabled)))
- '(flycheck-command-wrapper-function
-   (function my:flycheck-wrapper-function--use-fullpath-command))
- '(flycheck-executable-find (function my:flycheck-executable-find))
+   '("824d07981667fd7d63488756b6d6a4036bae972d26337babf7b56df6e42f2bcd" "191bc4e53173f13e9b827272fa39be59b7295a0593b9f070deb6cb7c3745fd1d" "13a8eaddb003fd0d561096e11e1a91b029d3c9d64554f8e897b2513dbf14b277" "d362eed16f74bfa8e49df0185a9336184d479e120c41837a5e6f020e0336bf7f" default))
+ '(flycheck-check-syntax-automatically '(save mode-enabled))
+ '(flycheck-command-wrapper-function #'my:flycheck-wrapper-function--use-fullpath-command)
+ '(flycheck-executable-find #'my:flycheck-executable-find)
  '(flymake-no-changes-timeout nil)
  '(flymake-start-on-flymake-mode t)
  '(flymake-start-on-newline nil)
  '(flymake-start-on-save-buffer t)
- '(help-at-pt-display-when-idle (quote (flymake-overlay)) nil (help-at-pt))
+ '(help-at-pt-display-when-idle '(flymake-overlay) nil (help-at-pt))
  '(help-at-pt-timer-delay 0.9)
  '(package-selected-packages
-   (quote
-    (typescript-mode which-key ivy-rich which-key-posframe magit ivy-postframe ivy-posframe jedi-core python-environment dracula-theme flycheck ivy counsel quickrun swiper paredit anything-match-plugin anything-config anything key-chord markdown-mode zlc go-eldoc elscreen bm init-loader eglot undo-tree jsonrpc json-rpc dash-functional lsp-mode shackle racer company-racer use-package company-jedi epc scala-mode disable-mouse flycheck-rust rust-mode go-mode fcitx "flymake-yaml" flymake-yaml yaml-mode toggle-file-mode pickup initchart flymake-jshint flymake-eslint ffap-python company-go anything-vcs-project)))
+   '(zen-mode solarized-theme typescript-mode which-key ivy-rich which-key-posframe magit ivy-postframe ivy-posframe jedi-core python-environment dracula-theme flycheck ivy counsel quickrun swiper paredit anything-match-plugin anything-config anything key-chord markdown-mode zlc go-eldoc elscreen bm init-loader eglot undo-tree jsonrpc json-rpc dash-functional lsp-mode shackle racer company-racer use-package company-jedi epc scala-mode disable-mouse flycheck-rust rust-mode go-mode fcitx "flymake-yaml" flymake-yaml yaml-mode toggle-file-mode pickup initchart flymake-jshint flymake-eslint ffap-python company-go anything-vcs-project))
  '(python-environment-virtualenv (list "python" "-m" "venv" "--system-site-packages"))
- '(safe-local-variable-values (quote ((encoding . utf-8))))
- '(send-mail-function (quote smtpmail-send-it)))
+ '(safe-local-variable-values '((encoding . utf-8)))
+ '(send-mail-function 'smtpmail-send-it))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(bm-face ((t (:background "knobColor" :overline "#8c8b85"))))
+ '(bm-face ((t (:background "rosy brown" :overline "#8c8b85"))))
  '(markdown-code-face ((t (:inherit fixed-pitch :background "Black"))))
  '(vhl/default-face ((nil (:foreground "#FF3333" :background "#FFCDCD")))))
 
@@ -171,7 +168,15 @@
 (add-hook 'html-mode-hook (lambda () (setq auto-fill-mode nil)))
 
 (cond ((equal system-type 'darwin)
-       nil)
+       (setq my:py-black-command "~/.local/bin/black")
+       (use-package python
+         :after (elscreen)
+         :hook (python-mode . my:mac:python-mode-hook)
+         :config
+         (defun my:mac:python-mode-hook ()
+           (define-key python-mode-map (kbd "C-c C-p") 'elscreen-previous)
+           )
+         ))
       ((equal system-type 'windows-nt)
        (use-package disable-mouse
          :ensure t

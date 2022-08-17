@@ -187,21 +187,23 @@
   )
 
 
-(let ((sysname (symbol-name system-type)))
-  (cond ((string-match-p "darwin" sysname)
-         ;; todo create font
-         (defvar myfont "-*-*-*-*-*-*-*-*-*-*-*-*-fontset-default")
-         (set-fontset-font
-          myfont
-          'japanese-jisx0208
-          ;;                  (font-spec :family "Hiragino Kaku Gothic ProN")
-          (font-spec :family "Hiragino Maru Gothic Pro"))
-         (add-to-list 'default-frame-alist `(font . ,myfont))
-         )
-        ((string-match-p "linux" sysname)
-         (set-fontset-font nil 'unicode
-                           (font-spec :family "Noto Sans Mono CJK JP" :weight 'normal :slant 'normal :style "Regular" :size 18)))
-        (t )))
+;; TODO:
+;; (let ((sysname (symbol-name system-type)))
+;;   (cond ((string-match-p "darwin" sysname)
+;;          ;; todo create font
+;;          (defvar myfont "-*-*-*-*-*-*-*-*-*-*-*-*-fontset-default")
+;;          (set-fontset-font
+;;           myfont
+;;           'japanese-jisx0208
+;;           ;;                  (font-spec :family "Hiragino Kaku Gothic ProN")
+;;           (font-spec :family "Hiragino Maru Gothic Pro"))
+;;          (add-to-list 'default-frame-alist `(font . ,myfont))
+;;          )
+;;         ((string-match-p "linux" sysname)
+;;          (set-fontset-font nil 'unicode
+;;                            (font-spec :family "Noto Sans Mono CJK JP" :weight 'normal :slant 'normal :style "Regular" :size 18)))
+;;         (t )))
+
 
 ;; emoji
 ;; install symbola-font or google-noto-emoji-font and fc-cache -vf

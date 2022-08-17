@@ -56,6 +56,8 @@
                 ('en `(
                      ("C-;" . elscreen-previous)
                      ("C-'" . elscreen-next) ;; not worked (why?)
+                     ("C-c C-p" . elscreen-previous)
+                     ("C-c C-n" . elscreen-next)
                       ))
                 (_ `(
                      ("C-;" . elscreen-previous)

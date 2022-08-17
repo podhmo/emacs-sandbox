@@ -74,6 +74,7 @@
 (progn ;; anything
   (require-and-fetch-if-not 'anything :url "https://raw.githubusercontent.com/emacsattic/anything/master/anything.el")
   (require-and-fetch-if-not 'anything-match-plugin :url "https://raw.githubusercontent.com/emacsattic/anything/master/anything-match-plugin.el")
+  (defvar browse-url-mosaic-program "mosaic")
   (require-and-fetch-if-not 'anything-config :url "https://raw.githubusercontent.com/emacsattic/anything/master/anything-config.el")
 
   ;; (require 'anything-complete)
@@ -81,28 +82,29 @@
   (setq anything-execute-action-at-once-if-one t)
 
   (require 'outline)
-  (defadvice anything-next-line (after execute-persistent-action disable)
-    (unless (or (anything-get-previous-header-pos)
-                (anything-get-next-header-pos))
-      (call-interactively 'anything-execute-persistent-action)))
+  ;; (defadvice anything-next-line (after execute-persistent-action disable)
+  ;;   (unless (or (anything-get-previous-header-pos)
+  ;;               (anything-get-next-header-pos))
+  ;;     (call-interactively 'anything-execute-persistent-action)))
 
-  (defadvice anything-previous-line (after execute-persistent-action disable)
-    (unless (or (anything-get-previous-header-pos)
-                (anything-get-next-header-pos))
-      (call-interactively 'anything-execute-persistent-action)))
+  ;; (defadvice anything-previous-line (after execute-persistent-action disable)
+  ;;   (unless (or (anything-get-previous-header-pos)
+  ;;               (anything-get-next-header-pos))
+  ;;     (call-interactively 'anything-execute-persistent-action)))
 
+  ;; (defmacro with-anything-line-move-advice (advice-name action)
+  ;;   `(progn
+  ;;      (ad-enable-advice 'anything-next-line 'after ',advice-name)
+  ;;      (ad-activate 'anything-next-line)
+  ;;      (ad-enable-advice 'anything-previous-line 'after ',advice-name)
+  ;;      (ad-activate 'anything-previous-line)
+  ;;      (cl-letf (((symbol-function 'message) (lambda (&rest args)))
+  ;;                (unwind-protect
+  ;;                    ,action
+  ;;                  (progn (ad-deactivate 'anything-previous-line)
+  ;;                         (ad-deactivate 'anything-next-line)))))))
   (defmacro with-anything-line-move-advice (advice-name action)
-    `(progn
-       (ad-enable-advice 'anything-next-line 'after ',advice-name)
-       (ad-activate 'anything-next-line)
-       (ad-enable-advice 'anything-previous-line 'after ',advice-name)
-       (ad-activate 'anything-previous-line)
-       (cl-letf (((symbol-function 'message) (lambda (&rest args)))
-                 (unwind-protect
-                     ,action
-                   (progn (ad-deactivate 'anything-previous-line)
-                          (ad-deactivate 'anything-next-line)))))))
-
+    (progn ,advice-name ,action))
   (defun anything-occur* ()
     "Preconfigured Anything for Occur source."
     (interactive)
