@@ -16,7 +16,8 @@
 
 ;;; ffap module
 (use-package ffap-python  ;; mine
-  :commands (ffap-python ffap-python:find-program ffap-python:find-python)
+  :commands (ffap-python ffap-python:find-program ffap-python:find-python ffap-python:import-ffap)
+  :after (python)
   :init
   (with-eval-after-load 'quickrun
     (setq my:check-python-program "pyflakes")
