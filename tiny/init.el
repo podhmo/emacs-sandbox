@@ -5,11 +5,17 @@
       (file-name-directory load-file-name)
     default-directory))
 
+;; settings
+
 (load-file (concat (current-directory) "macros.el"))
+(load-file (concat  (current-directory) "auto-save-buffers.el")) ; todo byte-compile
 
-
-;; lisp-mode
-(setq initial-major-mode 'emacs-lisp-mode)
+(progn ;; emacsclient
+  (condition-case err
+      (progn
+        (autoload 'server-running-p "server") 
+        (unless (server-running-p)  (server-start)))
+    (error (message "emacsclient load fail"))))
 
 ;; eye candy
 (global-display-line-numbers-mode)
@@ -28,23 +34,12 @@
 (auto-image-file-mode t)
 (setq resize-mini-windows t)
 
+;; lisp-mode
+(setq initial-major-mode 'emacs-lisp-mode)
+
 ;; shell
 (add-hook 'shell-mode-hook
           'ansi-color-for-comint-mode-on)
 
-
-;; settings
-
-					; todo byte-compile
-(load-file (concat  (current-directory) "auto-save-buffers.el")) 
-
-;; settings
-
-(progn ;; emacsclient
-  (condition-case err
-      (progn
-        (autoload 'server-running-p "server") 
-        (unless (server-running-p)  (server-start)))
-    (error (message "emacsclient load fail"))))
-
+;; main
 (auto-save-buffers-start 0.5)
