@@ -25,21 +25,28 @@
     (error (message "emacsclient load fail"))))
 
 ;; eye candy
-(global-display-line-numbers-mode)
-(menu-bar-mode -1)
-(when (fboundp 'tool-bar-mode)
-  (tool-bar-mode -1))
-(setq echo-keystrokes 0.2)
-(column-number-mode t)
-(show-paren-mode 1)
-(display-time-mode t)
-(transient-mark-mode t)
+(progn
+  (global-display-line-numbers-mode t)
+  (custom-set-variables '(display-line-numbers-width-start t))
 
-(setq search-highlight t)
-(setq query-replace-highlight t)
+  (progn ;; mode-line
+    (column-number-mode t)
+    (display-time-mode t)
+    )
 
-(auto-image-file-mode t)
-(setq resize-mini-windows t)
+  ;; (menu-bar-mode)
+  (tool-bar-mode -1)
+  (setq echo-keystrokes 0.2)
+
+  (show-paren-mode 1)
+  (transient-mark-mode t)
+
+  (setq search-highlight t)
+  (setq query-replace-highlight t)
+
+  (auto-image-file-mode t)
+  (setq resize-mini-windows t)
+  )
 
 ;; lisp-mode
 (setq initial-major-mode 'emacs-lisp-mode)
