@@ -1,1 +1,14 @@
-elpa
+*.elc
+.cask
+3rdparty
+*~
+.project.list
+abbrev_defs
+tramp
+recentf
+.python-environments
+bookmarks
+elpa/
+eshell/history
+
+00custom-environment.el
