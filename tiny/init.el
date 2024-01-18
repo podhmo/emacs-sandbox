@@ -7,8 +7,15 @@
 
 ;; settings
 
+(progn ; disable welcome message
+  (setq inhibit-startup-message t)
+  (setq inhibit-splash-screen t)
+  )
+
 (load-file (concat (current-directory) "macros.el"))
 (load-file (concat  (current-directory) "auto-save-buffers.el")) ; todo byte-compile
+
+(setq backup-directory-alist '((".*" . "~/.emacs.d/backup"))) ; backup is <filename>~
 
 (progn ;; emacsclient
   (condition-case err
