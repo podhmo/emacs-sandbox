@@ -5,54 +5,60 @@
       (file-name-directory load-file-name)
     default-directory))
 
-;; settings
-(progn ; disable welcome message
-  (setq inhibit-startup-message t)
-  (setq inhibit-splash-screen t)
-  )
+;; disable welcome message
+(setq inhibit-startup-message t)
+(setq inhibit-splash-screen t)
 
+;; load individual library
 (load-file (concat (current-directory) "macros.el"))
 (load-file (concat  (current-directory) "auto-save-buffers.el")) ; todo byte-compile
 
-(setq backup-directory-alist '((".*" . "~/.emacs.d/backup"))) ; backup is <filename>~
-
-(progn ; emacsclient
-  (condition-case err
-      (progn
-        (autoload 'server-running-p "server") 
-        (unless (server-running-p)  (server-start)))
-    (error (message "emacsclient load fail"))))
-
-;; eye candy
+;; settings
 (progn
-  (global-display-line-numbers-mode t)
-  (custom-set-variables '(display-line-numbers-width-start t))
-
-  (progn ; mode-line
-    (column-number-mode t)
-    (display-time-mode t)
+  (progn ; backup handling
+    (setq backup-directory-alist '((".*" . "~/.emacs.d/backup"))) ; backup is <filename>~
     )
 
-  ;; (menu-bar-mode)
-  (tool-bar-mode -1)
-  (setq echo-keystrokes 0.2)
+  (progn ; eye candy
+    (global-display-line-numbers-mode t)
+    (custom-set-variables '(display-line-numbers-width-start t))
 
-  (show-paren-mode 1)
-  (transient-mark-mode t)
+    (progn ; mode-line
+      (column-number-mode t)
+      (display-time-mode t)
+      )
 
-  (setq search-highlight t)
-  (setq query-replace-highlight t)
+    ;; (menu-bar-mode)
+    (tool-bar-mode -1)
+    (setq echo-keystrokes 0.2)
 
-  (auto-image-file-mode t)
-  (setq resize-mini-windows t)
+    (show-paren-mode 1)
+    (transient-mark-mode t)
+
+    (setq search-highlight t)
+    (setq query-replace-highlight t)
+
+    (auto-image-file-mode t)
+    (setq resize-mini-windows t)
+    )
+
+  (progn ; emacs client
+    (condition-case err
+	(progn
+          (autoload 'server-running-p "server") 
+          (unless (server-running-p)  (server-start)))
+      (error (message "emacsclient load fail")))
+    )
+
+  (progn ; lisp-mode
+    (setq initial-major-mode 'emacs-lisp-mode)
+    )
+
+  (progn ; shell
+    (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+    )
   )
 
-;; lisp-mode
-(setq initial-major-mode 'emacs-lisp-mode)
-
-;; shell
-(add-hook 'shell-mode-hook
-          'ansi-color-for-comint-mode-on)
 
 ;; main
 (progn
