@@ -20,18 +20,22 @@
     )
   
   (progn ; eye candy
-    (pcase system-type ; window size (frame size)
-      ('darwin (dolist (x '((top . 90) (left . 80) (width . 176) (height . 41)))
-		 (add-to-list 'default-frame-alist x))))
+    (progn ; window-layout
+      (pcase system-type ; window size (frame size)
+	('darwin (dolist (x '((top . 90) (left . 80) (width . 176) (height . 41)))
+		   (add-to-list 'default-frame-alist x)))
+	)
+
+      (let ((theme 'modus-vivendi)) ; theme
+	(aif (member theme (custom-available-themes))
+	    (load-theme (car it))))
+      )
+
+    (progn ; line number
+      (global-display-line-numbers-mode t)
+      (custom-set-variables '(display-line-numbers-width-start t))
+      )
     
-
-    (let ((theme 'modus-vivendi)) ; theme
-      (aif (member theme (custom-available-themes))
-	  (load-theme (car it))))
-
-    (global-display-line-numbers-mode t)
-    (custom-set-variables '(display-line-numbers-width-start t))
-
     (progn ; mode-line
       (column-number-mode t)
       (display-time-mode t)
