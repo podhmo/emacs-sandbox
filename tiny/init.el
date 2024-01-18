@@ -18,8 +18,12 @@
   (progn ; backup handling
     (setq backup-directory-alist '((".*" . "~/.emacs.d/backup"))) ; backup is <filename>~
     )
-
+  
   (progn ; eye candy
+    (pcase system-type ; window size (frame size)
+      ('darwin (dolist (x '((top . 90) (left . 80) (width . 176) (height . 41)))
+		 (add-to-list 'default-frame-alist x))))
+    
 
     (let ((theme 'modus-vivendi)) ; theme
       (aif (member theme (custom-available-themes))
@@ -50,7 +54,7 @@
   (progn ; emacs client
     (condition-case err
 	(progn
-          (autoload 'server-running-p "server") 
+          (autoload 'server-running-p "server")
           (unless (server-running-p)  (server-start)))
       (error (message "emacsclient load fail")))
     )
