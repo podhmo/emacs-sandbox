@@ -19,9 +19,9 @@
     (setq backup-directory-alist '((".*" . "~/.emacs.d/backup"))) ; backup is <filename>~
     )
   
-  (progn ; eye candy
-    (progn ; window-layout
-      (pcase system-type ; window size (frame size)
+  (progn ; layout
+    (progn ; window-layout (frame layout in emacs's glossary)
+      (pcase system-type
 	('darwin (dolist (x '((top . 90) (left . 80) (width . 176) (height . 41)))
 		   (add-to-list 'default-frame-alist x)))
 	)
