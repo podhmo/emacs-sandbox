@@ -20,6 +20,11 @@
     )
 
   (progn ; eye candy
+
+    (let ((theme 'modus-vivendi)) ; theme
+      (aif (member theme (custom-available-themes))
+	  (load-theme (car it))))
+
     (global-display-line-numbers-mode t)
     (custom-set-variables '(display-line-numbers-width-start t))
 
@@ -83,3 +88,5 @@
 	 (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
     (find-file memo-file))
   )
+
+
