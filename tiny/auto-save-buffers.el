@@ -13,10 +13,6 @@
        (setq auto-save-buffers-timer nil)
        (message "auto-save-buffer is deactive"))
 
-(def-toggle auto-save-buffers-toggle
-  (:on (auto-save-buffer-activate))
-  (:off (auto-save-buffer-deactivte)))
-
 (defun auto-save-buffers-start (delay)
   (setq auto-save-buffers-timer
         (run-with-idle-timer delay t 'auto-save-buffers)))
