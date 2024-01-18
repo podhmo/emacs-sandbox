@@ -69,4 +69,12 @@
 
     (auto-save-buffers-start 0.5)
     )
+
+  (progn ; key-binding
+    (defvar my:emacs-home-directory (current-directory))
+    (global-set-key (kbd "C-c x") (lambda () (interactive)
+				    (let ((file (concat my:emacs-home-directory "init.el")))
+				      (find-file file)))
+		    )
+    )
   )
