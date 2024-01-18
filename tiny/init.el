@@ -64,7 +64,6 @@
     )
   )
 
-
 ;; main
 (progn
   (progn ; auto-save
@@ -84,9 +83,11 @@
     )
 
   ;; open memo file
-  (let* ((cmd "ls -t ~/vboxshare/memo/memo*.txt | head -n 1")
-	 (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
-    (find-file memo-file))
+  (pcase system-type
+    ('darwin
+     (let* ((cmd "ls -t ~/vboxshare/memo/memo*.txt | head -n 1")
+	    (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
+       (find-file memo-file)))
+    (typ (message "default text file is not found in system-type='%S" typ))
+    )
   )
-
-
