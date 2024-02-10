@@ -111,6 +111,11 @@
      (let* ((cmd "ls -t ~/vboxshare/memo/memo*.txt | head -n 1")
 	    (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
        (find-file memo-file)))
+    ('gnu/linux ; wsl
+     (let* ((cmd "ls -t /mnt/c/Users/nao/vboxshare/memo/memo*.txt | head -n 1")
+	    (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
+       (find-file memo-file)))
     (typ (message "default text file is not found in system-type='%S" typ))
     )
   )
+
