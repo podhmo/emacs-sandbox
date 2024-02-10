@@ -22,14 +22,20 @@
   (progn ; layout
     (progn ; window-layout (frame layout in emacs's glossary)
       (pcase system-type
-	('darwin (dolist (x '((top . 90) (left . 80) (width . 176) (height . 41)))
-		   (add-to-list 'default-frame-alist x)))
+	('darwin
+	 (dolist (x '((top . 90) (left . 80) (width . 176) (height . 41)))
+	   (add-to-list 'default-frame-alist x))
+	 )
+	('gnu/linux ; wsl
+	 (dolist (x '((top . 90) (left . 80) (width . 176) (height . 41)))
+	   (add-to-list 'default-frame-alist x))
+	 )
 	)
-
-      (let ((theme 'modus-vivendi)) ; theme
-	(aif (member theme (custom-available-themes))
-	    (load-theme (car it))))
-      )
+      (let ((themes '(modus-vivendi tango-dark))) ; theme
+	(and-let* ((its (cl-intersection themes (custom-available-themes))))
+	  (message "-- load theme -- %s --" (car its))
+	  (load-theme (car its))
+	  )))
 
     (progn ; line number
       (global-display-line-numbers-mode t)
@@ -76,8 +82,8 @@
 (progn
   (progn ; auto-save
     (def-toggle auto-save-buffers-toggle
-		(:on (auto-save-buffer-activate))
-		(:off (auto-save-buffer-deactivte)))
+      (:on (auto-save-buffer-activate))
+      (:off (auto-save-buffer-deactivte)))
 
     (auto-save-buffers-start 0.5)
     )
