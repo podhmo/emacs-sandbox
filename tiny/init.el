@@ -27,15 +27,24 @@
 	   (add-to-list 'default-frame-alist x))
 	 )
 	('gnu/linux ; wsl
-	 (dolist (x '((top . 90) (left . 80) (width . 176) (height . 41)))
+	 ;; window
+	 (dolist (x '((top . 90) (left . 80) (width . 176) (height . 41) ))
 	   (add-to-list 'default-frame-alist x))
+	 ;; emoji display
+	 ;; need: apt-get install fonts-noto
+	 ;; see: https://ianyepan.github.io/posts/emacs-emojis/
+	 (and-let* ((its (member "Noto Color Emoji" (font-family-list))))
+	   (custom-set-faces
+	    '(default ((t (:family "Noto Sans CJK JP" :foundry "GOOG" :slant normal :weight normal :height 120 :width normal)))))
+	   (set-fontset-font t 'symbol (font-spec :family (car its)) nil 'prepend))
 	 )
 	)
       (let ((themes '(modus-vivendi tango-dark))) ; theme
 	(and-let* ((its (cl-intersection themes (custom-available-themes))))
 	  (message "-- load theme -- %s --" (car its))
 	  (load-theme (car its))
-	  )))
+	  ))
+      )
 
     (progn ; line number
       (global-display-line-numbers-mode t)
