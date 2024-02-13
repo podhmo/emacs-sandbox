@@ -39,11 +39,13 @@
 	   (set-fontset-font t 'symbol (font-spec :family (car its)) nil 'prepend))
 	 )
 	)
-      (let ((themes '(modus-vivendi tango-dark))) ; theme
-	(and-let* ((its (cl-intersection themes (custom-available-themes))))
-	  (message "-- load theme -- %s --" (car its))
-	  (load-theme (car its))
-	  ))
+      (let ((available-themes (custom-available-themes))
+	    (themes '(modus-vivendi tango-dark))) ; theme
+	(cl-dolist (theme themes)
+	  (when (member theme available-themes)
+	    (message "-- load theme -- %s --" theme)
+	    (load-theme theme)
+	    (cl-return))))
       )
 
     (progn ; line number
