@@ -84,6 +84,14 @@
 
   ;; (menu-bar-mode)
   (tool-bar-mode -1)
+
+  (progn ; tab-bar
+    (tab-bar-mode 1)
+    (global-set-key (kbd "C-c C-n") 'tab-next)
+    (global-set-key (kbd "C-c C-p") 'tab-previous)
+    (global-set-key (kbd "C-c C-f") 'find-file-other-tab)
+    (global-set-key (kbd "C-;") 'tab-next)
+    )
   )
 
 ;; external
