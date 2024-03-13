@@ -19,8 +19,9 @@
     (setq backup-directory-alist '((".*" . "~/.emacs.d/backup"))) ; backup is <filename>~
     )
   
+  (global-auto-revert-mode t)
   (setq echo-keystrokes 0.2)
-
+  
   (show-paren-mode 1)
   (transient-mark-mode t)
 
