@@ -50,7 +50,7 @@
        )
       ('gnu/linux ; wsl
        ;; window
-       (dolist (x '((top . 90) (left . 80) (width . 176) (height . 41) ))
+       (dolist (x '((top . 0) (left . 80) (width . 176) (height . 39) ))
 	 (add-to-list 'default-frame-alist x))
        ;; emoji display
        ;; need: apt-get install fonts-noto
@@ -100,8 +100,8 @@
     (setq initial-major-mode 'emacs-lisp-mode)
     )
 
-(progn ; javascript-mode
-  (add-to-list  'auto-mode-alist '("\\.mjs" .  js-mode))
+  (progn ; javascript-mode
+    (add-to-list  'auto-mode-alist '("\\.mjs" .  js-mode))
     )
 
   (progn ; shell
@@ -113,8 +113,8 @@
 (progn
   (progn ; auto-save
     (def-toggle auto-save-buffers-toggle
-		(:on (auto-save-buffer-activate))
-		(:off (auto-save-buffer-deactivte)))
+      (:on (auto-save-buffer-activate))
+      (:off (auto-save-buffer-deactivte)))
 
     (auto-save-buffers-start 0.5)
     )
@@ -123,8 +123,10 @@
     (defvar my:emacs-home-directory (current-directory))
     (global-set-key (kbd "C-c x") (lambda () (interactive)
 				    (let ((file (concat my:emacs-home-directory "init.el")))
-				      (find-file file)))
-		    )
+				      (if (fboundp 'switch-to-buffer-other-tab)
+					  (switch-to-buffer-other-tab file)
+					(find-file file)))
+				    ))
     )
 
   ;; open memo file
