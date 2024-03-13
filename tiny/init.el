@@ -127,6 +127,11 @@
     )
   )
 
+(defun my:delete-something () (interactive)
+       (cl-dolist (thing '(symbol word))
+	 (when-let ((found (thing-at-point thing)))
+	   (cl-return (delete-region (beginning-of-thing thing)  (end-of-thing thing ))))))
+
 ;; main
 (progn
   (progn ; auto-save
@@ -149,8 +154,9 @@
     ;; comment
     (global-set-key (kbd "C-c q") 'comment-region)
     (global-set-key (kbd "C-c Q") 'uncomment-region)
-    
-    ;; replace string
+
+    ;; string edit
+    (global-set-key (kbd "C-c d") 'my:delete-something)
     (global-set-key (kbd "M-r") 'replace-string)
     (global-set-key (kbd "M-R") 'replace-regexp)
 
