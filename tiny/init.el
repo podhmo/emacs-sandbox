@@ -100,6 +100,10 @@
     (setq initial-major-mode 'emacs-lisp-mode)
     )
 
+(progn ; javascript-mode
+  (add-to-list  'auto-mode-alist '("\\.mjs" .  js-mode))
+    )
+
   (progn ; shell
     (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
     )
