@@ -163,6 +163,18 @@
 	 (when-let ((found (thing-at-point thing)))
 	   (cl-return (delete-region (beginning-of-thing thing)  (end-of-thing thing ))))))
 
+(defun my:enclose-quote (beg end)
+  "foo -> \"foo\""
+  (interactive
+   (list
+    (if (use-region-p) (region-beginning) (beginning-of-thing 'word))
+    (if (use-region-p) (region-end) (end-of-thing 'word))))
+  (save-restriction
+    (let ((text (buffer-substring-no-properties beg end)))
+      (delete-region beg end)
+      (insert (prin1-to-string text))))  ;; prin1-to-string ha tenuki
+)
+
 ;; main
 (progn
   (progn ; auto-save
@@ -188,6 +200,7 @@
 
     ;; string edit
     (global-set-key (kbd "C-c d") 'my:delete-something)
+    (global-set-key (kbd "C-c e") 'my:enclose-quote)
     (global-set-key (kbd "M-r") 'replace-string)
     (global-set-key (kbd "M-R") 'replace-regexp)
 
