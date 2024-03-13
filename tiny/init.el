@@ -18,10 +18,10 @@
   (progn ; backup handling
     (setq backup-directory-alist '((".*" . "~/.emacs.d/backup"))) ; backup is <filename>~
     )
-  
+
   (global-auto-revert-mode t)
   (setq echo-keystrokes 0.2)
-  
+
   (show-paren-mode 1)
   (transient-mark-mode t)
 
@@ -42,7 +42,7 @@
   )
 
 ;; layout
-(progn 
+(progn
   (progn ; window-layout (frame layout in emacs's glossary)
     (pcase system-type
       ('darwin
@@ -77,7 +77,7 @@
     (global-display-line-numbers-mode t)
     (custom-set-variables '(display-line-numbers-width-start t))
     )
-  
+
   (progn ; mode-line
     (column-number-mode t)
     (display-time-mode t)
@@ -121,13 +121,28 @@
 	 (cond ((string-equal name "")  (tab-bar-new-tab))
 	       (t    (cl-dolist (b (buffer-list))
 		       (when (string-equal name (buffer-file-name b))
-			 (cl-return (switch-to-buffer-other-tab name)))) 
+			 (cl-return (switch-to-buffer-other-tab name))))
 		     (find-file-other-tab name ))))
   )
 
 ;; external
 (progn
   (progn ; lisp-mode
+    (defun my:elisp-pretty-print-region (beg end)
+      (interactive
+       (list
+	(if (use-region-p) (region-beginning) (point-min))
+	(if (use-region-p) (region-end) (point-max))))
+      (save-excursion
+	(unwind-protect
+	    (progn
+	      (narrow-to-region beg end)
+	      (goto-char (point-min))
+	      (while (re-search-forward "[  	]+$" nil t 1)
+		(replace-match ""))
+	      (indent-region (point-min) (point-max)))
+	  (widen))))
+
     (setq initial-major-mode 'emacs-lisp-mode)
     )
 
@@ -163,7 +178,7 @@
 					  (my:find-file-or-switch-buffer-other-tab file)
 					(find-file file)))
 				    ))
-    
+
     ;; comment
     (global-set-key (kbd "C-c q") 'comment-region)
     (global-set-key (kbd "C-c Q") 'uncomment-region)
