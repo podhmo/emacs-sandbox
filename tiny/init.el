@@ -206,6 +206,9 @@
       (define-key ctrl-j-map "m" 'tab-bar-move-tab-to) ; e.g. C-u 1 C-j m
       (define-key ctrl-j-map (kbd "C-f") 'my:find-file-or-switch-buffer-other-tab)
       (define-key ctrl-j-map "f" 'my:find-file-or-switch-buffer-other-tab)
+
+      (define-key ctrl-j-map (kbd "C-j") 'dabbrev-expand)
+
       (global-set-key (kbd "C-j") ctrl-j-map) ; activate
       )
     )
