@@ -92,13 +92,14 @@
   (global-set-key (kbd "C-c C-p") 'tab-previous)
   (global-set-key (kbd "C-c C-f") 'find-file-other-tab)
   (global-set-key (kbd "C-;") 'tab-next)
-  
+
   (defun my:tab-bar-open-hook--for-dedup (tab)
     (let ((last-tab-name (alist-get 'name tab)))
       (cl-dolist (other-tab (funcall tab-bar-tabs-function))
 	(let ((other-tab-name (alist-get 'name other-tab)))
 	  (if (string-equal last-tab-name other-tab-name)
 	      (cl-return (tab-bar-close-tab-by-name last-tab-name)))))))
+
   ;; side-effect
   (add-hook 'tab-bar-tab-post-open-functions 'my:tab-bar-open-hook--for-dedup)
   
@@ -106,7 +107,7 @@
 	 (cond ((string-equal name "")  (tab-bar-new-tab))
 	       (t    (cl-dolist (b (buffer-list))
 		       (when (string-equal name (buffer-file-name b))
-			 (cl-return (switch-to-buffer-other-tab name)))) ;; todo: dedup
+			 (cl-return (switch-to-buffer-other-tab name)))) 
 		     (find-file-other-tab name ))))
   )
 
@@ -143,6 +144,18 @@
 					  (my:find-file-or-switch-buffer-other-tab file)
 					(find-file file)))
 				    ))
+    
+    (progn    ;; ctrl-j map
+      (defvar ctrl-j-map (make-keymap))
+      (define-key ctrl-j-map "c" 'tab-new)
+      (define-key ctrl-j-map "n" 'tab-next)
+      (define-key ctrl-j-map "r" 'tab-rename)
+      (define-key ctrl-j-map "k" 'tab-close)
+      (define-key ctrl-j-map "p" 'tab-previous)
+      (define-key ctrl-j-map (kbd "C-f") 'my:find-file-or-switch-buffer-other-tab)
+      (define-key ctrl-j-map "f" 'my:find-file-or-switch-buffer-other-tab)
+      (global-set-key (kbd "C-j") ctrl-j-map) ; activate
+      )
     )
 
   ;; open memo file
