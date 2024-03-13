@@ -178,11 +178,13 @@
       (define-key ctrl-j-map "c" 'tab-new)
       (define-key ctrl-j-map "b" 'switch-to-buffer-other-tab)
       (define-key ctrl-j-map "n" 'tab-next)
+      (define-key ctrl-j-map (kbd "C-n") 'tab-next)
+      (define-key ctrl-j-map "p" 'tab-previous)
+      (define-key ctrl-j-map (kbd "C-p") 'tab-previous)
       (define-key ctrl-j-map "r" 'tab-rename)
       (define-key ctrl-j-map "k" 'tab-close)
       (define-key ctrl-j-map "K" 'my:tab-bar-dedup-tabs)
       (define-key ctrl-j-map "m" 'tab-bar-move-tab-to) ; e.g. C-u 1 C-j m
-      (define-key ctrl-j-map "p" 'tab-previous)
       (define-key ctrl-j-map (kbd "C-f") 'my:find-file-or-switch-buffer-other-tab)
       (define-key ctrl-j-map "f" 'my:find-file-or-switch-buffer-other-tab)
       (global-set-key (kbd "C-j") ctrl-j-map) ; activate
