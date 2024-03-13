@@ -94,16 +94,29 @@
   (global-set-key (kbd "C-c C-f") 'find-file-other-tab)
   (global-set-key (kbd "C-;") 'tab-next)
 
-  (defun my:tab-bar-open-hook--for-dedup (tab)
+  (defun my:tab-bar-open-hook--for-dedup (tab) ;; TODO: fix
     (let ((last-tab-name (alist-get 'name tab)))
       (cl-dolist (other-tab (funcall tab-bar-tabs-function))
 	(let ((other-tab-name (alist-get 'name other-tab)))
 	  (if (string-equal last-tab-name other-tab-name)
 	      (cl-return (tab-bar-close-tab-by-name last-tab-name)))))))
 
+  (defun my:tab-bar-open-hook--for-debug (tab)
+    (message "tab: %s -- all tabs %s" (alist-get 'name tab) (tab-bar-tab-name-all)))
+
   ;; side-effect
-  (add-hook 'tab-bar-tab-post-open-functions 'my:tab-bar-open-hook--for-dedup)
-  
+  ;;  (add-hook 'tab-bar-tab-post-open-functions 'my:tab-bar-open-hook--for-dedup)
+  (add-hook 'tab-bar-tab-post-open-functions 'my:tab-bar-open-hook--for-debug)
+
+  (defun my:tab-bar-dedup-tabs () (interactive)
+	 (let ((visited nil)
+	       (removed nil))
+	   (dolist (tab (funcall tab-bar-tabs-function))
+	     (let ((tab-name (alist-get 'name tab)))
+	       (if (member tab-name visited) (push tab-name removed) (push tab-name visited))))
+	   (dolist (tab-name removed)
+	     (tab-bar-close-tab-by-name tab-name))))
+
   (defun my:find-file-or-switch-buffer-other-tab (name)  (interactive "f")
 	 (cond ((string-equal name "")  (tab-bar-new-tab))
 	       (t    (cl-dolist (b (buffer-list))
@@ -163,9 +176,12 @@
     (progn    ;; ctrl-j map
       (defvar ctrl-j-map (make-keymap))
       (define-key ctrl-j-map "c" 'tab-new)
+      (define-key ctrl-j-map "b" 'switch-to-buffer-other-tab)
       (define-key ctrl-j-map "n" 'tab-next)
       (define-key ctrl-j-map "r" 'tab-rename)
       (define-key ctrl-j-map "k" 'tab-close)
+      (define-key ctrl-j-map "K" 'my:tab-bar-dedup-tabs)
+      (define-key ctrl-j-map "m" 'tab-bar-move-tab-to) ; e.g. C-u 1 C-j m
       (define-key ctrl-j-map "p" 'tab-previous)
       (define-key ctrl-j-map (kbd "C-f") 'my:find-file-or-switch-buffer-other-tab)
       (define-key ctrl-j-map "f" 'my:find-file-or-switch-buffer-other-tab)
