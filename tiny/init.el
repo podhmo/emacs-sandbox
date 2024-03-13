@@ -84,14 +84,30 @@
 
   ;; (menu-bar-mode)
   (tool-bar-mode -1)
+  )
 
-  (progn ; tab-bar
-    (tab-bar-mode 1)
-    (global-set-key (kbd "C-c C-n") 'tab-next)
-    (global-set-key (kbd "C-c C-p") 'tab-previous)
-    (global-set-key (kbd "C-c C-f") 'find-file-other-tab)
-    (global-set-key (kbd "C-;") 'tab-next)
-    )
+(progn ; tab-bar
+  (tab-bar-mode 1)
+  (global-set-key (kbd "C-c C-n") 'tab-next)
+  (global-set-key (kbd "C-c C-p") 'tab-previous)
+  (global-set-key (kbd "C-c C-f") 'find-file-other-tab)
+  (global-set-key (kbd "C-;") 'tab-next)
+  
+  (defun my:tab-bar-open-hook--for-dedup (tab)
+    (let ((last-tab-name (alist-get 'name tab)))
+      (cl-dolist (other-tab (funcall tab-bar-tabs-function))
+	(let ((other-tab-name (alist-get 'name other-tab)))
+	  (if (string-equal last-tab-name other-tab-name)
+	      (cl-return (tab-bar-close-tab-by-name last-tab-name)))))))
+  ;; side-effect
+  (add-hook 'tab-bar-tab-post-open-functions 'my:tab-bar-open-hook--for-dedup)
+  
+  (defun my:find-file-or-switch-buffer-other-tab (name)  (interactive "f")
+	 (cond ((string-equal name "")  (tab-bar-new-tab))
+	       (t    (cl-dolist (b (buffer-list))
+		       (when (string-equal name (buffer-file-name b))
+			 (cl-return (switch-to-buffer-other-tab name)))) ;; todo: dedup
+		     (find-file-other-tab name ))))
   )
 
 ;; external
@@ -124,7 +140,7 @@
     (global-set-key (kbd "C-c x") (lambda () (interactive)
 				    (let ((file (concat my:emacs-home-directory "init.el")))
 				      (if (fboundp 'switch-to-buffer-other-tab)
-					  (switch-to-buffer-other-tab file)
+					  (my:find-file-or-switch-buffer-other-tab file)
 					(find-file file)))
 				    ))
     )
@@ -142,4 +158,3 @@
     (typ (message "default text file is not found in system-type='%S" typ))
     )
   )
-
