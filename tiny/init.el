@@ -146,6 +146,14 @@
 					(find-file file)))
 				    ))
     
+    ;; comment
+    (global-set-key (kbd "C-c q") 'comment-region)
+    (global-set-key (kbd "C-c Q") 'uncomment-region)
+    
+    ;; replace string
+    (global-set-key (kbd "M-r") 'replace-string)
+    (global-set-key (kbd "M-R") 'replace-regexp)
+
     (progn    ;; ctrl-j map
       (defvar ctrl-j-map (make-keymap))
       (define-key ctrl-j-map "c" 'tab-new)
