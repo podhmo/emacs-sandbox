@@ -94,19 +94,14 @@
   (global-set-key (kbd "C-c C-f") 'find-file-other-tab)
   (global-set-key (kbd "C-;") 'tab-next)
 
-  (defun my:tab-bar-open-hook--for-dedup (tab) ;; TODO: fix
-    (let ((last-tab-name (alist-get 'name tab)))
-      (cl-dolist (other-tab (funcall tab-bar-tabs-function))
-	(let ((other-tab-name (alist-get 'name other-tab)))
-	  (if (string-equal last-tab-name other-tab-name)
-	      (cl-return (tab-bar-close-tab-by-name last-tab-name)))))))
-
+  (defun my:tab-bar-open-hook--for-dedup (tab)
+    (my:tab-bar-dedup-tabs))
   (defun my:tab-bar-open-hook--for-debug (tab)
     (message "tab: %s -- all tabs %s" (alist-get 'name tab) (tab-bar-tab-name-all)))
 
   ;; side-effect
-  ;;  (add-hook 'tab-bar-tab-post-open-functions 'my:tab-bar-open-hook--for-dedup)
   (add-hook 'tab-bar-tab-post-open-functions 'my:tab-bar-open-hook--for-debug)
+  (add-hook 'tab-bar-tab-post-open-functions 'my:tab-bar-open-hook--for-dedup)
 
   (defun my:tab-bar-dedup-tabs () (interactive)
 	 (let ((visited nil)
