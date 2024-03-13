@@ -95,7 +95,7 @@
   (global-set-key (kbd "C-;") 'tab-next)
 
   (defun my:tab-bar-open-hook--for-dedup (tab)
-    (my:tab-bar-dedup-tabs))
+    (run-with-timer 0.1 nil 'my:tab-bar-dedup-tabs)) ; work-around
   (defun my:tab-bar-open-hook--for-debug (tab)
     (message "tab: %s -- all tabs %s" (alist-get 'name tab) (tab-bar-tab-name-all)))
 
@@ -105,17 +105,25 @@
 
   (defun my:tab-bar-dedup-tabs () (interactive)
 	 (let ((visited nil)
-	       (removed nil))
+	       (removed nil)
+	       (current-tab-name (tab-bar-tab-name-current)))
 	   (dolist (tab (funcall tab-bar-tabs-function))
 	     (let ((tab-name (alist-get 'name tab)))
 	       (if (member tab-name visited) (push tab-name removed) (push tab-name visited))))
+	   ;; close tabs
 	   (dolist (tab-name removed)
-	     (tab-bar-close-tab-by-name tab-name))))
+	     (tab-bar-close-tab-by-name tab-name))
+	   ;; select tab by name
+	   (tab-bar-select-tab-by-name current-tab-name)
+	   ))
 
   (defun my:find-file-or-switch-buffer-other-tab (name)  (interactive "f")
 	 (cond ((string-equal name "")  (tab-bar-new-tab))
 	       (t    (cl-dolist (b (buffer-list))
 		       (when (string-equal name (buffer-file-name b))
+			 (cl-dolist (tab (funcall tab-bar-tabs-function))
+			   (when (string-equal name (alist-get 'name tab) )
+			     (cl-return (tab-bar-select-tab-by-name name))))
 			 (cl-return (switch-to-buffer-other-tab name))))
 		     (find-file-other-tab name ))))
   )
@@ -185,12 +193,13 @@
 
     (progn    ;; ctrl-j map
       (defvar ctrl-j-map (make-keymap))
-      (define-key ctrl-j-map "c" 'tab-new)
+      (define-key ctrl-j-map "c" (lambda () (interactive) (switch-to-buffer-other-tab "*scratch*"))) ; tab-new
       (define-key ctrl-j-map "b" 'switch-to-buffer-other-tab)
       (define-key ctrl-j-map "n" 'tab-next)
       (define-key ctrl-j-map (kbd "C-n") 'tab-next)
       (define-key ctrl-j-map "p" 'tab-previous)
       (define-key ctrl-j-map (kbd "C-p") 'tab-previous)
+      (define-key ctrl-j-map (kbd "RET") 'tab-switcher)
       (define-key ctrl-j-map "r" 'tab-rename)
       (define-key ctrl-j-map "k" 'tab-close)
       (define-key ctrl-j-map "K" 'my:tab-bar-dedup-tabs)
