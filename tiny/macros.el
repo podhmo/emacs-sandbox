@@ -1,19 +1,6 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 (require 'cl-lib)
 
-(defmacro let1 (var val &rest body)
-  "imported from gauche"
-  (declare (indent 2))
-  `(let ((,var ,val))
-     ,@body))
-
-(defmacro rlet1 (var val &rest body)
-  "imported from gauche"
-  (declare (indent 2))
-  `(let1 ,var ,val
-     ,@body
-     ,var))
-
 (defmacro aif (test-form then-form &rest else-forms)
   "Anaphoric if. Temporary variable `it' is the result of test-form."
   (declare (indent 2)
