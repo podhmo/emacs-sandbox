@@ -135,6 +135,8 @@
   )
 
 ;; external
+(setq-default  indent-tabs-mode nil)
+
 (progn
   (progn ; lisp-mode
     (defun my:elisp-pretty-print-region (beg end)
@@ -162,6 +164,32 @@
   (progn ; shell
     (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
     )
+
+  (progn ; text-mode
+    (defun my:indent-rigitly (n) (interactive "p")
+           (setq n (or n 1))
+           (if (use-region-p)
+               (indent-rigidly
+                (save-excursion (goto-char (region-beginning)) (point-at-bol))
+                (save-excursion (goto-char (region-end)) (point-at-eol))
+                (* n  4))
+             (indent-rigidly (point-at-bol) (point-at-eol) (* n  4))))
+    (defun my:unindent-rigitly (n) (interactive "p")
+           (setq n (or n 1))
+           (if (use-region-p)
+               (indent-rigidly
+                (save-excursion (goto-char (region-beginning)) (point-at-bol))
+                (save-excursion (goto-char (region-end)) (point-at-eol))
+                (* n  -4))
+             (indent-rigidly (point-at-bol) (point-at-eol) (* n  -4))))
+    (defun my:text-mode-setup ()
+      ;; indent
+      (define-key text-mode-map (kbd "<tab>")  'my:indent-rigitly)
+      (define-key text-mode-map (kbd "<backtab>")  'my:unindent-rigitly)
+      )
+    (add-hook 'text-mode-hook 'my:text-mode-setup)
+    )
+
   )
 
 (defun my:delete-something () (interactive)
