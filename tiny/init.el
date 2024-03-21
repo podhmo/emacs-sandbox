@@ -11,13 +11,18 @@
 
 ;; load individual library
 (load-file (concat (current-directory) "macros.el"))
-(load-file (concat  (current-directory) "auto-save-buffers.el")) ; todo byte-compile
 
 ;; settings
 (progn
   (progn ; backup handling
     (setq backup-directory-alist '((".*" . "~/.emacs.d/backup"))) ; backup is <filename>~
     )
+  (progn ; auto-save
+    (setq auto-save-visited-interval 0.5)
+    (auto-save-visited-mode t)
+    ;; TODO: disable in post save hook (e.g. node.js's project?)
+    )
+
 
   (global-auto-revert-mode t)
   (setq echo-keystrokes 0.2)
@@ -53,6 +58,7 @@
        ;; window
        (dolist (x '((top . 0) (left . 80) (width . 176) (height . 39) ))
 	 (add-to-list 'default-frame-alist x))
+
        ;; emoji display
        ;; need: apt-get install fonts-noto
        ;; see: https://ianyepan.github.io/posts/emacs-emojis/
@@ -173,17 +179,10 @@
     (let ((text (buffer-substring-no-properties beg end)))
       (delete-region beg end)
       (insert (prin1-to-string text))))  ;; prin1-to-string ha tenuki
-)
+  )
 
 ;; main
 (progn
-  (progn ; auto-save
-    (def-toggle auto-save-buffers-toggle
-      (:on (auto-save-buffer-activate))
-      (:off (auto-save-buffer-deactivte)))
-
-    (auto-save-buffers-start 0.5)
-    )
 
   (progn ; key-binding
     (defvar my:emacs-home-directory (current-directory))
