@@ -189,6 +189,7 @@
       ;; indent
       (define-key text-mode-map (kbd "<tab>")  'my:indent-rigitly)
       (define-key text-mode-map (kbd "<backtab>")  'my:unindent-rigitly)
+      (define-key text-mode-map (kbd "<S-iso-lefttab>") 'my:unindent-rigitly) ;; for skk
       )
     (add-hook 'text-mode-hook 'my:text-mode-setup)
     )
