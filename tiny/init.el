@@ -5,6 +5,9 @@
       (file-name-directory load-file-name)
     default-directory))
 
+;; ignore custom.el
+(setq custom-file (concat (current-directory) "custom.el"))
+
 ;; disable welcome message
 (setq inhibit-startup-message t)
 (setq inhibit-splash-screen t)
@@ -253,13 +256,27 @@
       )
     )
 
-  ;; open memo file
+  ;; after initialize
   (pcase system-type
     ('darwin
+     ;; open memo*.txt
      (let* ((cmd "ls -t ~/vboxshare/memo/memo*.txt | head -n 1")
 	    (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
        (find-file memo-file)))
+
     ('gnu/linux ; wsl
+
+     ;; skk
+     ;; need: apt-get install ddskk
+     ;; M-x  skk-get with encoding=euc-jp
+     (when (fboundp 'skk-mode)
+       (setq skk-egg-like-newline t) ; <enter>で改行を入力しない
+       (setq skk-auto-insert-paren t)
+       (setq default-input-method "japanese-skk") ; C-\
+       ;; (global-set-key (kbd "<zenkaku-hankaku>")  'toggle-input-methodl) ;; TODO: fix
+       )
+
+     ;; open memo*.txt
      (let* ((cmd "ls -t /mnt/c/Users/nao/vboxshare/memo/memo*.txt | head -n 1")
 	    (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
        (find-file memo-file)))
@@ -267,10 +284,7 @@
     )
   )
 
-;; external package
-;; (setq package-archives
-;;       `(("melpa" . "https://melpa.org/packages/")
-;;         ;; ("melpa-stable" . "https://stable.melpa.org/packages/")
-;;  	,@package-archives))
+;; ;; external package
+;; (setq package-archives  `(("melpa" . "https://melpa.org/packages/")  ("melpa-stable" . "https://stable.melpa.org/packages/") ,@package-archives))
 ;; (package-initialize)
-;; ;; (package-install 'writeroom-mode) ; -> zen-mode in vscode
+;; (package-install 'writeroom-mode) ; -> zen-mode in vscode
