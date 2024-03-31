@@ -157,7 +157,15 @@
 	      (indent-region (point-min) (point-max)))
 	  (widen))))
 
+
+    (defun my:elisp-mode-setup ()
+      (define-key emacs-lisp-mode-map (kbd "C-c C-e") 'eval-defun)
+      (define-key emacs-lisp-mode-map (kbd "C-c C-l") 'eval-buffer)
+      (define-key emacs-lisp-mode-map (kbd "C-x C-s") 'my:elisp-pretty-print-region) ;; saveはauto-save任せ
+      )
+    (add-hook 'emacs-lisp-mode-hook 'my:elisp-mode-setup)
     (setq initial-major-mode 'emacs-lisp-mode)
+
     )
 
   (progn ; javascript-mode
