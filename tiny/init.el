@@ -224,6 +224,7 @@
 ;; main
 (progn
   (progn ; key-binding
+
     (defvar my:emacs-home-directory (current-directory))
     (global-set-key (kbd "C-c x") (lambda () (interactive)
 				    (let ((file (concat my:emacs-home-directory "init.el")))
@@ -231,6 +232,7 @@
 					  (my:find-file-or-switch-buffer-other-tab file)
 					(find-file file)))
 				    ))
+    (global-set-key (kbd "C-x C-f") 'find-file-at-point)
 
     ;; comment
     (global-set-key (kbd "C-c q") 'comment-region)
