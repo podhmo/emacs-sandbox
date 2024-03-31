@@ -274,6 +274,9 @@
        (setq skk-egg-like-newline t) ; <enter>で改行を入力しない
        (setq skk-auto-insert-paren t)
        (setq default-input-method "japanese-skk") ; C-\
+
+       (global-set-key (kbd "C-x j") 'skk-mode) ;; disable skk-auto-fill-mode
+       (global-set-key (kbd "C-x C-j") 'skk-mode)
        ;; (global-set-key (kbd "<zenkaku-hankaku>")  'toggle-input-methodl) ;; TODO: fix
        )
 
