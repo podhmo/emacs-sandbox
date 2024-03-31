@@ -223,7 +223,6 @@
 
 ;; main
 (progn
-
   (progn ; key-binding
     (defvar my:emacs-home-directory (current-directory))
     (global-set-key (kbd "C-c x") (lambda () (interactive)
@@ -268,6 +267,13 @@
   ;; after initialize
   (pcase system-type
     ('darwin
+
+     (progn   ;; remember
+       (global-set-key (kbd "C-c r") 'remember)
+       (global-set-key (kbd "C-c C-r") 'remember)
+       (eval-after-load 'remember (setq remember-data-file "~/vboxshare/memo/notes"))
+       )
+
      ;; open memo*.txt
      (let* ((cmd "ls -t ~/vboxshare/memo/memo*.txt | head -n 1")
 	    (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
@@ -275,17 +281,24 @@
 
     ('gnu/linux ; wsl
 
-     ;; skk
-     ;; need: apt-get install ddskk
-     ;; M-x  skk-get with encoding=euc-jp
-     (when (fboundp 'skk-mode)
-       (setq skk-egg-like-newline t) ; <enter>で改行を入力しない
-       (setq skk-auto-insert-paren t)
-       (setq default-input-method "japanese-skk") ; C-\
+     (progn   ;; remember
+       (global-set-key (kbd "C-c r") 'remember)
+       (global-set-key (kbd "C-c C-r") 'remember)
+       (eval-after-load 'remember (setq remember-data-file "/mnt/c/Users/nao/vboxshare/memo/notes"))
+       )
 
-       (global-set-key (kbd "C-x j") 'skk-mode) ;; disable skk-auto-fill-mode
-       (global-set-key (kbd "C-x C-j") 'skk-mode)
-       ;; (global-set-key (kbd "<zenkaku-hankaku>")  'toggle-input-methodl) ;; TODO: fix
+     (progn ;; skk
+       ;; need: apt-get install ddskk
+       ;; M-x  skk-get with encoding=euc-jp
+       (when (fboundp 'skk-mode)
+         (setq skk-egg-like-newline t) ; <enter>で改行を入力しない
+         (setq skk-auto-insert-paren t)
+         (setq default-input-method "japanese-skk") ; C-\
+
+         (global-set-key (kbd "C-x j") 'skk-mode) ;; disable skk-auto-fill-mode
+         (global-set-key (kbd "C-x C-j") 'skk-mode)
+         ;; (global-set-key (kbd "<zenkaku-hankaku>")  'toggle-input-methodl) ;; TODO: fix
+         )
        )
 
      ;; key binding
