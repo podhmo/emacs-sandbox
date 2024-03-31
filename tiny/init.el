@@ -280,6 +280,9 @@
        ;; (global-set-key (kbd "<zenkaku-hankaku>")  'toggle-input-methodl) ;; TODO: fix
        )
 
+     ;; key binding
+     (global-set-key (kbd "<muhenkan>") 'delete-backward-char)      ;; TODO: with skk
+
      ;; open memo*.txt
      (let* ((cmd "ls -t /mnt/c/Users/nao/vboxshare/memo/memo*.txt | head -n 1")
 	    (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
