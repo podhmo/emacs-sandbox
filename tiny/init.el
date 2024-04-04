@@ -221,6 +221,17 @@
       (insert (prin1-to-string text))))  ;; prin1-to-string ha tenuki
   )
 
+(progn ;; code reading
+  (autoload 'my:browse-github (concat (current-directory) "browse-github.el"))
+  (defalias 'browse-github 'my:browse-github)
+  (defun browse-github-master () (interactive)
+         (browse-github :branch "master"))
+  (defun browse-github-main () (interactive)
+         (browse-github :branch "main"))
+  (defun browse-github-develop () (interactive)
+         (browse-github :branch "develop"))
+  )
+
 ;; main
 (progn
   (progn ; key-binding
