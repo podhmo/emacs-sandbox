@@ -23,9 +23,21 @@
   (progn ; auto-save
     (setq auto-save-visited-interval 0.5)
     (auto-save-visited-mode t)
-    ;; TODO: disable in post save hook (e.g. node.js's project?)
-    )
 
+
+    (defvar my:disable-auto-save-visited-mode-alist nil)
+    (push `(string-prefix-p . "/tmp") my:disable-auto-save-visited-mode-alist) ;; /tmp/** のファイルは自動saveしない
+
+    (defun my:find-file-hook--disable-auto-save ()
+      (let ((fname (buffer-file-name)))
+        (cl-dolist (arg my:disable-auto-save-visited-mode-alist)
+          (cl-destructuring-bind (fn . x) arg
+            (when (funcall fn x fname)
+              (message "# auto-save-visited-mode is disabled by %s %s" fn x)
+              (auto-save-visited-mode -1)
+              (cl-return nil))))))
+    (add-hook 'find-file-hook 'my:find-file-hook--disable-auto-save)
+    )
 
   (global-auto-revert-mode t)
   (setq echo-keystrokes 0.2)
@@ -341,6 +353,9 @@
          (global-set-key (kbd "C-x j") 'skk-mode) ;; disable skk-auto-fill-mode
          (global-set-key (kbd "C-x C-j") 'skk-mode)
          ;; (global-set-key (kbd "<zenkaku-hankaku>")  'toggle-input-methodl) ;; TODO: fix
+
+         ;; skkの辞書ファイルはauto-saveの対象から除外する
+         (push `(string-suffix-p . ".skk-jisyo") my:disable-auto-save-visited-mode-alist)
          )
        )
 
