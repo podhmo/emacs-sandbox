@@ -64,7 +64,6 @@
 ;; layout
 (progn
   (setq-default line-spacing 0.03) ;; すこしだけ行間にスペースをいれる
-  ;; (setq-local line-spacing 0.05)
 
   (progn ; window-layout (frame layout in emacs's glossary)
     (pcase system-type
@@ -209,6 +208,8 @@
                 (* n  -4))
              (indent-rigidly (point-at-bol) (point-at-eol) (* n  -4))))
     (defun my:text-mode-setup ()
+      (setq-local line-spacing 0.05) ;; ちょっと行間を拡げる
+
       ;; indent
       (define-key text-mode-map (kbd "<tab>")  'my:indent-rigitly)
       (define-key text-mode-map (kbd "<backtab>")  'my:unindent-rigitly)
