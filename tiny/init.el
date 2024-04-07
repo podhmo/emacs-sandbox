@@ -63,6 +63,9 @@
 
 ;; layout
 (progn
+  (setq-default line-spacing 0.03) ;; すこしだけ行間にスペースをいれる
+  ;; (setq-local line-spacing 0.05)
+
   (progn ; window-layout (frame layout in emacs's glossary)
     (pcase system-type
       ('darwin
