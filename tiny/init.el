@@ -1,5 +1,7 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 
+(setq debug-on-error t) ;; enable for debugging
+
 (defun current-directory ()
   (if load-file-name
       (file-name-directory load-file-name)
@@ -388,6 +390,8 @@
     (typ (message "default text file is not found in system-type='%S" typ))
     )
   )
+
+(setq debug-on-error nil)  ;; disable in daily life
 
 ;; ;; external package
 ;; (setq package-archives  `(("melpa" . "https://melpa.org/packages/")  ("melpa-stable" . "https://stable.melpa.org/packages/") ,@package-archives))
