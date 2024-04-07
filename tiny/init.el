@@ -217,7 +217,6 @@
       )
     (add-hook 'text-mode-hook 'my:text-mode-setup)
     )
-
   )
 
 (progn ;; text-editing
@@ -278,6 +277,17 @@
          (browse-github :branch "develop"))
   )
 
+
+(cl-defun side-pocket:toggle-filename (fname &key (marker "tmp"))
+  "toggle file name.  e.g. foo.txt <-> foo.tmp.txt"
+  (let* ((parts (split-string (file-name-nondirectory fname) "\\." t))
+         (new-name (string-join (cl-remove-if (lambda (x) (string-equal x marker)) parts) ".")))
+    (cond ((not (null (member marker parts))) (concat (file-name-directory fname) new-name)) ;; e.g. foo.txt -> foo.tmp.txt
+          (t (concat (file-name-directory fname)  (file-name-sans-extension new-name) "." marker "."  (file-name-extension new-name)))))) ;; e.g. foo.tmp.txt -> foo.txt
+(defun side-pocket:toggle-buffer () (interactive)
+       (when-let ((fname (buffer-file-name)))
+         (find-file  (side-pocket:toggle-filename fname :marker "tmp"))))
+
 ;; main
 (progn
   (progn ; key-binding
@@ -289,7 +299,9 @@
 					  (my:find-file-or-switch-buffer-other-tab file)
 					(find-file file)))
 				    ))
+    ;; find-file
     (global-set-key (kbd "C-x C-f") 'find-file-at-point)
+    (global-set-key (kbd "C-c C-c") 'side-pocket:toggle-buffer)
 
     ;; comment
     (global-set-key (kbd "C-c q") 'comment-region)
