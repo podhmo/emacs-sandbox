@@ -70,14 +70,13 @@
   (progn ; window-layout (frame layout in emacs's glossary)
     (pcase system-type
       ('darwin
-       (dolist (x '((top . 90) (left . 80) (width . 176) (height . 41)))
+       (dolist (x '((top . 90) (left . 80) (width . 176) (height . 41) (left-fringe 12) (right-fringe 12)))
 	 (add-to-list 'default-frame-alist x))
        )
       ('gnu/linux ; wsl
        ;; window
-       (dolist (x '((top . 0) (left . 80) (width . 176) (height . 39) ))
+       (dolist (x '((top . 0) (left . 80) (width . 176) (height . 39) (left-fringe 12) (right-fringe 12)))
 	 (add-to-list 'default-frame-alist x))
-
        ;; emoji display
        ;; need: apt-get install fonts-noto
        ;; see: https://ianyepan.github.io/posts/emacs-emojis/
