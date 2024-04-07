@@ -370,6 +370,9 @@
          (global-set-key (kbd "C-x C-j") 'skk-mode)
          ;; (global-set-key (kbd "<zenkaku-hankaku>")  'toggle-input-methodl) ;; TODO: fix
 
+         ;; text-modeのときにははじめからskk-modeを有効にしておく
+         (add-hook 'text-mode-hook 'skk-mode)
+
          ;; skkの辞書ファイルはauto-saveの対象から除外する
          (push `(string-suffix-p . ".skk-jisyo") my:disable-auto-save-visited-mode-alist)
          )
