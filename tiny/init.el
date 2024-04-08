@@ -302,6 +302,7 @@
 				    ))
     ;; find-file
     (global-set-key (kbd "C-x C-f") 'find-file-at-point)
+    (global-set-key (kbd "C-x C-a") 'revert-buffer)
     (global-set-key (kbd "C-c C-c") 'side-pocket:toggle-buffer)
 
     ;; comment
