@@ -44,6 +44,8 @@
   (global-auto-revert-mode t)
   (setq echo-keystrokes 0.2)
 
+  (setq visible-bell t) ;; disable beep
+
   (show-paren-mode 1)
   (transient-mark-mode t)
 
