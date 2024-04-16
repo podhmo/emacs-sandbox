@@ -385,18 +385,18 @@
     ;; key binding
     (global-set-key (kbd "<muhenkan>") 'delete-backward-char)      ;; TODO: with skk
     )
-
   ;; open memo*.txt
   (let* ((cmd "ls -t /mnt/c/Users/nao/vboxshare/memo/memo*.txt | head -n 1")
 	 (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
     (find-file memo-file)))
 
+;; after initialize settings
 (pcase system-type
   ('darwin
    (my:after-initialize--mac))
   ('gnu/linux ; wsl
    (my:after-initialize--windows))
-  (typ (message "default text file is not found in system-type='%S" typ))
+  (typ (message "the after initialize setting is not found in system-type='%S" typ))
   )
 
 (setq debug-on-error nil)  ;; disable in daily life
