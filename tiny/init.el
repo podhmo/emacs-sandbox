@@ -292,105 +292,103 @@
          (find-file  (side-pocket:toggle-filename fname :marker "tmp"))))
 
 ;; main
-(progn
-  (progn ; key-binding
+(progn ; key-binding
 
-    (defvar my:emacs-home-directory (current-directory))
-    (global-set-key (kbd "C-c x") (lambda () (interactive)
-				    (let ((file (concat my:emacs-home-directory "init.el")))
-				      (if (fboundp 'switch-to-buffer-other-tab)
-					  (my:find-file-or-switch-buffer-other-tab file)
-					(find-file file)))
-				    ))
-    ;; find-file
-    (global-set-key (kbd "C-x C-f") 'find-file-at-point)
-    (global-set-key (kbd "C-x C-a") 'revert-buffer)
-    (global-set-key (kbd "C-c C-c") 'side-pocket:toggle-buffer)
+  (defvar my:emacs-home-directory (current-directory))
+  (global-set-key (kbd "C-c x") (lambda () (interactive)
+				  (let ((file (concat my:emacs-home-directory "init.el")))
+				    (if (fboundp 'switch-to-buffer-other-tab)
+					(my:find-file-or-switch-buffer-other-tab file)
+				      (find-file file)))
+				  ))
+  ;; find-file
+  (global-set-key (kbd "C-x C-f") 'find-file-at-point)
+  (global-set-key (kbd "C-x C-a") 'revert-buffer)
+  (global-set-key (kbd "C-c C-c") 'side-pocket:toggle-buffer)
 
-    ;; comment
-    (global-set-key (kbd "C-c q") 'comment-region)
-    (global-set-key (kbd "C-c Q") 'uncomment-region)
+  ;; comment
+  (global-set-key (kbd "C-c q") 'comment-region)
+  (global-set-key (kbd "C-c Q") 'uncomment-region)
 
-    ;; string edit
-    (global-set-key (kbd "C-c d") 'my:delete-something)
-    (global-set-key (kbd "C-c e") 'my:enclose-quote)
-    (global-set-key (kbd "M-r") 'replace-string)
-    (global-set-key (kbd "M-R") 'replace-regexp)
+  ;; string edit
+  (global-set-key (kbd "C-c d") 'my:delete-something)
+  (global-set-key (kbd "C-c e") 'my:enclose-quote)
+  (global-set-key (kbd "M-r") 'replace-string)
+  (global-set-key (kbd "M-R") 'replace-regexp)
 
-    (progn    ;; ctrl-j map
-      (defvar ctrl-j-map (make-keymap))
-      (define-key ctrl-j-map "c" (lambda () (interactive) (switch-to-buffer-other-tab "*scratch*"))) ; tab-new
-      (define-key ctrl-j-map "b" 'switch-to-buffer-other-tab)
-      (define-key ctrl-j-map "n" 'tab-next)
-      (define-key ctrl-j-map (kbd "C-n") 'tab-next)
-      (define-key ctrl-j-map "p" 'tab-previous)
-      (define-key ctrl-j-map (kbd "C-p") 'tab-previous)
-      (define-key ctrl-j-map (kbd "RET") 'tab-switcher)
-      (define-key ctrl-j-map "r" 'tab-rename)
-      (define-key ctrl-j-map "k" 'tab-close)
-      (define-key ctrl-j-map "K" 'my:tab-bar-dedup-tabs)
-      (define-key ctrl-j-map "m" 'tab-bar-move-tab-to) ; e.g. C-u 1 C-j m
-      (define-key ctrl-j-map (kbd "C-f") 'my:find-file-or-switch-buffer-other-tab)
-      (define-key ctrl-j-map "f" 'my:find-file-or-switch-buffer-other-tab)
+  (progn    ;; ctrl-j map
+    (defvar ctrl-j-map (make-keymap))
+    (define-key ctrl-j-map "c" (lambda () (interactive) (switch-to-buffer-other-tab "*scratch*"))) ; tab-new
+    (define-key ctrl-j-map "b" 'switch-to-buffer-other-tab)
+    (define-key ctrl-j-map "n" 'tab-next)
+    (define-key ctrl-j-map (kbd "C-n") 'tab-next)
+    (define-key ctrl-j-map "p" 'tab-previous)
+    (define-key ctrl-j-map (kbd "C-p") 'tab-previous)
+    (define-key ctrl-j-map (kbd "RET") 'tab-switcher)
+    (define-key ctrl-j-map "r" 'tab-rename)
+    (define-key ctrl-j-map "k" 'tab-close)
+    (define-key ctrl-j-map "K" 'my:tab-bar-dedup-tabs)
+    (define-key ctrl-j-map "m" 'tab-bar-move-tab-to) ; e.g. C-u 1 C-j m
+    (define-key ctrl-j-map (kbd "C-f") 'my:find-file-or-switch-buffer-other-tab)
+    (define-key ctrl-j-map "f" 'my:find-file-or-switch-buffer-other-tab)
 
-      (define-key ctrl-j-map (kbd "C-j") 'dabbrev-expand)
+    (define-key ctrl-j-map (kbd "C-j") 'dabbrev-expand)
 
-      (global-set-key (kbd "C-j") ctrl-j-map) ; activate
-      )
-
-    ;; remember
-    (global-set-key (kbd "C-c r") 'remember)
-    (global-set-key (kbd "C-c C-r") 'remember)
+    (global-set-key (kbd "C-j") ctrl-j-map) ; activate
     )
 
-  ;; after initialize
-  (pcase system-type
-    ('darwin
+  ;; remember
+  (global-set-key (kbd "C-c r") 'remember)
+  (global-set-key (kbd "C-c C-r") 'remember)
+  )
 
-     (progn   ;; remember
-       (eval-after-load 'remember (setq remember-data-file "~/vboxshare/memo/notes"))
+;; after initialize
+(pcase system-type
+  ('darwin
+
+   (progn   ;; remember
+     (eval-after-load 'remember (setq remember-data-file "~/vboxshare/memo/notes"))
+     )
+
+   ;; open memo*.txt
+   (let* ((cmd "ls -t ~/vboxshare/memo/memo*.txt | head -n 1")
+	  (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
+     (find-file memo-file)))
+
+  ('gnu/linux ; wsl
+
+   (progn   ;; remember
+     (eval-after-load 'remember (setq remember-data-file "/mnt/c/Users/nao/vboxshare/memo/notes"))
+     )
+
+   (progn ;; skk
+     ;; need: apt-get install ddskk
+     ;; M-x  skk-get with encoding=euc-jp
+     (when (fboundp 'skk-mode)
+       (setq skk-egg-like-newline t) ; <enter>で改行を入力しない
+       (setq skk-auto-insert-paren t)
+       (setq default-input-method "japanese-skk") ; C-\
+
+       (global-set-key (kbd "C-x j") 'skk-mode) ;; disable skk-auto-fill-mode
+       (global-set-key (kbd "C-x C-j") 'skk-mode)
+       ;; (global-set-key (kbd "<zenkaku-hankaku>")  'toggle-input-methodl) ;; TODO: fix
+
+       ;; text-modeのときにははじめからskk-modeを有効にしておく
+       (add-hook 'text-mode-hook 'skk-mode)
+
+       ;; skkの辞書ファイルはauto-saveの対象から除外する
+       (push `(string-suffix-p . ".skk-jisyo") my:disable-auto-save-visited-mode-alist)
        )
+     )
 
-     ;; open memo*.txt
-     (let* ((cmd "ls -t ~/vboxshare/memo/memo*.txt | head -n 1")
-	    (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
-       (find-file memo-file)))
+   ;; key binding
+   (global-set-key (kbd "<muhenkan>") 'delete-backward-char)      ;; TODO: with skk
 
-    ('gnu/linux ; wsl
-
-     (progn   ;; remember
-       (eval-after-load 'remember (setq remember-data-file "/mnt/c/Users/nao/vboxshare/memo/notes"))
-       )
-
-     (progn ;; skk
-       ;; need: apt-get install ddskk
-       ;; M-x  skk-get with encoding=euc-jp
-       (when (fboundp 'skk-mode)
-         (setq skk-egg-like-newline t) ; <enter>で改行を入力しない
-         (setq skk-auto-insert-paren t)
-         (setq default-input-method "japanese-skk") ; C-\
-
-         (global-set-key (kbd "C-x j") 'skk-mode) ;; disable skk-auto-fill-mode
-         (global-set-key (kbd "C-x C-j") 'skk-mode)
-         ;; (global-set-key (kbd "<zenkaku-hankaku>")  'toggle-input-methodl) ;; TODO: fix
-
-         ;; text-modeのときにははじめからskk-modeを有効にしておく
-         (add-hook 'text-mode-hook 'skk-mode)
-
-         ;; skkの辞書ファイルはauto-saveの対象から除外する
-         (push `(string-suffix-p . ".skk-jisyo") my:disable-auto-save-visited-mode-alist)
-         )
-       )
-
-     ;; key binding
-     (global-set-key (kbd "<muhenkan>") 'delete-backward-char)      ;; TODO: with skk
-
-     ;; open memo*.txt
-     (let* ((cmd "ls -t /mnt/c/Users/nao/vboxshare/memo/memo*.txt | head -n 1")
-	    (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
-       (find-file memo-file)))
-    (typ (message "default text file is not found in system-type='%S" typ))
-    )
+   ;; open memo*.txt
+   (let* ((cmd "ls -t /mnt/c/Users/nao/vboxshare/memo/memo*.txt | head -n 1")
+	  (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
+     (find-file memo-file)))
+  (typ (message "default text file is not found in system-type='%S" typ))
   )
 
 (setq debug-on-error nil)  ;; disable in daily life
