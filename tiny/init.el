@@ -337,6 +337,10 @@
 
       (global-set-key (kbd "C-j") ctrl-j-map) ; activate
       )
+
+    ;; remember
+    (global-set-key (kbd "C-c r") 'remember)
+    (global-set-key (kbd "C-c C-r") 'remember)
     )
 
   ;; after initialize
@@ -344,8 +348,6 @@
     ('darwin
 
      (progn   ;; remember
-       (global-set-key (kbd "C-c r") 'remember)
-       (global-set-key (kbd "C-c C-r") 'remember)
        (eval-after-load 'remember (setq remember-data-file "~/vboxshare/memo/notes"))
        )
 
@@ -357,8 +359,6 @@
     ('gnu/linux ; wsl
 
      (progn   ;; remember
-       (global-set-key (kbd "C-c r") 'remember)
-       (global-set-key (kbd "C-c C-r") 'remember)
        (eval-after-load 'remember (setq remember-data-file "/mnt/c/Users/nao/vboxshare/memo/notes"))
        )
 
