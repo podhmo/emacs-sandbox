@@ -343,51 +343,51 @@
   )
 
 ;; after initialize
+(defun my:after-initialize--mac ()
+  ;; remember
+  (eval-after-load 'remember (setq remember-data-file "~/vboxshare/memo/notes"))
+
+  ;; open memo*.txt
+  (let* ((cmd "ls -t ~/vboxshare/memo/memo*.txt | head -n 1")
+	 (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
+    (find-file memo-file)))
+
+(defun my:after-initialize--windows ()
+  ;; remember
+  (eval-after-load 'remember (setq remember-data-file "/mnt/c/Users/nao/vboxshare/memo/notes"))
+
+  ;; skk
+  ;; need: apt-get install ddskk
+  ;; M-x  skk-get with encoding=euc-jp
+  (when (fboundp 'skk-mode)
+    (setq skk-egg-like-newline t) ; <enter>で改行を入力しない
+    (setq skk-auto-insert-paren t)
+    (setq default-input-method "japanese-skk") ; C-\
+
+    (global-set-key (kbd "C-x j") 'skk-mode) ;; disable skk-auto-fill-mode
+    (global-set-key (kbd "C-x C-j") 'skk-mode)
+    ;; (global-set-key (kbd "<zenkaku-hankaku>")  'toggle-input-methodl) ;; TODO: fix
+
+    ;; text-modeのときにははじめからskk-modeを有効にしておく
+    (add-hook 'text-mode-hook 'skk-mode)
+
+    ;; skkの辞書ファイルはauto-saveの対象から除外する
+    (push `(string-suffix-p . ".skk-jisyo") my:disable-auto-save-visited-mode-alist)
+
+    ;; key binding
+    (global-set-key (kbd "<muhenkan>") 'delete-backward-char)      ;; TODO: with skk
+    )
+
+  ;; open memo*.txt
+  (let* ((cmd "ls -t /mnt/c/Users/nao/vboxshare/memo/memo*.txt | head -n 1")
+	 (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
+    (find-file memo-file)))
+
 (pcase system-type
   ('darwin
-
-   (progn   ;; remember
-     (eval-after-load 'remember (setq remember-data-file "~/vboxshare/memo/notes"))
-     )
-
-   ;; open memo*.txt
-   (let* ((cmd "ls -t ~/vboxshare/memo/memo*.txt | head -n 1")
-	  (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
-     (find-file memo-file)))
-
+   (my:after-initialize--mac))
   ('gnu/linux ; wsl
-
-   (progn   ;; remember
-     (eval-after-load 'remember (setq remember-data-file "/mnt/c/Users/nao/vboxshare/memo/notes"))
-     )
-
-   (progn ;; skk
-     ;; need: apt-get install ddskk
-     ;; M-x  skk-get with encoding=euc-jp
-     (when (fboundp 'skk-mode)
-       (setq skk-egg-like-newline t) ; <enter>で改行を入力しない
-       (setq skk-auto-insert-paren t)
-       (setq default-input-method "japanese-skk") ; C-\
-
-       (global-set-key (kbd "C-x j") 'skk-mode) ;; disable skk-auto-fill-mode
-       (global-set-key (kbd "C-x C-j") 'skk-mode)
-       ;; (global-set-key (kbd "<zenkaku-hankaku>")  'toggle-input-methodl) ;; TODO: fix
-
-       ;; text-modeのときにははじめからskk-modeを有効にしておく
-       (add-hook 'text-mode-hook 'skk-mode)
-
-       ;; skkの辞書ファイルはauto-saveの対象から除外する
-       (push `(string-suffix-p . ".skk-jisyo") my:disable-auto-save-visited-mode-alist)
-       )
-     )
-
-   ;; key binding
-   (global-set-key (kbd "<muhenkan>") 'delete-backward-char)      ;; TODO: with skk
-
-   ;; open memo*.txt
-   (let* ((cmd "ls -t /mnt/c/Users/nao/vboxshare/memo/memo*.txt | head -n 1")
-	  (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
-     (find-file memo-file)))
+   (my:after-initialize--windows))
   (typ (message "default text file is not found in system-type='%S" typ))
   )
 
