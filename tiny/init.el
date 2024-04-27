@@ -160,6 +160,23 @@
 			     (cl-return (tab-bar-select-tab-by-name name))))
 			 (cl-return (switch-to-buffer-other-tab name))))
 		     (find-file-other-tab name ))))
+
+  ;; emacsclientでは常にnew-tabでファイルを開く
+  (tab-bar-history-mode 1)
+  (defun my:find-file-with-tab-bar--server-visit-hook ()
+    (run-with-timer
+     0.1 nil
+     (lambda (buf)
+       (message "## new-tab %s" buf)
+       (switch-to-buffer-other-tab buf)
+       (tab-bar-history-back)
+       (tab-bar-move-tab -1)
+       (tab-bar-switch-to-next-tab)
+       )
+     (current-buffer)
+     )
+    )
+  (add-hook 'server-visit-hook 'my:find-file-with-tab-bar--server-visit-hook)
   )
 
 ;; external
