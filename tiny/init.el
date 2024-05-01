@@ -319,6 +319,17 @@
 ;; main
 (progn ; key-binding
 
+  (progn ;; kill-buffer with tab-bar
+    (defun my:kill-buffer-with-tab-close-if-need (&optional kill-tab-bar-p)
+      "C-u C-x C-kの場合にはtabも閉じる"
+      (interactive (list current-prefix-arg))
+      (kill-buffer (current-buffer))
+      (when (not (null kill-tab-bar-p))
+        (tab-close)
+        ))
+    (global-set-key (kbd "C-x k") 'my:kill-buffer-with-tab-close-if-need)
+    )
+
   (defvar my:emacs-home-directory (current-directory))
   (global-set-key (kbd "C-c x") (lambda () (interactive)
 				  (let ((file (concat my:emacs-home-directory "init.el")))
