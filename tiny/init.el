@@ -365,7 +365,22 @@
   ;; remember
   (global-set-key (kbd "C-c r") 'remember)
   (global-set-key (kbd "C-c C-r") 'remember)
+
+  (progn   ;; dired
+    (defun my:dired-down-directory-or-display-file ()
+      (interactive)
+      (let ((fpath (dired-get-file-for-visit)))
+        (cond ((file-directory-p fpath) (call-interactively 'dired-find-file))
+              (t (call-interactively 'dired-display-file)))
+        ))
+    (defun my:dired-mode-setup ()
+      (define-key dired-mode-map (kbd "[") 'dired-up-directory)
+      (define-key dired-mode-map (kbd "]") 'my:dired-down-directory-or-display-file)
+      )
+    (add-hook 'dired-mode-hook 'my:dired-mode-setup)
+    )
   )
+
 
 ;; after initialize
 (defun my:after-initialize--mac ()
