@@ -165,7 +165,7 @@
 			 (cl-return (switch-to-buffer-other-tab name))))
 		     (find-file-other-tab name ))))
 
-  ;; emacsclientでは常にnew-tabでファイルを開く
+  ;; emacsclientでは常にnew-tabでファイルを開く (TODO: fixme https://zenn.dev/podhmo/scraps/9ea21658b74a5d#comment-4e56e8e0404eda )
   (tab-bar-history-mode 1)
   (defun my:find-file-with-tab-bar--server-visit-hook ()
     (run-with-timer
