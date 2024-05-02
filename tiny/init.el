@@ -123,6 +123,10 @@
 
 (progn ; tab-bar
   (tab-bar-mode 1)
+
+  ;; inactiveなタブとactiveなタブの差がわかりづらかったので暗くする
+  (custom-set-faces   '(tab-bar-tab-inactive ((t (:inherit tab-bar-tab :background "grey45" :slant italic)))))
+
   (global-set-key (kbd "C-c C-n") 'tab-next)
   (global-set-key (kbd "C-c C-p") 'tab-previous)
   (global-set-key (kbd "C-c C-f") 'find-file-other-tab)
