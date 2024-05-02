@@ -125,7 +125,7 @@
   (tab-bar-mode 1)
 
   ;; inactiveなタブとactiveなタブの差がわかりづらかったので暗くする
-  (custom-set-faces   '(tab-bar-tab-inactive ((t (:inherit tab-bar-tab :background "grey45" :slant italic)))))
+  (custom-set-faces '(tab-bar-tab-inactive ((t (:slant italic :strike-through t :background "grey45" :inherit tab-bar-tab)))))
 
   (global-set-key (kbd "C-c C-n") 'tab-next)
   (global-set-key (kbd "C-c C-p") 'tab-previous)
