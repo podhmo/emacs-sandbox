@@ -247,6 +247,7 @@
   )
 
 (progn ;; view-mode
+  (setq view-read-only t) ;; read-onlyのときにはview-modeで開く
   (with-eval-after-load 'view
     (defun my:dired-current-directory () (interactive)
            (dired (current-directory)))
