@@ -249,7 +249,7 @@
 (progn ;; view-mode
   (with-eval-after-load 'view
     (defun my:dired-current-directory () (interactive)
-      (dired (current-directory)))
+           (dired (current-directory)))
     (defun my:view-mode-setup ()
       (hl-line-mode 1)
 
@@ -375,9 +375,17 @@
         (cond ((file-directory-p fpath) (call-interactively 'dired-find-file))
               (t (call-interactively 'dired-display-file)))
         ))
+
     (defun my:dired-mode-setup ()
+      ;; up/down
       (define-key dired-mode-map (kbd "[") 'dired-up-directory)
       (define-key dired-mode-map (kbd "]") 'my:dired-down-directory-or-display-file)
+
+      ;; scroll-up/scroll-down other-window
+      (define-key dired-mode-map (kbd "M-n") 'scroll-other-window)
+      (define-key dired-mode-map (kbd "M-p") 'scroll-other-window-down)
+      (define-key dired-mode-map (kbd "M-<") 'beginning-of-buffer-other-window)
+      (define-key dired-mode-map (kbd "M->") 'end-of-buffer-other-window)
       )
     (add-hook 'dired-mode-hook 'my:dired-mode-setup)
     )
