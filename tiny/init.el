@@ -96,14 +96,14 @@
     (typ (message "layout setting is not found. system-type='%S" typ))
     )
 
-  ;; theme
-  (let ((available-themes (custom-available-themes))
-	(themes '(modus-vivendi tango-dark))) ; theme
-    (cl-dolist (theme themes)
-      (when (member theme available-themes)
-	(message "-- load theme -- %s --" theme)
-	(load-theme theme)
-	(cl-return))))
+  (progn  ;; theme
+    (let ((theme 'modus-vivendi))
+      (message "-- load theme -- %s --" theme)
+      (load-theme theme))
+
+    ;; inactiveなタブとactiveなタブの差がわかりづらかったので暗くする (for tab-bar)
+    (custom-set-faces  '(tab-bar-tab-inactive ((t (:strike-through t :inherit modus-themes-tab-inactive)))))
+    )
 
   (progn ; line number
     (global-display-line-numbers-mode t)
@@ -123,9 +123,6 @@
 
 (progn ; tab-bar
   (tab-bar-mode 1)
-
-  ;; inactiveなタブとactiveなタブの差がわかりづらかったので暗くする
-  (custom-set-faces '(tab-bar-tab-inactive ((t (:slant italic :strike-through t :background "grey45" :inherit tab-bar-tab)))))
 
   (global-set-key (kbd "C-c C-n") 'tab-next)
   (global-set-key (kbd "C-c C-p") 'tab-previous)
