@@ -343,6 +343,10 @@
   (global-set-key (kbd "C-x C-a") 'revert-buffer)
   (global-set-key (kbd "C-c C-c") 'side-pocket:toggle-buffer)
 
+  ;; goto
+  (global-set-key (kbd "C-x C-l") 'goto-line)
+  ;; 標準の設定ではM-g g,  M-g nはnext-error, M-g pはprevious-error
+
   ;; comment
   (global-set-key (kbd "C-c q") 'comment-region)
   (global-set-key (kbd "C-c Q") 'uncomment-region)
