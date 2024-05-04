@@ -246,6 +246,52 @@
          (browse-github :branch "develop"))
   )
 
+(progn ;; view-mode
+  (with-eval-after-load 'view
+    (defun my:dired-current-directory () (interactive)
+      (dired (current-directory)))
+    (defun my:view-mode-setup ()
+      (hl-line-mode 1)
+
+      ;; hjkl
+      (define-key view-mode-map (kbd "h") 'backward-char)
+      (define-key view-mode-map (kbd "j") 'next-line)
+      (define-key view-mode-map (kbd "k") 'previous-line)
+      (define-key view-mode-map (kbd "l") 'forward-char)
+
+      ;; page-up/page-down
+      (define-key view-mode-map (kbd "J") 'scroll-down)
+      (define-key view-mode-map (kbd "K") 'scroll-up)
+
+      ;; todo: next-definition/previous-definition
+
+      ;; directory
+      (define-key view-mode-map (kbd "[") 'my:dired-current-directory)
+      )
+    (defun my:view-mode-cleanup ()
+      (hl-line-mode -1))
+    (add-hook 'view-mode-on-hook 'my:view-mode-setup)
+    (add-hook 'view-mode-off-hook 'my:view-mode-cleanup)
+    )
+
+  (cl-defun my:find-file-hook--enable-view-mode (&key (writable-modes '(text-mode emacs-lisp-mode)))
+    "text-mode以外の場合にはview-modeで開く"
+    (cond ((memq major-mode writable-modes)
+           (hl-line-mode -1))
+          (t
+           (view-mode 1))))
+  (add-hook 'find-file-hook 'my:find-file-hook--enable-view-mode)
+
+  (with-eval-after-load 'help-mode
+    (defun my:help-mode-setup ()
+      (define-key help-mode-map (kbd "[") 'help-go-back)
+      (define-key help-mode-map (kbd "]") 'help-go-forward)
+      )
+    (add-hook 'help-mode-hook 'my:help-mode-setup)
+    )
+  )
+
+
 
 (cl-defun side-pocket:toggle-filename (fname &key (marker "tmp"))
   "toggle file name.  e.g. foo.txt <-> foo.tmp.txt"
