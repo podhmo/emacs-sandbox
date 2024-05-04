@@ -261,8 +261,8 @@
       (define-key view-mode-map (kbd "l") 'forward-char)
 
       ;; page-up/page-down
-      (define-key view-mode-map (kbd "J") 'scroll-down)
-      (define-key view-mode-map (kbd "K") 'scroll-up)
+      (define-key view-mode-map (kbd "J") 'scroll-up)
+      (define-key view-mode-map (kbd "K") 'scroll-down)
 
       ;; todo: next-definition/previous-definition
 
