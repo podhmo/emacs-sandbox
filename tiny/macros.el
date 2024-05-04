@@ -8,10 +8,6 @@
   `(let ((it ,test-form))
      (if it ,then-form ,@else-forms)))
 
-(unless (fboundp 'and-let*)
-  (require 'subr-x) ; for emacs 27.1
-  )
-
 
 (defmacro def-toggle (name &rest body)
   (and-let* ((on-clause (aif (assoc-default :on body) `(progn ,@it)))
