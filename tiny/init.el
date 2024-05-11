@@ -15,6 +15,10 @@
 
 ;; settings
 (progn
+  (progn ; for performance
+    (setq gc-cons-threshold (* 32 1024 1024)) ;; 32mb
+    )
+
   (progn ; backup handling
     (setq backup-directory-alist '((".*" . "~/.emacs.d/backup"))) ; backup is <filename>~
     )
@@ -106,7 +110,7 @@
   (tab-bar-history-mode 1)
   (defun my:find-file-with-tab-bar--server-visit-hook ()
     (run-with-timer
-     0.2 nil
+     0.1 nil
      (lambda (buf)
        (message "## new-tab %s" buf)
        (tab-bar-history-back)
