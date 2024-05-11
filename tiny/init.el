@@ -159,6 +159,12 @@
     (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
     )
 
+  (progn ; markdown
+    (unless (locate-library "markdown-mode")
+      (add-to-list  'auto-mode-alist '("\\.md" .  text-mode))
+      )
+    )
+
   (progn ; text-mode
     (defun my:indent-rigitly (n) (interactive "p")
            (setq n (or n 1))
