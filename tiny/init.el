@@ -414,8 +414,8 @@
 
   ;; skk
   ;; need: apt-get install ddskk
-  ;; M-x  skk-get with encoding=euc-jp
   (when (fboundp 'skk-mode)
+    (setq skk-jisyo-code "utf-8") ; jisyoのエンコーディングをutf-8にする
     (setq skk-sticky-key ";") ; sticky-shiftを使ってshiftキーの節約する
     (setq skk-egg-like-newline t) ; <enter>で改行を入力しない
     (setq skk-auto-insert-paren t)
