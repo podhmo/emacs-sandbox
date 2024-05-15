@@ -368,7 +368,11 @@
 
     (define-key ctrl-j-map (kbd "C-j") 'dabbrev-expand)
 
-    (global-set-key (kbd "C-j") ctrl-j-map) ; activate
+    ;; activate ctr-j map
+    (global-set-key (kbd "C-j") ctrl-j-map)
+    (defun my:view-mode-setup--activate-ctrl-j-map ()
+      (define-key view-mode-map (kbd "C-j") ctrl-j-map))
+    (add-hook 'view-mode-on-hook 'my:view-mode-setup--activate-ctrl-j-map)
     )
 
   ;; remember
