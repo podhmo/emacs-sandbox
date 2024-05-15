@@ -66,60 +66,64 @@
 
 
 (progn ; tab-bar
-  (tab-bar-mode 1)
+  (global-tab-line-mode 1)
 
-  (global-set-key (kbd "C-c C-n") 'tab-next)
-  (global-set-key (kbd "C-c C-p") 'tab-previous)
-  (global-set-key (kbd "C-c C-f") 'find-file-other-tab)
-  (global-set-key (kbd "C-;") 'tab-next)
+  (defun my:tab-line-tabs-window-buffers ()
+    "fileを持つものだけを対象にしたbufferを集める"
+    (sort
+     (seq-remove (lambda (b) (null (buffer-file-name b)))
+                 (buffer-list))
+     (lambda (x y) (string< (buffer-name x) (buffer-name y)))))
 
-  (defun my:tab-bar-open-hook--for-dedup (tab)
-    (run-with-timer 0.1 nil 'my:tab-bar-dedup-tabs)) ; work-around
-  (defun my:tab-bar-open-hook--for-debug (tab)
-    (message "tab: %s -- all tabs %s" (alist-get 'name tab) (tab-bar-tab-name-all)))
+  (setq tab-line-tabs-function 'my:tab-line-tabs-window-buffers)
+  (setq my:tab-line-switch-to-buffer-function 'switch-to-buffer)
 
-  ;; side-effect
-  (add-hook 'tab-bar-tab-post-open-functions 'my:tab-bar-open-hook--for-debug)
-  (add-hook 'tab-bar-tab-post-open-functions 'my:tab-bar-open-hook--for-dedup)
+  (defun my:tab-line-next-tab ()
+    "tab-lineの表示にしたがった場合の次のタブに移動"
+    (interactive)
+    (funcall my:tab-line-switch-to-buffer-function
+             (buffer-name
+              (cl-block :b
+                (let ((current-buf (current-buffer))
+                      (buffers (funcall tab-line-tabs-function))
+                      (foundp nil))
+                  (cl-dolist (b buffers)
+                    (when foundp
+                      (cl-return-from :b b))
+                    (when (equal current-buf b)
+                      (setq foundp t)))
+                  (cl-return-from :b (car buffers)))))))
 
-  (defun my:tab-bar-dedup-tabs () (interactive)
-	 (let ((visited nil)
-	       (removed nil)
-	       (current-tab-name (tab-bar-tab-name-current)))
-	   (dolist (tab (funcall tab-bar-tabs-function))
-	     (let ((tab-name (alist-get 'name tab)))
-	       (if (member tab-name visited) (push tab-name removed) (push tab-name visited))))
-	   ;; close tabs
-	   (dolist (tab-name removed)
-	     (tab-bar-close-tab-by-name tab-name))
-	   ;; select tab by name
-	   (tab-bar-select-tab-by-name current-tab-name)
-	   ))
+
+  (defun my:tab-line-prev-tab ()
+    "tab-lineの表示にしたがった場合の前のタブに移動"
+    (interactive)
+    (funcall my:tab-line-switch-to-buffer-function
+             (buffer-name
+              (cl-block :b
+                (let ((current-buf (current-buffer))
+                      (buffers (funcall tab-line-tabs-function))
+                      (prev-buf nil))
+                  (cl-dolist (b buffers)
+                    (when (equal current-buf b)
+                      (cl-return-from :b
+                        (or prev-buf (car (last buffers)))))
+                    (setq prev-buf b)))))))
+
+
+
+
+  (global-set-key (kbd "C-c C-n") 'my:tab-line-next-tab)
+  (global-set-key (kbd "C-c C-p") 'my:tab-line-prev-tab)
+  (global-set-key (kbd "C-;") 'my:tab-line-next-tab)
+
 
   (defun my:find-file-or-switch-buffer-other-tab (name)  (interactive "f")
 	 (cond ((string-equal name "")  (tab-bar-new-tab))
 	       (t    (cl-dolist (b (buffer-list))
 		       (when (string-equal name (buffer-file-name b))
-			 (cl-dolist (tab (funcall tab-bar-tabs-function))
-			   (when (string-equal name (alist-get 'name tab) )
-			     (cl-return (tab-bar-select-tab-by-name name))))
 			 (cl-return (switch-to-buffer-other-tab name))))
-		     (find-file-other-tab name ))))
-
-  ;; emacsclientでは常にnew-tabでファイルを開く
-  (tab-bar-history-mode 1)
-  (defun my:find-file-with-tab-bar--server-visit-hook ()
-    (run-with-timer
-     0.1 nil
-     (lambda (buf)
-       (message "## new-tab %s" buf)
-       (tab-bar-history-back)
-       (switch-to-buffer-other-tab buf)
-       )
-     (current-buffer)
-     )
-    )
-  (add-hook 'server-visit-hook 'my:find-file-with-tab-bar--server-visit-hook)
+		     (find-file name ))))
   )
 
 ;; external
@@ -352,17 +356,12 @@
 
   (progn    ;; ctrl-j map
     (defvar ctrl-j-map (make-keymap))
-    (define-key ctrl-j-map "c" (lambda () (interactive) (switch-to-buffer-other-tab "*scratch*"))) ; tab-new
+    (define-key ctrl-j-map "c" (lambda () (interactive) (switch-to-buffer "*scratch*"))) ; tab-new
     (define-key ctrl-j-map "b" 'switch-to-buffer-other-tab)
-    (define-key ctrl-j-map "n" 'tab-next)
-    (define-key ctrl-j-map (kbd "C-n") 'tab-next)
-    (define-key ctrl-j-map "p" 'tab-previous)
-    (define-key ctrl-j-map (kbd "C-p") 'tab-previous)
-    (define-key ctrl-j-map (kbd "RET") 'tab-switcher)
-    (define-key ctrl-j-map "r" 'tab-rename)
-    (define-key ctrl-j-map "k" 'tab-close)
-    (define-key ctrl-j-map "K" 'my:tab-bar-dedup-tabs)
-    (define-key ctrl-j-map "m" 'tab-bar-move-tab-to) ; e.g. C-u 1 C-j m
+    (define-key ctrl-j-map "n" 'my:tab-line-next-tab)
+    (define-key ctrl-j-map (kbd "C-n") 'my:tab-line-next-tab)
+    (define-key ctrl-j-map "p" 'my:tab-line-prev-tab)
+    (define-key ctrl-j-map (kbd "C-p") 'my:tab-line-prev-tab)
     (define-key ctrl-j-map (kbd "C-f") 'my:find-file-or-switch-buffer-other-tab)
     (define-key ctrl-j-map "f" 'my:find-file-or-switch-buffer-other-tab)
 
