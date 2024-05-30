@@ -159,6 +159,24 @@
 
   (progn ; shell
     (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+
+    (setq my:original-message-function (symbol-function 'message))
+    (defun my:shell-command-on-region-with-kill-new (start end command &optional output-buffer replace error-buffer display-error-buffer region-noncontiguous-p)
+      "`shell-command-on-region'のkill-ringに追加する版"
+      ;; ここはshell-command-on-regionのinteractiveのコードそのまま
+      (interactive (let (string)
+                     (unless (mark)
+		       (user-error "The mark is not set now, so there is no region"))
+		     (setq string (read-shell-command "Shell command on region: "))
+		     (list (region-beginning) (region-end) string current-prefix-arg current-prefix-arg shell-command-default-error-buffer t (region-noncontiguous-p))))
+
+      ;; message関数をすげかえるhack
+      (cl-letf (((symbol-function 'message)
+                 (lambda (x &rest args)
+                   (let ((text (apply 'format (cons x args))))
+                     (apply my:original-message-function (cons x args))
+                     (kill-new text)))))
+        (shell-command-on-region start end command output-buffer replace error-buffer display-error-buffer region-noncontiguous-p)))
     )
 
   (progn ; markdown
@@ -353,6 +371,9 @@
   ;; undo/redo
   (global-set-key (kbd "C-/") 'undo)
   (global-set-key (kbd "C-.") 'undo-redo)
+
+  ;; shell-command-region
+  (global-set-key (kbd "M-|") 'my:shell-command-on-region-with-kill-new)
 
   (progn    ;; ctrl-j map
     (defvar ctrl-j-map (make-keymap))
