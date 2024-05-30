@@ -350,6 +350,10 @@
   (global-set-key (kbd "M-r") 'replace-string)
   (global-set-key (kbd "M-R") 'replace-regexp)
 
+  ;; undo/redo
+  (global-set-key (kbd "C-/") 'undo)
+  (global-set-key (kbd "C-.") 'undo-redo)
+
   (progn    ;; ctrl-j map
     (defvar ctrl-j-map (make-keymap))
     (define-key ctrl-j-map "c" (lambda () (interactive) (switch-to-buffer-other-tab "*scratch*"))) ; tab-new
