@@ -160,24 +160,26 @@
   (progn ; shell
     (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 
-    (let ((original-message  (symbol-function 'message)))
-      (defun my:shell-command-on-region-with-kill-new (start end command &optional output-buffer replace error-buffer display-error-buffer region-noncontiguous-p)
-        "`shell-command-on-region'のkill-ringに追加する版"
-        ;; ここはshell-command-on-regionのinteractiveのコードそのまま
-        (interactive (let (string)
-                       (unless (mark)
-		         (user-error "The mark is not set now, so there is no region"))
-		       (setq string (read-shell-command "Shell command on region: "))
-		       (list (region-beginning) (region-end) string current-prefix-arg current-prefix-arg shell-command-default-error-buffer t (region-noncontiguous-p))))
+    (defun my:shell-command-on-region-with-kill-new (start end command &optional output-buffer replace error-buffer display-error-buffer region-noncontiguous-p)
+      "`shell-command-on-region'のkill-ringに追加する版"
+      ;; ここはshell-command-on-regionのinteractiveのコードそのまま
+      (interactive (let (string)
+                     (unless (mark)
+		       (user-error "The mark is not set now, so there is no region"))
+		     (setq string (read-shell-command "Shell command on region: "))
+		     (list (region-beginning) (region-end) string current-prefix-arg current-prefix-arg shell-command-default-error-buffer t (region-noncontiguous-p))))
 
-        ;; message関数をすげかえるhack
-        (cl-letf (((symbol-function 'message)
-                   (lambda (x &rest args)
-                     (let ((text (apply 'format (cons x args))))
-                       (apply original-message (cons x args))
-                       (kill-new text)))))
-          (shell-command-on-region start end command output-buffer replace error-buffer display-error-buffer region-noncontiguous-p))))
+      (let ((out-buffer-name shell-command-buffer-name))
+        (shell-command-on-region start end command output-buffer replace out-buffer-name out-buffer-name region-noncontiguous-p)
+        (unless replace
+          (let ((output-string
+                 (with-current-buffer shell-command-buffer-name
+                   (buffer-substring (point-min) (point-max))
+                   )))
+            (message output-string)
+            (kill-new output-string)))))
     )
+
 
   (progn ; markdown
     (unless (locate-library "markdown-mode")
