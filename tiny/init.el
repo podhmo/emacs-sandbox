@@ -155,6 +155,37 @@
 
   (progn ; javascript-mode
     (add-to-list  'auto-mode-alist '("\\.mjs" .  js-mode))
+
+    (with-eval-after-load 'js
+      ;; 対応するペアの出力
+      (add-hook 'js-mode-hook 'electric-pair-mode)
+
+      ;; 1行が長大なファイルへの対応
+      (defun my:count-chars-of-first-line ()
+        (interactive)
+        (save-excursion
+          (save-restriction
+            (goto-char (point-min))
+            (let (beg end)
+              (beginning-of-line)
+              (setq beg (point))
+              (end-of-line)
+              (setq end (point))
+              (when (interactive-p)
+                (message "first chars is %s beg=%s end=%s" (- end beg) beg end))
+              (- end beg)))))
+
+      (defun my:open-with-low-cost-mode--if-huge-first-line ()
+        (interactive)
+        "先頭行が長過ぎる場合に、論理行での移動を止める"
+        (let ((threashold 2000))
+          (when (>= (my:count-chars-of-first-line) threashold)
+            (fundamental-mode)
+            (message "huge first line, so setq-local line-mode-visual nil")
+            (setq-local line-move-visual nil) ;; C-nでの移動は論理行ではなく物理行にする
+            )))
+
+      (add-hook 'js-json-mode-hook 'my:open-with-low-cost-mode--if-huge-first-line))
     )
 
   (progn ; shell
