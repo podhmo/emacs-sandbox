@@ -365,13 +365,14 @@
 (progn ; key-binding
 
   (progn ;; kill-buffer with tab-bar
-    (defun my:kill-buffer-with-tab-close-if-need (&optional kill-tab-bar-p)
+    (defun my:kill-buffer-with-tab-close-if-need (&optional keep-tab-bar-p)
       "C-u C-x C-kの場合にはtabも閉じる"
       (interactive (list current-prefix-arg))
       (kill-buffer (current-buffer))
-      (when (not (null kill-tab-bar-p))
+      (unless keep-tab-bar-p
         (tab-close)
-        ))
+        )
+      )
     (global-set-key (kbd "C-x k") 'my:kill-buffer-with-tab-close-if-need)
     )
 
