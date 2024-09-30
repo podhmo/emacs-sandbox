@@ -284,6 +284,13 @@
         (delete-region beg end)
         (insert (prin1-to-string text))))  ;; prin1-to-string ha tenuki
     )
+
+  (defun my:strip-escape-sequence ()
+    "for github action's log .etc"
+    (interactive)
+    (save-excursion
+      (while (re-search-forward "\\\\[[0-9]*m" nil t 1)
+        (replace-match ""))))
   )
 
 (progn ;; code reading
