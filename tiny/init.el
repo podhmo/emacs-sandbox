@@ -285,12 +285,18 @@
         (insert (prin1-to-string text))))  ;; prin1-to-string ha tenuki
     )
 
-  (defun my:strip-escape-sequence ()
+  (defun my:strip-ansi-color ()
     "for github action's log .etc"
     (interactive)
     (save-excursion
       (while (re-search-forward "\\\\[[0-9]*m" nil t 1)
         (replace-match ""))))
+
+  (autoload 'ansi-color-apply-on-region "ansi-color")
+  (defun my:highlight-ansi-color ()
+    (interactive)
+    (let ((inhibit-read-only t))
+      (ansi-color-apply-on-region (point-min) (point-max))))
   )
 
 (progn ;; code reading
