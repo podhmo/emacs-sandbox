@@ -258,6 +258,9 @@
     (defun my:text-mode-setup ()
       (setq-local line-spacing 0.05) ;; ちょっと行間を拡げる
 
+      ;; text editing
+      (define-key text-mode-map (kbd "C-M-i") 'dabbrev-expand)
+
       ;; indent
       (define-key text-mode-map (kbd "<tab>")  'my:indent-rigitly)
       (define-key text-mode-map (kbd "<backtab>")  'my:unindent-rigitly)
