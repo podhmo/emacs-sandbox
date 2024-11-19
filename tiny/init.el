@@ -288,7 +288,7 @@
         (insert (prin1-to-string text))))  ;; prin1-to-string ha tenuki
     )
 
-  (defun my:strip-ansi-color ()
+  (defun my:ansi-color-strip ()
     "for github action's log .etc"
     (interactive)
     (save-excursion
@@ -296,7 +296,7 @@
         (replace-match ""))))
 
   (autoload 'ansi-color-apply-on-region "ansi-color")
-  (defun my:highlight-ansi-color ()
+  (defun my:ansi-color-highlight ()
     (interactive)
     (let ((inhibit-read-only t))
       (ansi-color-apply-on-region (point-min) (point-max))))
