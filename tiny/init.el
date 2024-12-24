@@ -370,8 +370,8 @@
     (add-hook 'view-mode-off-hook 'my:view-mode-cleanup)
     )
 
-  (cl-defun my:find-file-hook--enable-view-mode (&key (writable-modes '(text-mode emacs-lisp-mode)))
-    "text-mode以外の場合にはview-modeで開く"
+  (cl-defun my:find-file-hook--enable-view-mode (&key (writable-modes '(text-mode markdown-mode emacs-lisp-mode)))
+    "text-mode, markdown-mode以外の場合にはview-modeで開く"
     (unless(memq major-mode writable-modes)
       (view-mode 1)))
   (add-hook 'find-file-hook 'my:find-file-hook--enable-view-mode)
