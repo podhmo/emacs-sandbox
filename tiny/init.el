@@ -565,7 +565,9 @@
 ;; see: https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
 ;; (push '(typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src") treesit-language-source-alist)
 ;; (push '(mermaid "https://github.com/monaqa/tree-sitter-mermaid" "master" "src") treesit-language-source-alist)
+;; (push '(yaml "https://github.com/ikatyang/tree-sitter-yaml" "master" "src") treesit-language-source-alist)
 ;;
 ;; (treesit-install-language-grammar 'typescript) ;; generate tree-sitter/libtree-sitter-typescript.so
 ;; (treesit-install-language-grammar 'mermaid)
+;; (treesit-install-language-grammar 'yaml)
 ;; M-x typescript-ts-mode
