@@ -505,6 +505,26 @@
   ;; remember
   (eval-after-load 'remember (setq remember-data-file "~/vboxshare/memo/notes"))
 
+  ;; skk
+  ;; need: apt-get install ddskk
+  (when (fboundp 'skk-mode)
+    (setq skk-jisyo-code "utf-8") ; jisyoのエンコーディングをutf-8にする
+    (setq skk-sticky-key ";") ; sticky-shiftを使ってshiftキーの節約する
+    (setq skk-egg-like-newline t) ; <enter>で改行を入力しない
+    (setq skk-auto-insert-paren t)
+    (setq default-input-method "japanese-skk") ; C-\
+
+    (global-set-key (kbd "C-x j") 'skk-mode) ;; disable skk-auto-fill-mode
+    (global-set-key (kbd "C-x C-j") 'skk-mode)
+    ;; (global-set-key (kbd "<zenkaku-hankaku>")  'toggle-input-methodl) ;; TODO: fix
+
+    ;; text-modeのときにははじめからskk-modeを有効にしておく
+    (add-hook 'text-mode-hook 'skk-mode)
+
+    ;; skkの辞書ファイルはauto-saveの対象から除外する
+    (push `(string-suffix-p . ".skk-jisyo") my:disable-auto-save-visited-mode-alist)
+    )
+
   ;; open memo*.txt
   (let* ((cmd "ls -t ~/vboxshare/memo/memo*.txt | head -n 1")
 	 (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
