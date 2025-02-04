@@ -506,7 +506,7 @@
   (eval-after-load 'remember (setq remember-data-file "~/vboxshare/memo/notes"))
 
   ;; skk
-  ;; need: apt-get install ddskk
+  ;; need: install ddskk by melpa
   (when (fboundp 'skk-mode)
     (setq skk-jisyo-code "utf-8") ; jisyoのエンコーディングをutf-8にする
     (setq skk-sticky-key ";") ; sticky-shiftを使ってshiftキーの節約する
