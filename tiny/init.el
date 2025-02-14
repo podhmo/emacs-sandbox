@@ -36,7 +36,7 @@
           (cl-destructuring-bind (fn . x) arg
             (when (funcall fn x fname)
               (message "# auto-save-visited-mode is disabled by %s %s" fn x)
-              (auto-save-visited-mode -1)
+              (setq-local auto-save-visited-mode nil)
               (cl-return nil))))))
     (add-hook 'find-file-hook 'my:find-file-hook--disable-auto-save)
     )
