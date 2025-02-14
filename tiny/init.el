@@ -41,6 +41,11 @@
     (add-hook 'find-file-hook 'my:find-file-hook--disable-auto-save)
     )
 
+  ;; case sensitive/insensitive
+  (setq read-file-name-completion-ignore-case t)
+  (setq read-buffer-completion-ignore-case t)
+
+
   (global-auto-revert-mode t)
   (setq echo-keystrokes 0.2)
 
