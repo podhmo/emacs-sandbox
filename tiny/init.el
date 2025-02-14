@@ -85,7 +85,8 @@
 
   ;; side-effect
   (add-hook 'tab-bar-tab-post-open-functions 'my:tab-bar-open-hook--for-debug)
-  (add-hook 'tab-bar-tab-post-open-functions 'my:tab-bar-open-hook--for-dedup)
+  ;; (add-hook 'tab-bar-tab-post-open-functions 'my:tab-bar-open-hook--for-dedup)
+  ;; (remove-hook 'tab-bar-tab-post-open-functions 'my:tab-bar-open-hook--for-dedup)
 
   (defun my:tab-bar-dedup-tabs () (interactive)
 	 (let ((visited nil)
@@ -415,6 +416,7 @@
         )
       )
     (global-set-key (kbd "C-x k") 'my:kill-buffer-with-tab-close-if-need)
+    (global-set-key (kbd "C-x K") 'my:tab-bar-dedup-tabs)
     )
 
   (defvar my:emacs-home-directory (current-directory))
