@@ -237,6 +237,10 @@
             (kill-new output-string)))))
     )
 
+  (with-eval-after-load 'python
+    (define-key python-mode-map (kbd "C-c C-p") 'tab-previous)
+    (define-key python-mode-map (kbd "C-c C-n") 'tab-next)
+    )
 
   (progn ; markdown
     (unless (locate-library "markdown-mode")
