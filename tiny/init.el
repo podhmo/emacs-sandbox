@@ -511,6 +511,13 @@
   )
 
 
+(defun my:skk-previous-candidate-around-advice (fn &rest args)
+  "読み取り専用バッファで C-p が SKK の候補選択ではなくカーソル移動になるようにする設定, :aroundで利用する"
+  (interactive)
+  (if buffer-read-only
+      (call-interactively 'previous-line)
+    (apply fn args)))
+
 ;; after initialize
 (defun my:after-initialize--mac ()
   ;; remember
@@ -519,6 +526,8 @@
   ;; skk
   ;; need: install ddskk by melpa
   (when (fboundp 'skk-mode)
+    (advice-add 'skk-previous-candidate :around #'my:skk-previous-candidate-around-advice) ; read only bufferでカーソル移動をするために
+
     (setq skk-jisyo-code "utf-8") ; jisyoのエンコーディングをutf-8にする
     (setq skk-sticky-key ";") ; sticky-shiftを使ってshiftキーの節約する
     (setq skk-egg-like-newline t) ; <enter>で改行を入力しない
@@ -549,6 +558,8 @@
   ;; skk
   ;; need: apt-get install ddskk
   (when (fboundp 'skk-mode)
+    (advice-add 'skk-previous-candidate :around #'my-skk-previous-candidate-around-advice) ; read only bufferでカーソル移動をするために
+
     (setq skk-jisyo-code "utf-8") ; jisyoのエンコーディングをutf-8にする
     (setq skk-sticky-key ";") ; sticky-shiftを使ってshiftキーの節約する
     (setq skk-egg-like-newline t) ; <enter>で改行を入力しない
