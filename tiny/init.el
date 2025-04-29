@@ -412,7 +412,7 @@
 
   (progn ;; kill-buffer with tab-bar
     (defun my:kill-buffer-with-tab-close-if-need (&optional keep-tab-bar-p)
-      "C-u C-x C-kの場合にはtabも閉じる"
+      "This is a wrapper of `kill-buffer'. If this function called with C-u prefix, then keeping tab (usually closing tab)"
       (interactive (list current-prefix-arg))
       (kill-buffer (current-buffer))
       (unless keep-tab-bar-p
