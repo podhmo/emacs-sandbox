@@ -558,7 +558,7 @@
   ;; skk
   ;; need: apt-get install ddskk
   (when (fboundp 'skk-mode)
-    (advice-add 'skk-previous-candidate :around #'my-skk-previous-candidate-around-advice) ; read only bufferでカーソル移動をするために
+    (advice-add 'skk-previous-candidate :around #'my:skk-previous-candidate-around-advice) ; read only bufferでカーソル移動をするために
 
     (setq skk-jisyo-code "utf-8") ; jisyoのエンコーディングをutf-8にする
     (setq skk-sticky-key ";") ; sticky-shiftを使ってshiftキーの節約する
