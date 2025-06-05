@@ -478,6 +478,7 @@
     (global-set-key (kbd "C-j") ctrl-j-map)
     (global-set-key (kbd "C-S-j") ctrl-j-map) ;; skkの確定とctrl-jが被るのでその代替に
     (global-set-key (kbd "M-j") ctrl-j-map) ;; skkの確定とctrl-jが被るのでその代替に
+
     (defun my:view-mode-setup--activate-ctrl-j-map ()
       (define-key view-mode-map (kbd "C-j") ctrl-j-map))
     (add-hook 'view-mode-on-hook 'my:view-mode-setup--activate-ctrl-j-map)
@@ -541,15 +542,28 @@
     ;; text-modeのときにははじめからskk-modeを有効にしておく
     (add-hook 'text-mode-hook 'skk-mode)
 
+    ;; mini-bufferはskkを無効にしたい
+    (defun my:skk-force-latin-mode ()
+      (when skk-mode (skk-latin-mode-on)))
+    (add-hook 'minibuffer-setup-hook 'deactivate-input-method)
+    (add-hook 'isearch-mode-hook 'my:skk-force-latin-mode)
+
     ;; skkの辞書ファイルはauto-saveの対象から除外する
     (push `(string-suffix-p . ".skk-jisyo") my:disable-auto-save-visited-mode-alist)
-    )
 
-  ;; open memo*.txt
-  (let* ((cmd "ls -t ~/vboxshare/memo/memo*.txt | head -n 1")
-	 (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
-    (find-file memo-file)
-    (end-of-buffer)))
+    ;; skk-insertを潰す (代替はC-enter)
+    (defun my:skk-mode-setup ()
+      (define-key skk-j-mode-map (kbd "C-j") ctrl-j-map)
+      (define-key skk-j-mode-map (kbd "<C-return>") 'skk-insert)
+      )
+    (add-hook 'skk-mode-hook 'my:skk-mode-setup)
+
+    ;; open memo*.txt
+    (let* ((cmd "ls -t ~/vboxshare/memo/memo*.txt | head -n 1")
+	   (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
+      (find-file memo-file)
+      (end-of-buffer)))
+  )
 
 (defun my:after-initialize--windows ()
   ;; remember
@@ -572,6 +586,20 @@
 
     ;; text-modeのときにははじめからskk-modeを有効にしておく
     (add-hook 'text-mode-hook 'skk-mode)
+
+    ;; mini-bufferはskkを無効にしたい
+    (defun my:skk-force-latin-mode ()
+      (when skk-mode (skk-latin-mode-on)))
+    (add-hook 'minibuffer-setup-hook 'deactivate-input-method)
+    (add-hook 'isearch-mode-hook 'my:skk-force-latin-mode)
+
+    ;; skk-insertを潰す (代替はC-enter)
+    (defun my:skk-mode-setup ()
+      (define-key skk-j-mode-map (kbd "C-j") ctrl-j-map)
+      (define-key skk-j-mode-map (kbd "<C-return>") 'skk-insert)
+      )
+    (add-hook 'skk-mode-hook 'my:skk-mode-setup)
+
 
     ;; skkの辞書ファイルはauto-saveの対象から除外する
     (push `(string-suffix-p . ".skk-jisyo") my:disable-auto-save-visited-mode-alist)
@@ -608,8 +636,10 @@
 ;; (push '(typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src") treesit-language-source-alist)
 ;; (push '(mermaid "https://github.com/monaqa/tree-sitter-mermaid" "master" "src") treesit-language-source-alist)
 ;; (push '(yaml "https://github.com/ikatyang/tree-sitter-yaml" "master" "src") treesit-language-source-alist)
+;; (push '(markdown "https://github.com/ikatyang/tree-sitter-markdown") treesit-language-source-alist)
 ;;
 ;; (treesit-install-language-grammar 'typescript) ;; generate tree-sitter/libtree-sitter-typescript.so
 ;; (treesit-install-language-grammar 'mermaid)
 ;; (treesit-install-language-grammar 'yaml)
+;; (treesit-install-language-grammar 'markdown)
 ;; M-x typescript-ts-mode
