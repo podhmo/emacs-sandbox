@@ -19,7 +19,7 @@ emacsの.emacs.dの寄せ集め
 
 ```shell
 $ ghq get -p podhmo/emacs-sandbox
-$ ln -s ~/ghq/github.com/emacs-sandbox/tiny ~/.emacs.d
+$ ln -s ~/ghq/github.com/podhmo/emacs-sandbox/tiny ~/.emacs.d
 ```
 
 ## docs
