@@ -102,15 +102,6 @@
 	   (tab-bar-select-tab-by-name current-tab-name)
 	   ))
 
-  (defun my:find-file-or-switch-buffer-other-tab (name)  (interactive "f")
-	 (cond ((string-equal name "")  (tab-bar-new-tab))
-	       (t    (cl-dolist (b (buffer-list))
-		       (when (string-equal name (buffer-file-name b))
-			 (cl-dolist (tab (funcall tab-bar-tabs-function))
-			   (when (string-equal name (alist-get 'name tab) )
-			     (cl-return (tab-bar-select-tab-by-name name))))
-			 (cl-return (switch-to-buffer-other-tab name))))
-		     (find-file-other-tab name ))))
 
   ;; emacsclientでは常にnew-tabでファイルを開く
   (tab-bar-history-mode 1)
@@ -427,7 +418,7 @@
   (global-set-key (kbd "C-c x") (lambda () (interactive)
 				  (let ((file (concat my:emacs-home-directory "init.el")))
 				    (if (fboundp 'switch-to-buffer-other-tab)
-					(my:find-file-or-switch-buffer-other-tab file)
+					(find-file-other-tab file)
 				      (find-file file)))
 				  ))
   ;; find-file
@@ -469,8 +460,8 @@
     (define-key ctrl-j-map "k" 'tab-close)
     (define-key ctrl-j-map "K" 'my:tab-bar-dedup-tabs)
     (define-key ctrl-j-map "m" 'tab-bar-move-tab-to) ; e.g. C-u 1 C-j m
-    (define-key ctrl-j-map (kbd "C-f") 'my:find-file-or-switch-buffer-other-tab)
-    (define-key ctrl-j-map "f" 'my:find-file-or-switch-buffer-other-tab)
+    (define-key ctrl-j-map (kbd "C-f") 'find-file-other-tab)
+    (define-key ctrl-j-map "f" 'find-file-other-tab)
 
     (define-key ctrl-j-map (kbd "C-j") 'dabbrev-expand)
 
