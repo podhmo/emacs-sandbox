@@ -101,7 +101,7 @@
 	   ;; select tab by name
 	   (tab-bar-select-tab-by-name current-tab-name)
 	   ))
-
+  (defalias 'my:dedup-tabs 'my:tab-bar-dedup-tabs)
 
   ;; emacsclientでは常にnew-tabでファイルを開く
   (tab-bar-history-mode 1)
