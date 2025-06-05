@@ -610,7 +610,19 @@
   ;; open memo*.txt
   (let* ((cmd "ls -t /mnt/c/Users/nao/vboxshare/memo/memo*.txt | head -n 1")
 	 (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
-    (find-file memo-file)))
+    (find-file memo-file))
+  )
+
+
+;; 手抜きで "*Compile-Log*" bufferを閉じる (delete-backward-charが使われてるらしい)
+(add-to-list 'display-buffer-alist
+             '("^\\*Compile-Log\\*"
+               (display-buffer-below-selected)
+               (window-height . 0.3)
+               (side . bottom)
+               (inhibit-same-window . t)
+               (body-function . (lambda (w)
+                                  (run-at-time 3 nil 'delete-window w)))))
 
 ;; after initialize settings
 (pcase system-type
