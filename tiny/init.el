@@ -458,8 +458,6 @@
 
     ;; activate ctr-j map
     (global-set-key (kbd "C-j") ctrl-j-map)
-    (global-set-key (kbd "C-S-j") ctrl-j-map) ;; skkの確定とctrl-jが被るのでその代替に
-    (global-set-key (kbd "M-j") ctrl-j-map) ;; skkの確定とctrl-jが被るのでその代替に
 
     (defun my:view-mode-setup--activate-ctrl-j-map ()
       (define-key view-mode-map (kbd "C-j") ctrl-j-map))
