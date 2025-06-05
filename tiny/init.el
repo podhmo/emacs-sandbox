@@ -103,20 +103,11 @@
 	   ))
   (defalias 'my:dedup-tabs 'my:tab-bar-dedup-tabs)
 
-  ;; emacsclientでは常にnew-tabでファイルを開く
-  (tab-bar-history-mode 1)
+  ;; (tab-bar-history-mode 1)
   (defun my:find-file-with-tab-bar--server-visit-hook ()
-    (run-with-timer
-     0.1 nil
-     (lambda (buf)
-       (message "## new-tab %s" buf)
-       (tab-bar-history-back)
-       (switch-to-buffer-other-tab buf)
-       )
-     (current-buffer)
-     )
-    )
-  (add-hook 'server-visit-hook 'my:find-file-with-tab-bar--server-visit-hook)
+    "単純にemacsclientで開いたときにタブで開く。重複したら手動で `my:dedup-tabs' を呼ぶ"
+    (find-file-other-tab (buffer-file-name)))
+  (add-hook 'server-visit-hook 'my:find-file-with-tab-bar--server-visit-hook)  ;; emacsclientでは常にnew-tabでファイルを開く
   )
 
 ;; external
