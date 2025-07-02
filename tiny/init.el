@@ -618,11 +618,14 @@
 (setq debug-on-error nil)  ;; disable in daily life
 
 ;; ;; external package
-;; (setq package-archives  `(("melpa" . "https://melpa.org/packages/")  ("melpa-stable" . "https://stable.melpa.org/packages/") ,@package-archives))
+;; (require 'package)
+;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 ;; (package-initialize)
+;;
 ;; (package-install 'writeroom-mode) ; -> zen-mode in vscode
 ;; (package-install 'ddskk-postframe);  skkの変換候補を良いかんじに表示してくる
-
+;;
+;; (load-file "./extra.el")
 
 ;; ;; activate tree-sitter
 ;; see: M-x view-emacs-news
