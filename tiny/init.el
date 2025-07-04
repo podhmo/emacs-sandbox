@@ -199,6 +199,14 @@
   (progn ; shell
     (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 
+
+    ;; M-x で *shell* bufferを開くときにはother windowに開く
+    (add-to-list 'display-buffer-alist
+                 '("\\*shell\\*"
+                   (display-buffer-at-bottom)
+                   (reusable-window . t)))
+
+
     (defun my:shell-command-on-region-with-kill-new (start end command &optional output-buffer replace error-buffer display-error-buffer region-noncontiguous-p)
       "`shell-command-on-region'のkill-ringに追加する版"
       ;; ここはshell-command-on-regionのinteractiveのコードそのまま
@@ -455,6 +463,8 @@
     (define-key ctrl-j-map "f" 'find-file-other-tab)
 
     (define-key ctrl-j-map (kbd "C-j") 'dabbrev-expand)
+
+    (define-key ctrl-j-map (kbd "S") 'shell)
 
     ;; activate ctr-j map
     (global-set-key (kbd "C-j") ctrl-j-map)
