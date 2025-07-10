@@ -553,8 +553,7 @@
   ;; open memo*.txt
   (let* ((cmd "ls -t ~/memo/memo*.txt | head -n 1")
 	 (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
-    (find-file memo-file)
-    (end-of-buffer))
+    (find-file memo-file))
   )
 
 
