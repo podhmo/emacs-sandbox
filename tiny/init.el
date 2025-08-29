@@ -301,6 +301,14 @@
     (interactive)
     (let ((inhibit-read-only t))
       (ansi-color-apply-on-region (point-min) (point-max))))
+
+  (defun my:masking-home-directory ()
+    (interactive)
+    (let ((home (getenv "HOME")))
+      (save-excursion
+        (goto-char (point-min))
+        (while (search-forward home nil t 1)
+          (replace-match "$HOME")))))
   )
 
 (progn ;; code reading
