@@ -304,11 +304,26 @@
 
   (defun my:masking-home-directory ()
     (interactive)
-    (let ((home (getenv "HOME")))
+    (let ((home (getenv "HOME"))
+          (repo (base64-decode-string "d2NsNDgvYWktYW5hbHlzdA==")))
       (save-excursion
+        (goto-char (point-min))
+        (while (search-forward repo nil t 1)
+          (replace-match "podhmo/app"))
         (goto-char (point-min))
         (while (search-forward home nil t 1)
           (replace-match "$HOME")))))
+
+  (defun my:format-buffer ()
+    (interactive)
+    (my:masking-home-directory)
+    (save-excursion
+      (goto-char (point-min))
+      (while (search-forward "\\t" nil t 1)
+        (replace-match "\t"))
+      (goto-char (point-min))
+      (while (search-forward "\\n" nil t 1)
+        (replace-match "\n"))))
   )
 
 (progn ;; code reading
