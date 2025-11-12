@@ -642,6 +642,7 @@
 ;; after initialize settings
 (pcase system-type
   ('darwin
+   (global-set-key (kbd "s-P") 'execute-extended-command) ;; for vscode user
    (my:after-initialize--mac))
   ('gnu/linux ; wsl
    (my:after-initialize--windows))
