@@ -623,9 +623,9 @@
     (global-set-key (kbd "<muhenkan>") 'delete-backward-char)      ;; TODO: with skk
     )
   ;; open memo*.txt
-  (let* ((cmd "ls -t /mnt/c/Users/nao/vboxshare/memo/memo*.txt | head -n 1")
+  (let* ((cmd "ls -t ~/memo/memo*.txt | head -n 1")
 	 (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
-    (find-file memo-file))
+    (and (file-exists-p memo-file) (find-file memo-file)))
   )
 
 
