@@ -27,6 +27,8 @@ custom-settings.el
 
 future work (TODO)
 
+- (use-packageをまじめに使う)
+- (tree-sitterをつかった方のモードをまじめに使う)
 - (領域選択をしてLLMに渡す)
 - (領域選択をして翻訳する)
 - (音声入力してその後編集という感じで作業できるようにする)

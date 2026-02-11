@@ -2,11 +2,6 @@
 (setq inhibit-startup-message t)
 (setq inhibit-splash-screen t)
 
-;; bar
-;; (progn ; bar
-;;   ;; (menu-bar-mode)
-;;   (tool-bar-mode -1)
-;;   )
 (push '(tool-bar-lines . 0) default-frame-alist)
 
 (progn ;; window-layout
