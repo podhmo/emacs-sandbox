@@ -7,8 +7,8 @@
       (file-name-directory load-file-name)
     default-directory))
 
-;; ignore custom.el
-(setq custom-file (concat (current-directory) "custom.el"))
+;; ignore custom-settings.el
+(setq custom-file (concat (current-directory) "custom-settings.el"))
 
 
 ;; load individual library
@@ -357,7 +357,7 @@
 
 (defun my:after-initialize--windows ()
   ;; remember
-  (eval-after-load 'remember (setq remember-data-file "/mnt/c/Users/nao/vboxshare/memo/notes"))
+  (eval-after-load 'remember (setq remember-data-file "~/memo/notes"))
 
   ;; skk
   ;; need: apt-get install ddskk
@@ -373,9 +373,6 @@
     (global-set-key (kbd "C-x j") 'skk-mode) ;; disable skk-auto-fill-mode
     (global-set-key (kbd "C-x C-j") 'skk-mode)
     ;; (global-set-key (kbd "<zenkaku-hankaku>")  'toggle-input-methodl) ;; TODO: fix
-
-    ;; text-modeのときにははじめからskk-modeを有効にしておく
-    (add-hook 'text-mode-hook 'skk-mode)
 
     ;; mini-bufferはskkを無効にしたい
     (defun my:skk-force-latin-mode ()
@@ -396,9 +393,11 @@
 
     ;; key binding
     (global-set-key (kbd "<muhenkan>") 'delete-backward-char)      ;; TODO: with skk
+    (global-set-key (kbd "<henkan>")  'newline)
+
     )
   ;; open memo*.txt
-  (let* ((cmd "ls -t ~/memo/memo*.txt | head -n 1")
+  (let* ((cmd "ls -t ~/memo/memo*.md | head -n 1")
 	 (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
     (and (file-exists-p memo-file) (find-file memo-file)))
   )
@@ -426,26 +425,10 @@
 
 (setq debug-on-error nil)  ;; disable in daily life
 
-;; ;; external package
-;; (require 'package)
-;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-;; (package-initialize)
-;;
-;; (package-install 'writeroom-mode) ; -> zen-mode in vscode
-;; (package-install 'ddskk-postframe);  skkの変換候補を良いかんじに表示してくる
-;;
-;; (load-file "./extra.el")
 
-;; ;; activate tree-sitter
-;; see: M-x view-emacs-news
-;; see: https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
-;; (push '(typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src") treesit-language-source-alist)
-;; (push '(mermaid "https://github.com/monaqa/tree-sitter-mermaid" "master" "src") treesit-language-source-alist)
-;; (push '(yaml "https://github.com/ikatyang/tree-sitter-yaml" "master" "src") treesit-language-source-alist)
-;; (push '(markdown "https://github.com/ikatyang/tree-sitter-markdown") treesit-language-source-alist)
-;;
-;; (treesit-install-language-grammar 'typescript) ;; generate tree-sitter/libtree-sitter-typescript.so
-;; (treesit-install-language-grammar 'mermaid)
-;; (treesit-install-language-grammar 'yaml)
-;; (treesit-install-language-grammar 'markdown)
-;; M-x typescript-ts-mode
+;;----------------------------------------
+;; init after
+;;----------------------------------------
+(defvar my:use-after-init nil "これが有効なときにはサードパーティのコードを有効にする。通常はcustom-settings.elで設定される")
+(when my:use-after-init
+  (load-file (concat (current-directory) "after-init.el")))

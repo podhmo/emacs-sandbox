@@ -1,5 +1,23 @@
 # rebirth
 
+## 読み込まれる順序
+
+1. early-init.el
+2. init.el
+3. after-init.el # ただしcustom-settings.elでmy:use-after-init == tのときだけ
+
+サードパーティパッケージを有効にする
+
+custom-settings.el
+```elisp
+;;; -*- coding: utf-8; lexical-binding: t -*-
+
+(setq my:use-after-init t)
+```
+
+
+## 補足情報
+
 今回からの変更予定
 
 - view onlyで開くのがデフォルトの操作だったのを辞める
