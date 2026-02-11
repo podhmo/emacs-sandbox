@@ -118,12 +118,6 @@
                )
   )
 
-
-(with-eval-after-load 'python
-  (define-key python-mode-map (kbd "C-c C-p") 'tab-previous)
-  (define-key python-mode-map (kbd "C-c C-n") 'tab-next)
-  )
-
 (progn ; markdown
   (unless (locate-library "markdown-mode")
     (add-to-list  'auto-mode-alist '("\\.md" .  text-mode))
@@ -147,6 +141,15 @@
 
 
 (load-file (concat (current-directory) "interactives.el"))
+
+(progn ; tab-line
+  (global-tab-line-mode t)
+  (global-set-key (kbd "C-c <muhenkan>") 'my:tab-line-prev-tab)
+  (global-set-key (kbd "C-c C-p") 'my:tab-line-prev-tab)
+  (global-set-key (kbd "C-c <henkan>") 'my:tab-line-next-tab)
+  (global-set-key (kbd "C-c C-n") 'my:tab-line-next-tab)
+  )
+
 
 (progn ;; code reading
   (defalias 'browse-github 'my:browse-github)
@@ -197,27 +200,11 @@
   )
 
 
-;; main
 (progn ; key-binding
-  (progn ;; kill-buffer with tab-bar
-    (defun my:kill-buffer-with-tab-close-if-need (&optional keep-tab-bar-p)
-      "This is a wrapper of `kill-buffer'. If this function called with C-u prefix, then keeping tab (usually closing tab)"
-      (interactive (list current-prefix-arg))
-      (kill-buffer (current-buffer))
-      (unless keep-tab-bar-p
-        (tab-close)
-        )
-      )
-    (global-set-key (kbd "C-x k") 'my:kill-buffer-with-tab-close-if-need)
-    (global-set-key (kbd "C-x K") 'my:tab-bar-dedup-tabs)
-    )
-
   (defvar my:emacs-home-directory (current-directory))
   (global-set-key (kbd "C-c x") (lambda () (interactive)
 				  (let ((file (concat my:emacs-home-directory "init.el")))
-				    (if (fboundp 'switch-to-buffer-other-tab)
-					(find-file-other-tab file)
-				      (find-file file)))
+				    (find-file file))
 				  ))
   ;; find-file
   (global-set-key (kbd "C-x C-f") 'find-file-at-point)
@@ -247,19 +234,11 @@
 
   (progn    ;; ctrl-j map
     (defvar ctrl-j-map (make-keymap))
-    (define-key ctrl-j-map "c" (lambda () (interactive) (switch-to-buffer-other-tab "*scratch*"))) ; tab-new
-    (define-key ctrl-j-map "b" 'switch-to-buffer-other-tab)
-    (define-key ctrl-j-map "n" 'tab-next)
-    (define-key ctrl-j-map (kbd "C-n") 'tab-next)
-    (define-key ctrl-j-map "p" 'tab-previous)
-    (define-key ctrl-j-map (kbd "C-p") 'tab-previous)
-    (define-key ctrl-j-map (kbd "RET") 'tab-switcher)
-    (define-key ctrl-j-map "r" 'tab-rename)
-    (define-key ctrl-j-map "k" 'tab-close)
-    (define-key ctrl-j-map "K" 'my:tab-bar-dedup-tabs)
-    (define-key ctrl-j-map "m" 'tab-bar-move-tab-to) ; e.g. C-u 1 C-j m
-    (define-key ctrl-j-map (kbd "C-f") 'find-file-other-tab)
-    (define-key ctrl-j-map "f" 'find-file-other-tab)
+    (define-key ctrl-j-map "c" (lambda () (interactive) (switch-to-buffer (get-buffer-create "*scratch*"))))
+    (define-key ctrl-j-map "n" 'my:tab-line-next-tab)
+    (define-key ctrl-j-map (kbd "C-n") 'my:tab-line-next-tab)
+    (define-key ctrl-j-map "p" 'my:tab-line-prev-tab)
+    (define-key ctrl-j-map (kbd "C-p") 'my:tab-line-prev-tab)
 
     (define-key ctrl-j-map (kbd "C-j") 'dabbrev-expand)
 

@@ -18,6 +18,8 @@
   :mode (("\\.md\\'" . gfm-mode))
   :init
   (setq markdown-command "multimarkdown") ; または "pandoc --from=markdown --to=html5"
+  :bind (("C-c <henkan>" . my:tab-line-next-tab)
+         ("C-c <muhenkan>" . my:tab-line-prev-tab))
   :config
   ;; よく使うカスタマイズ
   (setq markdown-asymmetric-header t)      ; # 見出しを非対称にする（GitHub風）

@@ -24,6 +24,7 @@ custom-settings.el
 - 組み込みの機能しか使わない制限を捨てる
 - 自作の機能を作るのを避けていたがこの制限を捨てる
 - 日本語入力の開始は常に`C-\` (toggle-input-method) で行う
+- tab-barは捨てる。tab-lineの方を使う
 
 future work (TODO)
 
@@ -46,7 +47,6 @@ future work (TODO)
 
 細々とした不備
 
-- tab-barで常に新しいタブで開きたい。" *"から始まるバッファはタブの対象外
 - skk-modeで無効にした `C-j` の影響でタブ移動が失敗することがある
 - kill-ringの選択が手軽にできない
 - backupファイルがまだ同一ディレクトリ内に作られてしまう
