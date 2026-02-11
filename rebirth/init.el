@@ -1,0 +1,451 @@
+;;; -*- coding: utf-8; lexical-binding: t -*-
+
+(setq debug-on-error t) ;; enable for debugging
+
+(defun current-directory ()
+  (if load-file-name
+      (file-name-directory load-file-name)
+    default-directory))
+
+;; ignore custom.el
+(setq custom-file (concat (current-directory) "custom.el"))
+
+
+;; load individual library
+(load-file (concat (current-directory) "macros.el"))
+(load-file (concat (current-directory) "utils.el"))
+
+
+;; settings
+(progn
+  (progn ; for performance
+    (setq gc-cons-threshold (* 32 1024 1024)) ;; 32mb
+    )
+
+  (progn ; backup handling
+    (setq backup-directory-alist '((".*" . "~/.emacs.d/backup"))) ; backup is <filename>~
+    )
+  (progn ; auto-save
+    (setq auto-save-visited-interval 0.5)
+    (auto-save-visited-mode t)
+
+
+    (defvar my:disable-auto-save-visited-mode-alist nil)
+    (push `(string-prefix-p . "/tmp") my:disable-auto-save-visited-mode-alist) ;; /tmp/** のファイルは自動saveしない
+
+    (defun my:find-file-hook--disable-auto-save ()
+      (let ((fname (buffer-file-name)))
+        (cl-dolist (arg my:disable-auto-save-visited-mode-alist)
+          (cl-destructuring-bind (fn . x) arg
+            (when (funcall fn x fname)
+              (message "# auto-save-visited-mode is disabled by %s %s" fn x)
+              (setq-local auto-save-visited-mode nil)
+              (cl-return nil))))))
+    (add-hook 'find-file-hook 'my:find-file-hook--disable-auto-save)
+    )
+
+  ;; case sensitive/insensitive
+  (setq read-file-name-completion-ignore-case t)
+  (setq read-buffer-completion-ignore-case t)
+
+
+  (global-auto-revert-mode t)
+  (setq echo-keystrokes 0.2)
+
+  (setq visible-bell t) ;; disable beep
+
+  (show-paren-mode 1)
+  (transient-mark-mode t)
+
+  (setq search-highlight t)
+  (setq query-replace-highlight t)
+
+  (auto-image-file-mode t)
+  (setq resize-mini-windows t)
+
+  (progn ; emacs client
+    (condition-case err
+	(progn
+          (autoload 'server-running-p "server")
+          (unless (server-running-p)  (server-start)))
+      (error (message "emacsclient load fail")))
+    )
+  )
+
+
+(setq-default indent-tabs-mode nil)
+(load-file (concat (current-directory) "languages.el"))
+
+(progn ; lisp-mode
+  (defun my:elisp-mode-setup ()
+    (define-key emacs-lisp-mode-map (kbd "C-c C-e") 'eval-defun)
+    (define-key emacs-lisp-mode-map (kbd "C-c C-l") 'eval-buffer)
+    (define-key emacs-lisp-mode-map (kbd "C-x C-s") 'my:elisp-pretty-print-region) ;; saveはauto-save任せ
+    )
+  (add-hook 'emacs-lisp-mode-hook 'my:elisp-mode-setup)
+  (setq initial-major-mode 'emacs-lisp-mode)
+  )
+
+
+(progn ; javascript-mode
+  (add-to-list  'auto-mode-alist '("\\.mjs" .  js-mode))
+
+  (with-eval-after-load 'js
+    ;; 対応するペアの出力
+    (add-hook 'js-mode-hook 'electric-pair-mode)
+
+    ;; 1行が長大なファイルへの対応
+    (defun my:open-with-low-cost-mode--if-huge-first-line ()
+      (interactive)
+      "先頭行が長過ぎる場合に、論理行での移動を止める"
+      (let ((threashold 2000))
+        (when (>= (my:count-chars-of-first-line) threashold)
+          (fundamental-mode)
+          (message "huge first line, so setq-local line-mode-visual nil")
+          (setq-local line-move-visual nil) ;; C-nでの移動は論理行ではなく物理行にする
+          )))
+    (add-hook 'js-json-mode-hook 'my:open-with-low-cost-mode--if-huge-first-line))
+  )
+
+(progn ; shell
+  (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+
+  ;; M-x で *shell* bufferを開くときにはother windowに開く
+  (add-to-list 'display-buffer-alist
+               '("\\*shell\\*"
+                 (display-buffer-at-bottom)
+                 (reusable-window . t))
+               )
+  )
+
+
+(with-eval-after-load 'python
+  (define-key python-mode-map (kbd "C-c C-p") 'tab-previous)
+  (define-key python-mode-map (kbd "C-c C-n") 'tab-next)
+  )
+
+(progn ; markdown
+  (unless (locate-library "markdown-mode")
+    (add-to-list  'auto-mode-alist '("\\.md" .  text-mode))
+    )
+  )
+
+(progn ; text-mode
+  (defun my:text-mode-setup ()
+    (setq-local line-spacing 0.05) ;; ちょっと行間を拡げる
+
+    ;; text editing
+    (define-key text-mode-map (kbd "C-M-i") 'dabbrev-expand)
+
+    ;; indent
+    (define-key text-mode-map (kbd "<tab>")  'my:indent-rigitly)
+    (define-key text-mode-map (kbd "<backtab>")  'my:unindent-rigitly)
+    (define-key text-mode-map (kbd "<S-iso-lefttab>") 'my:unindent-rigitly) ;; for skk
+    )
+  (add-hook 'text-mode-hook 'my:text-mode-setup)
+  )
+
+
+(load-file (concat (current-directory) "interactives.el"))
+
+(progn ;; code reading
+  (defalias 'browse-github 'my:browse-github)
+  (defun browse-github-master () (interactive)
+         (browse-github :branch "master"))
+  (defun browse-github-main () (interactive)
+         (browse-github :branch "main"))
+  (defun browse-github-develop () (interactive)
+         (browse-github :branch "develop"))
+  )
+
+(progn ;; view-mode
+  (setq view-read-only t) ;; read-onlyのときにはview-modeで開く
+  (with-eval-after-load 'view
+    (defun my:dired-current-directory () (interactive)
+           (dired (current-directory)))
+    (defun my:view-mode-setup ()
+      (hl-line-mode 1)
+
+      ;; hjkl
+      (define-key view-mode-map (kbd "h") 'backward-char)
+      (define-key view-mode-map (kbd "j") 'next-line)
+      (define-key view-mode-map (kbd "k") 'previous-line)
+      (define-key view-mode-map (kbd "l") 'forward-char)
+
+      ;; page-up/page-down
+      (define-key view-mode-map (kbd "J") 'scroll-up)
+      (define-key view-mode-map (kbd "K") 'scroll-down)
+
+      ;; todo: next-definition/previous-definition
+
+      ;; directory
+      (define-key view-mode-map (kbd "[") 'my:dired-current-directory)
+      )
+    (defun my:view-mode-cleanup ()
+      (hl-line-mode -1))
+    (add-hook 'view-mode-on-hook 'my:view-mode-setup)
+    (add-hook 'view-mode-off-hook 'my:view-mode-cleanup)
+    )
+
+  (with-eval-after-load 'help-mode
+    (defun my:help-mode-setup ()
+      (define-key help-mode-map (kbd "[") 'help-go-back)
+      (define-key help-mode-map (kbd "]") 'help-go-forward)
+      )
+    (add-hook 'help-mode-hook 'my:help-mode-setup)
+    )
+  )
+
+
+;; main
+(progn ; key-binding
+  (progn ;; kill-buffer with tab-bar
+    (defun my:kill-buffer-with-tab-close-if-need (&optional keep-tab-bar-p)
+      "This is a wrapper of `kill-buffer'. If this function called with C-u prefix, then keeping tab (usually closing tab)"
+      (interactive (list current-prefix-arg))
+      (kill-buffer (current-buffer))
+      (unless keep-tab-bar-p
+        (tab-close)
+        )
+      )
+    (global-set-key (kbd "C-x k") 'my:kill-buffer-with-tab-close-if-need)
+    (global-set-key (kbd "C-x K") 'my:tab-bar-dedup-tabs)
+    )
+
+  (defvar my:emacs-home-directory (current-directory))
+  (global-set-key (kbd "C-c x") (lambda () (interactive)
+				  (let ((file (concat my:emacs-home-directory "init.el")))
+				    (if (fboundp 'switch-to-buffer-other-tab)
+					(find-file-other-tab file)
+				      (find-file file)))
+				  ))
+  ;; find-file
+  (global-set-key (kbd "C-x C-f") 'find-file-at-point)
+  (global-set-key (kbd "C-x C-a") 'revert-buffer)
+  (global-set-key (kbd "C-c C-c") 'side-pocket:toggle-buffer)
+
+  ;; goto
+  (global-set-key (kbd "C-x C-l") 'goto-line)
+  ;; 標準の設定ではM-g g,  M-g nはnext-error, M-g pはprevious-error
+
+  ;; comment
+  (global-set-key (kbd "C-c q") 'comment-region)
+  (global-set-key (kbd "C-c Q") 'uncomment-region)
+
+  ;; string edit
+  (global-set-key (kbd "C-c d") 'my:delete-something)
+  (global-set-key (kbd "C-c e") 'my:enclose-quote)
+  (global-set-key (kbd "M-r") 'replace-string)
+  (global-set-key (kbd "M-R") 'replace-regexp)
+
+  ;; undo/redo
+  (global-set-key (kbd "C-/") 'undo)
+  (global-set-key (kbd "C-.") 'undo-redo)
+
+  ;; shell-command-region
+  (global-set-key (kbd "M-|") 'my:shell-command-on-region-with-kill-new)
+
+  (progn    ;; ctrl-j map
+    (defvar ctrl-j-map (make-keymap))
+    (define-key ctrl-j-map "c" (lambda () (interactive) (switch-to-buffer-other-tab "*scratch*"))) ; tab-new
+    (define-key ctrl-j-map "b" 'switch-to-buffer-other-tab)
+    (define-key ctrl-j-map "n" 'tab-next)
+    (define-key ctrl-j-map (kbd "C-n") 'tab-next)
+    (define-key ctrl-j-map "p" 'tab-previous)
+    (define-key ctrl-j-map (kbd "C-p") 'tab-previous)
+    (define-key ctrl-j-map (kbd "RET") 'tab-switcher)
+    (define-key ctrl-j-map "r" 'tab-rename)
+    (define-key ctrl-j-map "k" 'tab-close)
+    (define-key ctrl-j-map "K" 'my:tab-bar-dedup-tabs)
+    (define-key ctrl-j-map "m" 'tab-bar-move-tab-to) ; e.g. C-u 1 C-j m
+    (define-key ctrl-j-map (kbd "C-f") 'find-file-other-tab)
+    (define-key ctrl-j-map "f" 'find-file-other-tab)
+
+    (define-key ctrl-j-map (kbd "C-j") 'dabbrev-expand)
+
+    (define-key ctrl-j-map (kbd "S") 'shell)
+
+    ;; activate ctr-j map
+    (global-set-key (kbd "C-j") ctrl-j-map)
+
+    (defun my:view-mode-setup--activate-ctrl-j-map ()
+      (define-key view-mode-map (kbd "C-j") ctrl-j-map))
+    (add-hook 'view-mode-on-hook 'my:view-mode-setup--activate-ctrl-j-map)
+    )
+
+  ;; remember
+  (global-set-key (kbd "C-c r") 'remember)
+  (global-set-key (kbd "C-c C-r") 'remember)
+
+  (progn   ;; dired
+    (defun my:dired-down-directory-or-display-file ()
+      (interactive)
+      (let ((fpath (dired-get-file-for-visit)))
+        (cond ((file-directory-p fpath) (call-interactively 'dired-find-file))
+              (t (call-interactively 'dired-display-file)))
+        ))
+
+    (defun my:dired-mode-setup ()
+      ;; up/down
+      (define-key dired-mode-map (kbd "[") 'dired-up-directory)
+      (define-key dired-mode-map (kbd "]") 'my:dired-down-directory-or-display-file)
+
+      ;; scroll-up/scroll-down other-window
+      (define-key dired-mode-map (kbd "M-n") 'scroll-other-window)
+      (define-key dired-mode-map (kbd "M-p") 'scroll-other-window-down)
+      (define-key dired-mode-map (kbd "M-<") 'beginning-of-buffer-other-window)
+      (define-key dired-mode-map (kbd "M->") 'end-of-buffer-other-window)
+      )
+    (add-hook 'dired-mode-hook 'my:dired-mode-setup)
+    )
+  )
+
+
+(defun my:skk-previous-candidate-around-advice (fn &rest args)
+  "読み取り専用バッファで C-p が SKK の候補選択ではなくカーソル移動になるようにする設定, :aroundで利用する"
+  (interactive)
+  (if buffer-read-only
+      (call-interactively 'previous-line)
+    (apply fn args)))
+
+;; after initialize
+(defun my:after-initialize--mac ()
+  ;; remember
+  (eval-after-load 'remember (setq remember-data-file "~/vboxshare/memo/notes"))
+
+  ;; skk
+  ;; need: install ddskk by melpa
+  (when (fboundp 'skk-mode)
+    (advice-add 'skk-previous-candidate :around #'my:skk-previous-candidate-around-advice) ; read only bufferでカーソル移動をするために
+
+    (setq skk-jisyo-code "utf-8") ; jisyoのエンコーディングをutf-8にする
+    (setq skk-sticky-key ";") ; sticky-shiftを使ってshiftキーの節約する
+    (setq skk-egg-like-newline t) ; <enter>で改行を入力しない
+    (setq skk-auto-insert-paren t)
+    (setq default-input-method "japanese-skk") ; C-\
+
+    (global-set-key (kbd "C-x j") 'skk-mode) ;; disable skk-auto-fill-mode
+    (global-set-key (kbd "C-x C-j") 'skk-mode)
+    ;; (global-set-key (kbd "<zenkaku-hankaku>")  'toggle-input-methodl) ;; TODO: fix
+
+    ;; text-modeのときにははじめからskk-modeを有効にしておく
+    (add-hook 'text-mode-hook 'skk-mode)
+
+    ;; mini-bufferはskkを無効にしたい
+    (defun my:skk-force-latin-mode ()
+      (when skk-mode (skk-latin-mode-on)))
+    (add-hook 'minibuffer-setup-hook 'deactivate-input-method)
+    (add-hook 'isearch-mode-hook 'my:skk-force-latin-mode)
+
+    ;; skkの辞書ファイルはauto-saveの対象から除外する
+    (push `(string-suffix-p . ".skk-jisyo") my:disable-auto-save-visited-mode-alist)
+
+    ;; skk-insertを潰す (代替はC-enter)
+    (defun my:skk-mode-setup ()
+      (define-key skk-j-mode-map (kbd "C-j") ctrl-j-map)
+      (define-key skk-j-mode-map (kbd "<C-return>") 'skk-insert)
+      )
+    (add-hook 'skk-mode-hook 'my:skk-mode-setup)
+    )
+
+  ;; open memo*.txt
+  (let* ((cmd "ls -t ~/memo/memo*.txt | head -n 1")
+	 (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
+    (find-file memo-file))
+  )
+
+
+(defun my:after-initialize--windows ()
+  ;; remember
+  (eval-after-load 'remember (setq remember-data-file "/mnt/c/Users/nao/vboxshare/memo/notes"))
+
+  ;; skk
+  ;; need: apt-get install ddskk
+  (when (fboundp 'skk-mode)
+    (advice-add 'skk-previous-candidate :around #'my:skk-previous-candidate-around-advice) ; read only bufferでカーソル移動をするために
+
+    (setq skk-jisyo-code "utf-8") ; jisyoのエンコーディングをutf-8にする
+    (setq skk-sticky-key ";") ; sticky-shiftを使ってshiftキーの節約する
+    (setq skk-egg-like-newline t) ; <enter>で改行を入力しない
+    (setq skk-auto-insert-paren t)
+    (setq default-input-method "japanese-skk") ; C-\
+
+    (global-set-key (kbd "C-x j") 'skk-mode) ;; disable skk-auto-fill-mode
+    (global-set-key (kbd "C-x C-j") 'skk-mode)
+    ;; (global-set-key (kbd "<zenkaku-hankaku>")  'toggle-input-methodl) ;; TODO: fix
+
+    ;; text-modeのときにははじめからskk-modeを有効にしておく
+    (add-hook 'text-mode-hook 'skk-mode)
+
+    ;; mini-bufferはskkを無効にしたい
+    (defun my:skk-force-latin-mode ()
+      (when skk-mode (skk-latin-mode-on)))
+    (add-hook 'minibuffer-setup-hook 'deactivate-input-method)
+    (add-hook 'isearch-mode-hook 'my:skk-force-latin-mode)
+
+    ;; skk-insertを潰す (代替はC-enter)
+    (defun my:skk-mode-setup ()
+      (define-key skk-j-mode-map (kbd "C-j") ctrl-j-map)
+      (define-key skk-j-mode-map (kbd "<C-return>") 'skk-insert)
+      )
+    (add-hook 'skk-mode-hook 'my:skk-mode-setup)
+
+
+    ;; skkの辞書ファイルはauto-saveの対象から除外する
+    (push `(string-suffix-p . ".skk-jisyo") my:disable-auto-save-visited-mode-alist)
+
+    ;; key binding
+    (global-set-key (kbd "<muhenkan>") 'delete-backward-char)      ;; TODO: with skk
+    )
+  ;; open memo*.txt
+  (let* ((cmd "ls -t ~/memo/memo*.txt | head -n 1")
+	 (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
+    (and (file-exists-p memo-file) (find-file memo-file)))
+  )
+
+
+;; 手抜きで "*Compile-Log*" bufferを閉じる (delete-backward-charが使われてるらしい)
+(add-to-list 'display-buffer-alist
+             '("^\\*Compile-Log\\*"
+               (display-buffer-below-selected)
+               (window-height . 0.3)
+               (side . bottom)
+               (inhibit-same-window . t)
+               (body-function . (lambda (w)
+                                  (run-at-time 3 nil 'delete-window w)))))
+
+;; after initialize settings
+(pcase system-type
+  ('darwin
+   (global-set-key (kbd "s-P") 'execute-extended-command) ;; for vscode user
+   (my:after-initialize--mac))
+  ('gnu/linux ; wsl
+   (my:after-initialize--windows))
+  (typ (message "the after initialize setting is not found in system-type='%S" typ))
+  )
+
+(setq debug-on-error nil)  ;; disable in daily life
+
+;; ;; external package
+;; (require 'package)
+;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+;; (package-initialize)
+;;
+;; (package-install 'writeroom-mode) ; -> zen-mode in vscode
+;; (package-install 'ddskk-postframe);  skkの変換候補を良いかんじに表示してくる
+;;
+;; (load-file "./extra.el")
+
+;; ;; activate tree-sitter
+;; see: M-x view-emacs-news
+;; see: https://www.masteringemacs.org/article/how-to-get-started-tree-sitter
+;; (push '(typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src") treesit-language-source-alist)
+;; (push '(mermaid "https://github.com/monaqa/tree-sitter-mermaid" "master" "src") treesit-language-source-alist)
+;; (push '(yaml "https://github.com/ikatyang/tree-sitter-yaml" "master" "src") treesit-language-source-alist)
+;; (push '(markdown "https://github.com/ikatyang/tree-sitter-markdown") treesit-language-source-alist)
+;;
+;; (treesit-install-language-grammar 'typescript) ;; generate tree-sitter/libtree-sitter-typescript.so
+;; (treesit-install-language-grammar 'mermaid)
+;; (treesit-install-language-grammar 'yaml)
+;; (treesit-install-language-grammar 'markdown)
+;; M-x typescript-ts-mode
