@@ -253,13 +253,62 @@
   :demand t; 即時ロードしたい
   )
 
-(progn ; tab-line
+
+
+;; タブ移動
+(use-package tab-line
+  :demand t  ; global-tab-line-mode を即座に有効にするため即時ロード
+  :preface
+  (defun my:tab-line-tabs-window-buffers ()
+    "fileを持つものだけを対象にしたbufferを集める"
+    (sort
+     (seq-remove (lambda (b) (null (buffer-file-name b)))
+                 (buffer-list))
+     (lambda (x y) (string< (buffer-name x) (buffer-name y)))))
+
+  (defun my:tab-line-next-tab ()
+    "tab-lineの表示にしたがった場合の次のタブに移動"
+    (interactive)
+    (require 'cl-lib)
+    (funcall my:tab-line-switch-to-buffer-function
+             (buffer-name
+              (cl-block :b
+                (let ((current-buf (current-buffer))
+                      (buffers (funcall tab-line-tabs-function))
+                      (foundp nil))
+                  (cl-dolist (b buffers)
+                    (when foundp
+                      (cl-return-from :b b))
+                    (when (equal current-buf b)
+                      (setq foundp t)))
+                  (cl-return-from :b (car buffers)))))))
+
+  (defun my:tab-line-prev-tab ()
+    "tab-lineの表示にしたがった場合の前のタブに移動"
+    (interactive)
+    (require 'cl-lib)
+    (funcall my:tab-line-switch-to-buffer-function
+             (buffer-name
+              (cl-block :b
+                (let ((current-buf (current-buffer))
+                      (buffers (funcall tab-line-tabs-function))
+                      (prev-buf nil))
+                  (cl-dolist (b buffers)
+                    (when (equal current-buf b)
+                      (cl-return-from :b
+                        (or prev-buf (car (last buffers)))))
+                    (setq prev-buf b)))))))
+
+  :bind (("C-c <muhenkan>" . my:tab-line-prev-tab)
+         ("C-c C-p"         . my:tab-line-prev-tab)
+         ("C-c <henkan>"   . my:tab-line-next-tab)
+         ("C-c C-n"         . my:tab-line-next-tab))
+
+  :config
   (global-tab-line-mode t)
-  (global-set-key (kbd "C-c <muhenkan>") 'my:tab-line-prev-tab)
-  (global-set-key (kbd "C-c C-p") 'my:tab-line-prev-tab)
-  (global-set-key (kbd "C-c <henkan>") 'my:tab-line-next-tab)
-  (global-set-key (kbd "C-c C-n") 'my:tab-line-next-tab)
-  )
+  (setq tab-line-tabs-function 'my:tab-line-tabs-window-buffers)
+  (setq my:tab-line-switch-to-buffer-function 'switch-to-buffer))
+
 
 
 (progn ;; code reading
