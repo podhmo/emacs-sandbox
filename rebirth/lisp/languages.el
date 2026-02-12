@@ -4,20 +4,6 @@
 ;; elisp
 ;;-----------------------------------------
 
-(defun my:elisp-pretty-print-region (beg end)
-  (interactive
-   (list
-    (if (use-region-p) (region-beginning) (point-min))
-    (if (use-region-p) (region-end) (point-max))))
-  (save-excursion
-    (unwind-protect
-	    (progn
-	      (narrow-to-region beg end)
-	      (goto-char (point-min))
-	      (while (re-search-forward "[  	]+$" nil t 1)
-	        (replace-match ""))
-	      (indent-region (point-min) (point-max)))
-      (widen))))
 
 
 ;;-----------------------------------------

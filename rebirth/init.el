@@ -101,20 +101,38 @@
   (recentf-mode 1))
 
 
+
 (use-package languages :load-path my:local-lisp-dir
   :demand t; 即時ロードしたい
   )
 
 
-(progn ; lisp-mode
-  (defun my:elisp-mode-setup ()
-    (define-key emacs-lisp-mode-map (kbd "C-c C-e") 'eval-defun)
-    (define-key emacs-lisp-mode-map (kbd "C-c C-l") 'eval-buffer)
-    (define-key emacs-lisp-mode-map (kbd "C-x C-s") 'my:elisp-pretty-print-region) ;; saveはauto-save任せ
-    )
-  (add-hook 'emacs-lisp-mode-hook 'my:elisp-mode-setup)
-  (setq initial-major-mode 'emacs-lisp-mode)
-  )
+
+(use-package elisp-mode
+  :preface
+  ;; 自作関数はバイトコンパイラの警告を避けるために :preface に記述
+  (defun my:elisp-pretty-print-region (beg end)
+    (interactive
+     (list
+      (if (use-region-p) (region-beginning) (point-min))
+      (if (use-region-p) (region-end) (point-max))))
+    (save-excursion
+      (unwind-protect
+	      (progn
+	        (narrow-to-region beg end)
+	        (goto-char (point-min))
+	        (while (re-search-forward "[  	]+$" nil t 1)
+	          (replace-match ""))
+	        (indent-region (point-min) (point-max)))
+        (widen))))
+  :bind (:map emacs-lisp-mode-map
+              ("C-c C-e" . eval-defun)
+              ("C-c C-l" . eval-buffer)
+              ("C-x C-s" . my:elisp-pretty-print-region))
+  :init
+  ;; 起動時に反映させたい変数の設定
+  (setq initial-major-mode 'emacs-lisp-mode))
+
 
 
 (progn ; javascript-mode
