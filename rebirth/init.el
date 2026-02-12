@@ -18,13 +18,26 @@
 
 ;; settings
 (progn
-  (progn ; for performance
-    (setq gc-cons-threshold (* 32 1024 1024)) ;; 32mb
-    )
+  (progn ; yes/no -> y/n
+    (setq use-short-answers t
+          confirm-kill-emacs 'y-or-n-p))
+
+
+  (progn ; text edithing
+    (setq-default indent-tabs-mode nil
+                  tab-width 4
+                  fill-column 120))
 
   (progn ; backup handling
-    (setq backup-directory-alist '((".*" . "~/.emacs.d/backup"))) ; backup is <filename>~
+    (setq delete-by-moving-to-trash t           ; OSのゴミ箱へ
+          make-backup-files nil                 ; ~ファイルを作らない
+          auto-save-default nil
+          create-lockfiles nil)
+
+    ;; backup is <filename>~. make-backup-filesで無効にしてるから無駄な設定かも
+    (setq backup-directory-alist '((".*" . "~/.emacs.d/backup")))
     )
+
   (progn ; auto-save
     (setq auto-save-visited-interval 0.5)
     (auto-save-visited-mode t)
@@ -65,15 +78,19 @@
 
   (progn ; emacs client
     (condition-case err
-	(progn
+        (progn
           (autoload 'server-running-p "server")
           (unless (server-running-p)  (server-start)))
       (error (message "emacsclient load fail")))
     )
   )
 
+(progn ;; 最近使ったファイル
+  (recentf-mode 1)
+  (setq recentf-max-saved-items 100
+        recentf-exclude '("/tmp/" "/ssh:"))
+  )
 
-(setq-default indent-tabs-mode nil)
 (load-file (concat (current-directory) "languages.el"))
 
 (progn ; lisp-mode

@@ -2,6 +2,18 @@
 (setq inhibit-startup-message t)
 (setq inhibit-splash-screen t)
 
+
+;; performance
+(setq gc-cons-threshold most-positive-fixnum          ; GCを極力遅らせる
+      gc-cons-percentage 0.8
+      read-process-output-max (* 1024 1024 32)         ; 32MiB
+      inhibit-compacting-font-caches t)
+
+;; (add-hook 'after-init-hook
+;;           (lambda () (setq gc-cons-threshold 800000))) ; 通常に戻す
+
+
+
 (push '(tool-bar-lines . 0) default-frame-alist)
 
 (progn ;; window-layout
