@@ -15,12 +15,10 @@
 (eval-and-compile
   (defvar my:local-lisp-dir (expand-file-name "lisp" (current-directory))))
 
-(use-package macros
-  :load-path my:local-lisp-dir
+(use-package macros :load-path my:local-lisp-dir
   :demand t; 即時ロードしたい
   )
-(use-package utils
-  :load-path my:local-lisp-dir
+(use-package utils :load-path my:local-lisp-dir
   :demand t; 即時ロードしたい
   )
 
@@ -94,14 +92,16 @@
     )
   )
 
-(progn ;; 最近使ったファイル
-  (recentf-mode 1)
-  (setq recentf-max-saved-items 100
-        recentf-exclude '("/tmp/" "/ssh:"))
-  )
 
-(use-package languages ; TODO: 雑な定義を辞める
-  :load-path my:local-lisp-dir
+(use-package recentf ;; 最近使ったファイル
+  :custom
+  (recentf-max-saved-items 100)
+  (recentf-exclude '("/tmp/" "/ssh:"))
+  :config
+  (recentf-mode 1))
+
+
+(use-package languages :load-path my:local-lisp-dir
   :demand t; 即時ロードしたい
   )
 
@@ -170,8 +170,7 @@
   )
 
 
-(use-package interactives
-  :load-path my:local-lisp-dir
+(use-package interactives :load-path my:local-lisp-dir
   :demand t; 即時ロードしたい
   )
 
