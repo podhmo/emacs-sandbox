@@ -445,6 +445,17 @@
 				      (find-file file)))
 				  ))
   ;; find-file
+  (defun my:find-file-at-point-goto-line--advice (ret)
+    "Ignore RET and jump to line number given in `ffap-string-at-point'."
+    (when (and
+           (stringp ffap-string-at-point)
+           (string-match ":\\([0-9]+\\)\\'" ffap-string-at-point))
+      (goto-char (point-min))
+      (forward-line (1- (string-to-number (match-string 1 ffap-string-at-point)))))
+    ret)
+  ;; support ffap with <file-path>:<line-no>
+  (advice-add 'find-file-at-point :filter-return #'my:find-file-at-point-goto-line--advice)
+
   (global-set-key (kbd "C-x C-f") 'find-file-at-point)
   (global-set-key (kbd "C-x C-a") 'revert-buffer)
   (global-set-key (kbd "C-c C-c") 'side-pocket:toggle-buffer)
@@ -674,3 +685,4 @@
 ;; (treesit-install-language-grammar 'yaml)
 ;; (treesit-install-language-grammar 'markdown)
 ;; M-x typescript-ts-mode
+(put 'set-goal-column 'disabled nil)
