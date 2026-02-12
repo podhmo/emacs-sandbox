@@ -50,3 +50,50 @@ future work (TODO)
 - skk-modeで無効にした `C-j` の影響でタブ移動が失敗することがある
 - kill-ringの選択が手軽にできない
 - backupファイルがまだ同一ディレクトリ内に作られてしまう
+
+
+---
+
+## これならわかるuse-package
+
+Before: 従来の progn による一括設定
+
+```lisp
+(progn ; my-sample-mode の設定
+  ;; 1. [init相当] ロード前に必要な変数設定
+  (setq my-sample-variable t)
+
+  ;; 2. [mode相当] 拡張子の関連付け
+  (add-to-list 'auto-mode-alist '("\\.sample\\'" . my-sample-mode))
+
+  ;; 3. [hook相当] フックの登録
+  (add-hook 'my-sample-mode-hook 'my-setup-function)
+
+  ;; 4. [config相当] ロード後に実行したい処理
+  (with-eval-after-load 'my-sample
+    (my-sample-initialize-api)
+    (setq my-sample-active-flag t))
+)
+```
+
+After: use-package による構造化
+
+use-package 内部では progn を書かなくても、複数の式をキーワードごとにまとめて記述できます。
+
+```lisp
+(use-package my-sample
+  ;; 2. [mode] auto-mode-alist への追加。同時に遅延ロードも設定される
+  :mode "\\.sample\\'"
+
+  ;; 3. [hook] add-hook の代わり。"-hook" サフィックスは自動補完される
+  :hook (my-sample-mode . my-setup-function)
+
+  ;; 1. [init] パッケージがロードされる「前」に実行される
+  :init
+  (setq my-sample-variable t)
+
+  ;; 4. [config] パッケージがロードされた「後」に実行される
+  :config
+  (my-sample-initialize-api)
+  (setq my-sample-active-flag t))
+```

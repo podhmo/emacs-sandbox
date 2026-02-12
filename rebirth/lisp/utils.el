@@ -31,30 +31,6 @@
 
 
 ;;----------------------------------------
-;; cursor movement
-;;----------------------------------------
-
-(defun my:indent-rigitly (n) (interactive "p")
-       (setq n (or n 1))
-       (if (use-region-p)
-           (indent-rigidly
-            (save-excursion (goto-char (region-beginning)) (point-at-bol))
-            (save-excursion (goto-char (region-end)) (point-at-eol))
-            (* n  4))
-         (indent-rigidly (point-at-bol) (point-at-eol) (* n  4))))
-
-(defun my:unindent-rigitly (n) (interactive "p")
-       (setq n (or n 1))
-       (if (use-region-p)
-           (indent-rigidly
-            (save-excursion (goto-char (region-beginning)) (point-at-bol))
-            (save-excursion (goto-char (region-end)) (point-at-eol))
-            (* n  -4))
-         (indent-rigidly (point-at-bol) (point-at-eol) (* n  -4))))
-
-
-
-;;----------------------------------------
 ;; shell
 ;;----------------------------------------
 

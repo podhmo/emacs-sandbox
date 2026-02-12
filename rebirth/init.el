@@ -200,37 +200,53 @@
 
 
 
-(progn ; shell
-  (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
-
+(use-package shell :defer t
+  :hook (shell-mode . ansi-color-for-comint-mode-on)
+  :init
   ;; M-x で *shell* bufferを開くときにはother windowに開く
   (add-to-list 'display-buffer-alist
                '("\\*shell\\*"
                  (display-buffer-at-bottom)
-                 (reusable-window . t))
-               )
-  )
+                 (reusable-window . t))))
 
-(progn ; markdown
+
+
+(use-package text-mode
+  :init
+  ;; markdown-modeがない場合はtext-modeに
   (unless (locate-library "markdown-mode")
     (add-to-list  'auto-mode-alist '("\\.md" .  text-mode))
     )
+
+  :preface
+  (defun my:indent-rigitly (n) (interactive "p")
+         (setq n (or n 1))
+         (if (use-region-p)
+             (indent-rigidly
+              (save-excursion (goto-char (region-beginning)) (point-at-bol))
+              (save-excursion (goto-char (region-end)) (point-at-eol))
+              (* n  4))
+           (indent-rigidly (point-at-bol) (point-at-eol) (* n  4))))
+
+  (defun my:unindent-rigitly (n) (interactive "p")
+         (setq n (or n 1))
+         (if (use-region-p)
+             (indent-rigidly
+              (save-excursion (goto-char (region-beginning)) (point-at-bol))
+              (save-excursion (goto-char (region-end)) (point-at-eol))
+              (* n  -4))
+           (indent-rigidly (point-at-bol) (point-at-eol) (* n  -4))))
+
+  :bind (:map text-mode-map
+              ("C-M-i" . dabbrev-expand)
+              ("<tab>" . my:indent-rigitly)
+              ("<backtab>" . my:unindent-rigitly)
+              ("<S-iso-lefttab>" . my:unindent-rigitly)) ;; for skk
+  :hook (text-mode . (lambda ()
+                       (setq-local line-spacing 0.05) ;; ちょっと行間を拡げる
+                       ))
   )
 
-(progn ; text-mode
-  (defun my:text-mode-setup ()
-    (setq-local line-spacing 0.05) ;; ちょっと行間を拡げる
-
-    ;; text editing
-    (define-key text-mode-map (kbd "C-M-i") 'dabbrev-expand)
-
-    ;; indent
-    (define-key text-mode-map (kbd "<tab>")  'my:indent-rigitly)
-    (define-key text-mode-map (kbd "<backtab>")  'my:unindent-rigitly)
-    (define-key text-mode-map (kbd "<S-iso-lefttab>") 'my:unindent-rigitly) ;; for skk
-    )
-  (add-hook 'text-mode-hook 'my:text-mode-setup)
-  )
 
 
 (use-package interactives :load-path my:local-lisp-dir
