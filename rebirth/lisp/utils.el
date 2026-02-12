@@ -4,20 +4,6 @@
 ;; text
 ;;----------------------------------------
 
-(defun my:count-chars-of-first-line ()
-  (interactive)
-  (save-excursion
-    (save-restriction
-      (goto-char (point-min))
-      (let (beg end)
-        (beginning-of-line)
-        (setq beg (point))
-        (end-of-line)
-        (setq end (point))
-        (when (interactive-p)
-          (message "first chars is %s beg=%s end=%s" (- end beg) beg end))
-        (- end beg)))))
-
 
 (defun my:delete-something () (interactive)
        (cl-dolist (thing '(symbol word whitespace))

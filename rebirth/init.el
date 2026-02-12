@@ -23,74 +23,87 @@
   )
 
 
-;; settings
-(progn
-  (progn ; yes/no -> y/n
-    (setq use-short-answers t
-          confirm-kill-emacs 'y-or-n-p))
 
+(use-package emacs ; core settings
+  :custom
+  ;; --- UI・応答設定 ---
+  ;; yes/no を y/n にし、終了時に確認する
+  (use-short-answers t)
+  (confirm-kill-emacs 'y-or-n-p)
+  ;; ビープ音を視覚的な通知（フラッシュ）に変更 [1]
+  (visible-bell t)
+  ;; キー入力の表示速度、ミニウィンドウの挙動
+  (echo-keystrokes 0.2)
+  (resize-mini-windows t)
 
-  (progn ; text edithing
-    (setq-default indent-tabs-mode nil
-                  tab-width 4
-                  fill-column 120))
+  ;; --- ファイル・補完設定 ---
+  (read-file-name-completion-ignore-case t)
+  (read-buffer-completion-ignore-case t)
 
-  (progn ; backup handling
-    (setq delete-by-moving-to-trash t           ; OSのゴミ箱へ
-          make-backup-files nil                 ; ~ファイルを作らない
-          auto-save-default nil
-          create-lockfiles nil)
+  ;; --- バックアップ・保存設定 ---
+  (delete-by-moving-to-trash t)    ; ゴミ箱へ移動
+  (make-backup-files nil)          ; バックアップファイルを作らない
+  (auto-save-default nil)          ; 自動保存をデフォルトでは無効
+  (create-lockfiles nil)           ; ロックファイルを作らない
+  (backup-directory-alist '((".*" . "~/.emacs.d/backup")))
 
-    ;; backup is <filename>~. make-backup-filesで無効にしてるから無駄な設定かも
-    (setq backup-directory-alist '((".*" . "~/.emacs.d/backup")))
-    )
+  ;; --- 検索・ハイライト設定 ---
+  (search-highlight t)
+  (query-replace-highlight t)
 
-  (progn ; auto-save
-    (setq auto-save-visited-interval 0.5)
-    (auto-save-visited-mode t)
+  :init
+  ;; バッファローカルな変数のデフォルト値設定（ロード前に行う）
+  (setq-default indent-tabs-mode nil
+                tab-width 4
+                fill-column 120)
 
-
-    (defvar my:disable-auto-save-visited-mode-alist nil)
-    (push `(string-prefix-p . "/tmp") my:disable-auto-save-visited-mode-alist) ;; /tmp/** のファイルは自動saveしない
-
-    (defun my:find-file-hook--disable-auto-save ()
-      (let ((fname (buffer-file-name)))
-        (cl-dolist (arg my:disable-auto-save-visited-mode-alist)
-          (cl-destructuring-bind (fn . x) arg
-            (when (funcall fn x fname)
-              (message "# auto-save-visited-mode is disabled by %s %s" fn x)
-              (setq-local auto-save-visited-mode nil)
-              (cl-return nil))))))
-    (add-hook 'find-file-hook 'my:find-file-hook--disable-auto-save)
-    )
-
-  ;; case sensitive/insensitive
-  (setq read-file-name-completion-ignore-case t)
-  (setq read-buffer-completion-ignore-case t)
-
-
+  :config
+  ;; --- モードの有効化 ---
+  ;; 外部でのファイル変更を自動反映 [3]
   (global-auto-revert-mode t)
-  (setq echo-keystrokes 0.2)
-
-  (setq visible-bell t) ;; disable beep
-
+  ;; 対応する括弧を表示
   (show-paren-mode 1)
+  ;; 選択範囲（マーク）を視覚化
   (transient-mark-mode t)
-
-  (setq search-highlight t)
-  (setq query-replace-highlight t)
-
+  ;; 画像ファイルを自動表示
   (auto-image-file-mode t)
-  (setq resize-mini-windows t)
 
-  (progn ; emacs client
-    (condition-case err
-        (progn
-          (autoload 'server-running-p "server")
-          (unless (server-running-p)  (server-start)))
-      (error (message "emacsclient load fail")))
-    )
+  ;; --- Emacs Serverの設定 ---
+  (condition-case err
+      (progn
+        (require 'server)
+        (unless (server-running-p)
+          (server-start)))
+    (error (message "emacsclient load fail"))))
+
+
+
+(use-package emacs ; auto-save
+  :custom
+  (auto-save-visited-interval 0.5)
+
+  :preface
+  (defvar my:disable-auto-save-visited-mode-alist nil)
+
+  (defun my:find-file-hook--disable-auto-save ()
+    (require 'cl-lib)
+
+    (let ((fname (buffer-file-name)))
+      (cl-dolist (arg my:disable-auto-save-visited-mode-alist)
+        (cl-destructuring-bind (fn . x) arg
+          (when (funcall fn x fname)
+            (message "# auto-save-visited-mode is disabled by %s %s" fn x)
+            (setq-local auto-save-visited-mode nil)
+            (cl-return nil))))))
+
+  :init
+  (push `(string-prefix-p . "/tmp") my:disable-auto-save-visited-mode-alist)
+  :hook
+  (find-file . my:find-file-hook--disable-auto-save)
+  :config
+  (auto-save-visited-mode t)
   )
+
 
 
 (use-package recentf ;; 最近使ったファイル
@@ -99,12 +112,6 @@
   (recentf-exclude '("/tmp/" "/ssh:"))
   :config
   (recentf-mode 1))
-
-
-
-(use-package languages :load-path my:local-lisp-dir
-  :demand t; 即時ロードしたい
-  )
 
 
 
@@ -135,25 +142,63 @@
 
 
 
-(progn ; javascript-mode
-  (add-to-list  'auto-mode-alist '("\\.mjs" .  js-mode))
+(use-package make-mode :defer t
+  :config
+  ;; auto-save中で定期的にy-or-n-pで尋ねてくるのはうるさすぎるので *Messages* に書くだけにする。元の関数を上書きしている。
+  (defun makefile-warn-suspicious-lines ()
+    ;; Returning non-nil cancels the save operation
+    (if (derived-mode-p 'makefile-mode)
+        (save-excursion
+	      (goto-char (point-min))
+	      (if (re-search-forward "^\\(\t+$\\| +\t\\)" nil t)
+	          (message "Suspicious line %d. Save anyway? "
+		               (count-lines (point-min) (point)))))))
 
-  (with-eval-after-load 'js
-    ;; 対応するペアの出力
-    (add-hook 'js-mode-hook 'electric-pair-mode)
+  (defun makefile-warn-continuations ()
+    (if (derived-mode-p 'makefile-mode)
+        (save-excursion
+	      (goto-char (point-min))
+	      (if (re-search-forward "\\\\[ \t]+$" nil t)
+	          (message "Suspicious continuation in line %d. Save anyway? "
+		               (count-lines (point-min) (point)))))))
 
-    ;; 1行が長大なファイルへの対応
-    (defun my:open-with-low-cost-mode--if-huge-first-line ()
-      (interactive)
-      "先頭行が長過ぎる場合に、論理行での移動を止める"
-      (let ((threashold 2000))
-        (when (>= (my:count-chars-of-first-line) threashold)
-          (fundamental-mode)
-          (message "huge first line, so setq-local line-mode-visual nil")
-          (setq-local line-move-visual nil) ;; C-nでの移動は論理行ではなく物理行にする
-          )))
-    (add-hook 'js-json-mode-hook 'my:open-with-low-cost-mode--if-huge-first-line))
   )
+
+
+
+;; javascript
+(use-package js :defer t
+  :mode ("\\.mjs\\'" . js-mode)
+  :preface
+  ;; バイトコンパイル時の警告を防ぐため、自作関数は :preface に定義
+  (defun my:count-chars-of-first-line ()
+    (interactive)
+    (save-excursion
+      (save-restriction
+        (goto-char (point-min))
+        (let (beg end)
+          (beginning-of-line)
+          (setq beg (point))
+          (end-of-line)
+          (setq end (point))
+          (when (interactive-p)
+            (message "first chars is %s beg=%s end=%s" (- end beg) beg end))
+          (- end beg)))))
+
+  (defun my:open-with-low-cost-mode--if-huge-first-line ()
+    (interactive)
+    "先頭行が長過ぎる場合に、論理行での移動を止める"
+    (let ((threashold 2000))
+      (when (>= (my:count-chars-of-first-line) threashold)
+        (fundamental-mode)
+        (message "huge first line, so setq-local line-mode-visual nil")
+        (setq-local line-move-visual nil)))) ; C-nでの移動は論理行ではなく物理行にする
+  :hook
+  ;; -hook サフィックスは自動補完されるため省略可能
+  (js-mode . electric-pair-mode)
+  (js-json-mode . my:open-with-low-cost-mode--if-huge-first-line))
+
+
 
 (progn ; shell
   (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
