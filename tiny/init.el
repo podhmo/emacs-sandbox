@@ -62,7 +62,7 @@
 
   (progn ; emacs client
     (condition-case err
-	(progn
+        (progn
           (autoload 'server-running-p "server")
           (unless (server-running-p)  (server-start)))
       (error (message "emacsclient load fail")))
@@ -89,18 +89,18 @@
   ;; (remove-hook 'tab-bar-tab-post-open-functions 'my:tab-bar-open-hook--for-dedup)
 
   (defun my:tab-bar-dedup-tabs () (interactive)
-	 (let ((visited nil)
-	       (removed nil)
-	       (current-tab-name (tab-bar-tab-name-current)))
-	   (dolist (tab (funcall tab-bar-tabs-function))
-	     (let ((tab-name (alist-get 'name tab)))
-	       (if (member tab-name visited) (push tab-name removed) (push tab-name visited))))
-	   ;; close tabs
-	   (dolist (tab-name removed)
-	     (tab-bar-close-tab-by-name tab-name))
-	   ;; select tab by name
-	   (tab-bar-select-tab-by-name current-tab-name)
-	   ))
+         (let ((visited nil)
+               (removed nil)
+               (current-tab-name (tab-bar-tab-name-current)))
+           (dolist (tab (funcall tab-bar-tabs-function))
+             (let ((tab-name (alist-get 'name tab)))
+               (if (member tab-name visited) (push tab-name removed) (push tab-name visited))))
+           ;; close tabs
+           (dolist (tab-name removed)
+             (tab-bar-close-tab-by-name tab-name))
+           ;; select tab by name
+           (tab-bar-select-tab-by-name current-tab-name)
+           ))
   (defalias 'my:dedup-tabs 'my:tab-bar-dedup-tabs)
 
   ;; (tab-bar-history-mode 1)
@@ -119,17 +119,17 @@
     (defun my:elisp-pretty-print-region (beg end)
       (interactive
        (list
-	(if (use-region-p) (region-beginning) (point-min))
-	(if (use-region-p) (region-end) (point-max))))
+        (if (use-region-p) (region-beginning) (point-min))
+        (if (use-region-p) (region-end) (point-max))))
       (save-excursion
-	(unwind-protect
-	    (progn
-	      (narrow-to-region beg end)
-	      (goto-char (point-min))
-	      (while (re-search-forward "[  	]+$" nil t 1)
-		(replace-match ""))
-	      (indent-region (point-min) (point-max)))
-	  (widen))))
+        (unwind-protect
+            (progn
+              (narrow-to-region beg end)
+              (goto-char (point-min))
+              (while (re-search-forward "[      ]+$" nil t 1)
+                (replace-match ""))
+              (indent-region (point-min) (point-max)))
+          (widen))))
 
 
     (defun my:elisp-mode-setup ()
@@ -149,17 +149,17 @@
         ;; Returning non-nil cancels the save operation
         (if (derived-mode-p 'makefile-mode)
             (save-excursion
-	      (goto-char (point-min))
-	      (if (re-search-forward "^\\(\t+$\\| +\t\\)" nil t)
-	          (message "Suspicious line %d. Save anyway? "
-			   (count-lines (point-min) (point)))))))
+              (goto-char (point-min))
+              (if (re-search-forward "^\\(\t+$\\| +\t\\)" nil t)
+                  (message "Suspicious line %d. Save anyway? "
+                           (count-lines (point-min) (point)))))))
       (defun makefile-warn-continuations ()
         (if (derived-mode-p 'makefile-mode)
             (save-excursion
-	      (goto-char (point-min))
-	      (if (re-search-forward "\\\\[ \t]+$" nil t)
-		  (message "Suspicious continuation in line %d. Save anyway? "
-			   (count-lines (point-min) (point)))))))
+              (goto-char (point-min))
+              (if (re-search-forward "\\\\[ \t]+$" nil t)
+                  (message "Suspicious continuation in line %d. Save anyway? "
+                           (count-lines (point-min) (point)))))))
       ))
 
   (progn ; javascript-mode
@@ -213,9 +213,9 @@
       ;; ここはshell-command-on-regionのinteractiveのコードそのまま
       (interactive (let (string)
                      (unless (mark)
-		       (user-error "The mark is not set now, so there is no region"))
-		     (setq string (read-shell-command "Shell command on region: "))
-		     (list (region-beginning) (region-end) string current-prefix-arg current-prefix-arg shell-command-default-error-buffer t (region-noncontiguous-p))))
+                       (user-error "The mark is not set now, so there is no region"))
+                     (setq string (read-shell-command "Shell command on region: "))
+                     (list (region-beginning) (region-end) string current-prefix-arg current-prefix-arg shell-command-default-error-buffer t (region-noncontiguous-p))))
 
       (let ((out-buffer-name shell-command-buffer-name))
         (shell-command-on-region start end command output-buffer replace out-buffer-name out-buffer-name region-noncontiguous-p)
@@ -274,8 +274,8 @@
 (progn ;; text-editing
   (defun my:delete-something () (interactive)
          (cl-dolist (thing '(symbol word whitespace))
-	   (when-let ((found (thing-at-point thing)))
-	     (cl-return (delete-region (beginning-of-thing thing)  (end-of-thing thing ))))))
+           (when-let ((found (thing-at-point thing)))
+             (cl-return (delete-region (beginning-of-thing thing)  (end-of-thing thing ))))))
 
   (defun my:enclose-quote (beg end)
     "foo -> \"foo\""
@@ -439,11 +439,11 @@
 
   (defvar my:emacs-home-directory (current-directory))
   (global-set-key (kbd "C-c x") (lambda () (interactive)
-				  (let ((file (concat my:emacs-home-directory "init.el")))
-				    (if (fboundp 'switch-to-buffer-other-tab)
-					(find-file-other-tab file)
-				      (find-file file)))
-				  ))
+                                  (let ((file (concat my:emacs-home-directory "init.el")))
+                                    (if (fboundp 'switch-to-buffer-other-tab)
+                                        (find-file-other-tab file)
+                                      (find-file file)))
+                                  ))
   ;; find-file
   (defun my:find-file-at-point-goto-line--advice (ret)
     "Ignore RET and jump to line number given in `ffap-string-at-point'."
@@ -586,7 +586,7 @@
 
   ;; open memo*.txt
   (let* ((cmd "ls -t ~/memo/memo*.txt | head -n 1")
-	 (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
+         (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
     (find-file memo-file))
   )
 
@@ -635,7 +635,7 @@
     )
   ;; open memo*.txt
   (let* ((cmd "ls -t ~/memo/memo*.txt | head -n 1")
-	 (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
+         (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
     (and (file-exists-p memo-file) (find-file memo-file)))
   )
 

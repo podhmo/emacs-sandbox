@@ -220,9 +220,9 @@
 (progn ; key-binding
   (defvar my:emacs-home-directory (current-directory))
   (global-set-key (kbd "C-c x") (lambda () (interactive)
-				  (let ((file (concat my:emacs-home-directory "init.el")))
-				    (find-file file))
-				  ))
+                                  (let ((file (concat my:emacs-home-directory "init.el")))
+                                    (find-file file))
+                                  ))
   ;; find-file
   (global-set-key (kbd "C-x C-f") 'find-file-at-point)
   (global-set-key (kbd "C-x C-a") 'revert-buffer)
@@ -346,7 +346,7 @@
 
   ;; open memo*.txt
   (let* ((cmd "ls -t ~/memo/memo*.txt | head -n 1")
-	 (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
+         (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
     (find-file memo-file))
   )
 
@@ -394,7 +394,7 @@
     )
   ;; open memo*.txt
   (let* ((cmd "ls -t ~/memo/memo*.md | head -n 1")
-	 (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
+         (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
     (and (file-exists-p memo-file) (find-file memo-file)))
   )
 
