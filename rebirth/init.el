@@ -12,8 +12,17 @@
 
 
 ;; load individual library
-(load-file (concat (current-directory) "macros.el"))
-(load-file (concat (current-directory) "utils.el"))
+(eval-and-compile
+  (defvar my:local-lisp-dir (expand-file-name "lisp" (current-directory))))
+
+(use-package macros
+  :load-path my:local-lisp-dir
+  :demand t; 即時ロードしたい
+  )
+(use-package utils
+  :load-path my:local-lisp-dir
+  :demand t; 即時ロードしたい
+  )
 
 
 ;; settings
@@ -91,7 +100,11 @@
         recentf-exclude '("/tmp/" "/ssh:"))
   )
 
-(load-file (concat (current-directory) "languages.el"))
+(use-package languages ; TODO: 雑な定義を辞める
+  :load-path my:local-lisp-dir
+  :demand t; 即時ロードしたい
+  )
+
 
 (progn ; lisp-mode
   (defun my:elisp-mode-setup ()
@@ -157,7 +170,10 @@
   )
 
 
-(load-file (concat (current-directory) "interactives.el"))
+(use-package interactives
+  :load-path my:local-lisp-dir
+  :demand t; 即時ロードしたい
+  )
 
 (progn ; tab-line
   (global-tab-line-mode t)

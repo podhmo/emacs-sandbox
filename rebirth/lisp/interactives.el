@@ -130,3 +130,5 @@
                         (or prev-buf (car (last buffers)))))
                     (setq prev-buf b)))))))
   )
+
+(provide 'interactives)

@@ -16,6 +16,9 @@
     `(let (,state)
        (defun ,name (&optional ,flag) (interactive "P")
               (cl-case ,flag
-		((1 t) (progn ,on-clause (setq ,state t)))
-		((-1) (progn ,off-clause (setq ,state nil)))
-		(otherwise (,name (if (not ,state) 1 -1))))))))
+		        ((1 t) (progn ,on-clause (setq ,state t)))
+		        ((-1) (progn ,off-clause (setq ,state nil)))
+		        (otherwise (,name (if (not ,state) 1 -1))))))))
+
+(provide 'macros)
+

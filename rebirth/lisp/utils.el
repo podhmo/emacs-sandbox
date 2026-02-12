@@ -21,8 +21,8 @@
 
 (defun my:delete-something () (interactive)
        (cl-dolist (thing '(symbol word whitespace))
-	 (when-let ((found (thing-at-point thing)))
-	   (cl-return (delete-region (beginning-of-thing thing)  (end-of-thing thing ))))))
+	     (when-let ((found (thing-at-point thing)))
+	       (cl-return (delete-region (beginning-of-thing thing)  (end-of-thing thing ))))))
 
 (defun my:enclose-quote (beg end)
   "foo -> \"foo\""
@@ -77,9 +77,9 @@
   ;; ここはshell-command-on-regionのinteractiveのコードそのまま
   (interactive (let (string)
                  (unless (mark)
-		   (user-error "The mark is not set now, so there is no region"))
-		 (setq string (read-shell-command "Shell command on region: "))
-		 (list (region-beginning) (region-end) string current-prefix-arg current-prefix-arg shell-command-default-error-buffer t (region-noncontiguous-p))))
+		           (user-error "The mark is not set now, so there is no region"))
+		         (setq string (read-shell-command "Shell command on region: "))
+		         (list (region-beginning) (region-end) string current-prefix-arg current-prefix-arg shell-command-default-error-buffer t (region-noncontiguous-p))))
 
   (let ((out-buffer-name shell-command-buffer-name))
     (shell-command-on-region start end command output-buffer replace out-buffer-name out-buffer-name region-noncontiguous-p)
@@ -90,3 +90,5 @@
                )))
         (message output-string)
         (kill-new output-string)))))
+
+(provide 'utils)
