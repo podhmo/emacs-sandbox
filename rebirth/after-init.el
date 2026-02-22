@@ -29,6 +29,10 @@
   (add-hook 'markdown-mode-hook #'visual-line-mode))
 
 
+(use-package go-mode
+  :mode (("\\.go$" . go-mode))
+  )
+
 
 ;;----------------------------------------
 ;; TODO: tree-sitter
