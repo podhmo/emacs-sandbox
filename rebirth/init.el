@@ -437,6 +437,11 @@
       )
     (add-hook 'dired-mode-hook 'my:dired-mode-setup)
     )
+
+  (progn ;; windowsのWSL上で半角/全角キーを入力すると連続してタイプされるの抑制したい
+    (global-set-key (kbd "<zenkaku-hankaku>") 'ignore)
+    (global-set-key (kbd "C-<zenkaku-hankaku>") 'ignore)
+    )
   )
 
 
