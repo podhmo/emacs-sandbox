@@ -19,7 +19,8 @@
   :init
   (setq markdown-command "multimarkdown") ; または "pandoc --from=markdown --to=html5"
   :bind (("C-c <henkan>" . my:tab-line-next-tab)
-         ("C-c <muhenkan>" . my:tab-line-prev-tab))
+         ("C-c <muhenkan>" . my:tab-line-prev-tab)
+         ("C-c c" . side-pocket:toggle-buffer))
   :config
   ;; よく使うカスタマイズ
   (setq markdown-asymmetric-header t)      ; # 見出しを非対称にする（GitHub風）
