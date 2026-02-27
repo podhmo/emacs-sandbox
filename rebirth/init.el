@@ -557,6 +557,8 @@
                (body-function . (lambda (w)
                                   (run-at-time 3 nil 'delete-window w)))))
 
+(load custom-file)
+
 ;; after initialize settings
 (pcase system-type
   ('darwin
