@@ -26,6 +26,7 @@
               ;; indent/unindentのtoggleだけで十分
               ("TAB" . my:indent-rigitly)
               ("<tab>" . my:indent-rigitly)
+              ("S-TAB" . my:unindent-rigitly)
               ("<backtab>" . my:unindent-rigitly)
               ("S-<tab>" . my:unindent-rigitly)
               ("<S-iso-lefttab>" . my:unindent-rigitly) ;; for skk

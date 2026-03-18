@@ -241,6 +241,7 @@
               ("C-M-i" . dabbrev-expand)
               ("TAB" . my:indent-rigitly)
               ("<tab>" . my:indent-rigitly)
+              ("S-TAB" . my:unindent-rigitly)
               ("<backtab>" . my:unindent-rigitly)
               ("<S-iso-lefttab>" . my:unindent-rigitly)) ;; for skk
   :hook (text-mode . (lambda ()
