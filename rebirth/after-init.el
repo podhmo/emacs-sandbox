@@ -24,6 +24,7 @@
               ("C-c <muhenkan>" . my:tab-line-prev-tab)
 
               ;; indent/unindentのtoggleだけで十分
+              ("TAB" . my:indent-rigitly)
               ("<tab>" . my:indent-rigitly)
               ("<backtab>" . my:unindent-rigitly)
               ("S-<tab>" . my:unindent-rigitly)

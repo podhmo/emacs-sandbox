@@ -239,6 +239,7 @@
 
   :bind (:map text-mode-map
               ("C-M-i" . dabbrev-expand)
+              ("TAB" . my:indent-rigitly)
               ("<tab>" . my:indent-rigitly)
               ("<backtab>" . my:unindent-rigitly)
               ("<S-iso-lefttab>" . my:unindent-rigitly)) ;; for skk
