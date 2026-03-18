@@ -74,3 +74,95 @@
 ;; (treesit-install-language-grammar 'yaml)
 ;; (treesit-install-language-grammar 'markdown)
 ;; (treesit-install-language-grammar 'markdown-inline)
+
+
+;; ===============================================
+;; 現代的なミニバッファ補完環境（Vertico + Consult + Marginalia + Orderless）
+;; ===============================================
+
+(use-package vertico
+  :ensure t
+  :demand t                          ; 即時ロード（必須）
+  :custom
+  (vertico-count 15)                 ; 表示する候補数
+  (vertico-cycle t)                  ; 最後の候補から最初に戻る（循環）
+  (vertico-resize nil)               ; ミニバッファの高さを自動調整しない
+  :init
+  (vertico-mode 1)
+
+  :bind (:map vertico-map
+              ("C-f" . vertico-exit)           ; 確定して退出
+              ("RET" . vertico-exit)
+              ("TAB" . vertico-insert)))       ; 部分挿入（便利）
+
+;; 補完履歴を保存・ソート（Verticoが履歴順で並べ替えるようになる）
+(use-package savehist
+  :ensure t
+  :init
+  (savehist-mode 1))
+
+;; Marginalia：候補の横に便利な注釈（ファイル種別、ドキュメント、キーなど）を表示
+(use-package marginalia
+  :ensure t
+  :after vertico
+  :custom
+  (marginalia-align 'right)          ; 注釈を右寄せ（見やすい）
+  :init
+  (marginalia-mode 1)
+
+  :bind (:map minibuffer-local-map
+              ("M-A" . marginalia-cycle)))   ; 注釈の種類を切り替え
+
+;; Orderless：スペース区切りで「どの順番でも」マッチする強力な補完スタイル
+(use-package orderless
+  :ensure t
+  :custom
+  (completion-styles '(orderless basic))          ; orderlessを最優先
+  (completion-category-defaults nil)
+  (completion-category-overrides
+   '((file (styles partial-completion))           ; ファイル補完は部分一致も併用
+     (buffer (styles orderless))))
+  ;; 必要に応じて追加（Consult Wiki推奨）
+  ;; (orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch))
+  ;; (orderless-component-separator #'orderless-escapable-split-on-space)
+  )
+
+;; Consult：超高機能な補完コマンド群（find-file、grep、ripgrep、imenu、buffer切り替えなど）
+;; TODO: まだ真面目に調整をしていない。
+(use-package consult
+  :ensure t
+  :after (vertico orderless)
+  :bind (;; 基本的な置き換え（おすすめ）
+         ("C-x b"   . consult-buffer)          ; バッファ切り替え（最近使った順＋プレビュー）
+         ("C-x 4 b" . consult-buffer-other-window)
+         ("C-x 5 b" . consult-buffer-other-frame)
+         ("C-x p b" . consult-project-buffer)  ; プロジェクト内バッファ
+
+         ("M-g g"   . consult-goto-line)       ; 行ジャンプ（プレビュー付き）
+         ("M-g M-g" . consult-goto-line)
+         ("M-g o"   . consult-outline)         ; アウトライン
+         ("M-g i"   . consult-imenu)           ; imenu（関数/変数一覧）
+         ("M-g I"   . consult-imenu-multi)
+
+         ("M-s d"   . consult-find)            ; ファイル検索（fd/find）
+         ("M-s D"   . consult-locate)
+         ("M-s g"   . consult-grep)            ; rg/grep（プロジェクト全体）
+         ("M-s G"   . consult-git-grep)
+         ("M-s r"   . consult-ripgrep)         ; ripgrep（超高速・おすすめ）
+         ("M-s l"   . consult-line)            ; 現在のバッファ内検索（ライブプレビュー）
+         ("M-s L"   . consult-line-multi)
+
+         ("M-y"     . consult-yank-pop)        ; kill-ringをプレビュー付きで貼り付け
+         ("C-x C-r" . consult-recent-file)     ; 最近開いたファイル
+
+         :map isearch-mode-map
+         ("M-s l" . consult-line))             ; isearch中にもconsult-line
+
+  :custom
+  (consult-preview-key '(:debounce 0.2 any))  ; プレビューを少し遅延（軽くする）
+  (consult-narrow-key "<")                    ; 候補をタイプで絞り込み（例: <b でbufferのみ）
+
+  :config
+  ;; 必要に応じて追加設定
+  (setq consult-project-root-function #'consult--default-project--root) ; project.el連携
+  )
