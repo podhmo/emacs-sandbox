@@ -18,9 +18,28 @@
   :mode (("\\.md\\'" . gfm-mode))
   :init
   (setq markdown-command "multimarkdown") ; または "pandoc --from=markdown --to=html5"
-  :bind (("C-c <henkan>" . my:tab-line-next-tab)
-         ("C-c <muhenkan>" . my:tab-line-prev-tab)
-         ("C-c c" . side-pocket:toggle-buffer))
+
+  :bind (:map markdown-mode-map
+              ("C-c <henkan>" . my:tab-line-next-tab)
+              ("C-c <muhenkan>" . my:tab-line-prev-tab)
+
+              ;; indent/unindentのtoggleだけで十分
+              ("<tab>" . my:indent-rigitly)
+              ("<backtab>" . my:unindent-rigitly)
+              ("S-<tab>" . my:unindent-rigitly)
+              ("<S-iso-lefttab>" . my:unindent-rigitly) ;; for skk
+
+              ;; 移動はここでも有効になってほしい
+              ("C-c <muhenkan>" . my:tab-line-prev-tab)
+              ("C-c C-p"         . my:tab-line-prev-tab)
+              ("C-c <henkan>"   . my:tab-line-next-tab)
+              ("C-c C-n"         . my:tab-line-next-tab)
+
+              ("C-c n" . markdown-forward-block)
+              ("C-c p" . markdown-backward-block)
+
+              ("C-c c" . side-pocket:toggle-buffer))
+
   :config
   ;; よく使うカスタマイズ
   (setq markdown-asymmetric-header t)      ; # 見出しを非対称にする（GitHub風）
