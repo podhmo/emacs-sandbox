@@ -132,7 +132,7 @@
 (use-package consult
   :ensure t
   :after (vertico orderless)
-  :bind (;; 基本的な置き換え（おすすめ）
+  :bind (
          ("C-x b"   . consult-buffer)          ; バッファ切り替え（最近使った順＋プレビュー）
          ("C-x 4 b" . consult-buffer-other-window)
          ("C-x 5 b" . consult-buffer-other-frame)
@@ -143,6 +143,7 @@
          ("M-g o"   . consult-outline)         ; アウトライン
          ("M-g i"   . consult-imenu)           ; imenu（関数/変数一覧）
          ("M-g I"   . consult-imenu-multi)
+         ("M-g f" . my:consult-git-ls-files)
 
          ("M-s d"   . consult-find)            ; ファイル検索（fd/find）
          ("M-s D"   . consult-locate)
@@ -161,8 +162,31 @@
   :custom
   (consult-preview-key '(:debounce 0.2 any))  ; プレビューを少し遅延（軽くする）
   (consult-narrow-key "<")                    ; 候補をタイプで絞り込み（例: <b でbufferのみ）
-
   :config
   ;; 必要に応じて追加設定
   (setq consult-project-root-function #'consult--default-project--root) ; project.el連携
+
+  (defun my:consult-git-ls-files ()
+    "プロジェクト内のファイルを `git ls-files` で一覧表示（project-current対応）。
+Gitリポジトリでなければメッセージを表示。"
+    (interactive)
+    (let* ((proj (project-current t))  ; t = プロジェクトがなければプロンプトで選択
+           (root (and proj (project-root proj)))
+           (default-directory (or root default-directory)))
+
+      (if (not (vc-git-root default-directory))
+          (message "Not inside a Git repository. (project root: %s)"
+                   (or root default-directory))
+        ;; Gitリポジトリ内なら git ls-files を実行
+        (let* ((cmd "git ls-files -z --full-name --")
+               (cands (split-string (shell-command-to-string cmd) "\0" t)))
+          (find-file
+           (consult--read cands
+                          :prompt "Git Files: "
+                          :sort nil               ; git ls-files の順序を維持
+                          :require-match t
+                          :category 'file
+                          :state (consult--file-preview)
+                          :history 'file-name-history
+                          :add-history (thing-at-point 'filename)))))))
   )
