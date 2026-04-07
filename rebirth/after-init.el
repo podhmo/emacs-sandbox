@@ -56,6 +56,23 @@
   )
 
 
+(use-package moonbit-mode
+  :vc (:url "https://github.com/podhmo/moonbit-mode" :rev "856b781053212235280caef06a9f9abf387bc9b9")
+  :ensure t
+  :init
+  (add-to-list 'treesit-language-source-alist
+               '(moonbit "https://github.com/moonbitlang/tree-sitter-moonbit"))
+
+  :hook (moonbit-mode . my:moonbit-setup)
+  :bind (:map moonbit-mode-map
+              ("C-x C-s" . moonbit-format-buffer))
+  :config
+  (defun my:moonbit-setup ()
+    (flymake-mode t)
+    (eldoc-mode t)
+    )
+  )
+
 ;;----------------------------------------
 ;; TODO: tree-sitter
 ;;----------------------------------------
