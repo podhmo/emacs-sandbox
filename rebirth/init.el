@@ -185,6 +185,7 @@
             (message "first chars is %s beg=%s end=%s" (- end beg) beg end))
           (- end beg)))))
 
+  :config
   (defun my:open-with-low-cost-mode--if-huge-first-line ()
     (interactive)
     "先頭行が長過ぎる場合に、論理行での移動を止める"
@@ -193,10 +194,18 @@
         (fundamental-mode)
         (message "huge first line, so setq-local line-mode-visual nil")
         (setq-local line-move-visual nil)))) ; C-nでの移動は論理行ではなく物理行にする
+
+  (defun my:json-mode-setup ()
+    (my:open-with-low-cost-mode--if-huge-first-line)
+    (setq js-indent-level 2)
+    (electric-pair-mode t)
+    )
+
   :hook
   ;; -hook サフィックスは自動補完されるため省略可能
   (js-mode . electric-pair-mode)
-  (js-json-mode . my:open-with-low-cost-mode--if-huge-first-line))
+  (js-json-mode . my:json-mode-setup)
+  )
 
 
 
