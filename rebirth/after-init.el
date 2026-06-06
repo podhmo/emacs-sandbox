@@ -161,6 +161,7 @@
          ("M-g i"   . consult-imenu)           ; imenu（関数/変数一覧）
          ("M-g I"   . consult-imenu-multi)
          ("M-g f" . my:consult-git-ls-files)
+         ("M-g l" . my:consult-ghq-list)
 
          ("M-s d"   . consult-find)            ; ファイル検索（fd/find）
          ("M-s D"   . consult-locate)
@@ -206,4 +207,25 @@ Gitリポジトリでなければメッセージを表示。"
                           :state (consult--file-preview)
                           :history 'file-name-history
                           :add-history (thing-at-point 'filename)))))))
+
+  (defun my:consult-ghq-list ()
+    "ghq で管理しているリポジトリ一覧を表示してディレクトリを選択。
+選択したら `dired` で開く。"
+    (interactive)
+    (let* ((cmd "ghq list -p")
+           (cands (split-string (shell-command-to-string cmd) "\n" t))
+           (default-directory (or (car cands) default-directory)))  ; 念のため
+
+      (if (null cands)
+          (message "ghq リポジトリが見つかりませんでした。")
+        (let ((selected (consult--read cands
+                                       :prompt "ghq Repos: "
+                                       :sort nil          ; ghqの出力順を維持
+                                       :require-match t
+                                       :category 'file
+                                       :state (consult--file-preview)
+                                       :history 'file-name-history
+                                       :add-history (thing-at-point 'filename))))
+          (when selected
+            (dired selected))))))
   )
