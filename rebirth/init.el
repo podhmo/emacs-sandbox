@@ -515,7 +515,7 @@
   (eval-after-load 'remember (setq remember-data-file "~/memo/notes"))
 
   ;; skk
-  ;; need: apt-get install ddskk
+  ;; need: M-x list-packages でddskkをインストール。その後 M-x skk-get で辞書をインストール。
   (when (fboundp 'skk-mode)
     (advice-add 'skk-previous-candidate :around #'my:skk-previous-candidate-around-advice) ; read only bufferでカーソル移動をするために
 
@@ -524,6 +524,14 @@
     (setq skk-egg-like-newline t) ; <enter>で改行を入力しない
     (setq skk-auto-insert-paren t)
     (setq default-input-method "japanese-skk") ; C-\
+
+    ;; skk-serverを立ちあげるのは面倒なのでそのままjisyoファイルを読み込むことにする。 https://ddskk.readthedocs.io/ja/latest/04_settings.html#id14
+    ;; M-x skk-get で生成されたファイルを指定する。 cdbのものののほうが軽い気がするが使っていない。
+    (when (file-exists-p "~/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
+      (setq skk-large-jisyo "~/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
+      ;; ドキュメントの内容とは異なりskk-large-jisyoを書くだけではskk-serverへのアクセスを止めない場合がある。
+      ;; serverにアクセスしようとしたときをかなり長めに待つことににある。その場合は `skk-server-host' をCustomizeでnilにする必要がある。
+      )
 
     (global-set-key (kbd "C-x j") 'skk-mode) ;; disable skk-auto-fill-mode
     (global-set-key (kbd "C-x C-j") 'skk-mode)
@@ -541,7 +549,6 @@
       (define-key skk-j-mode-map (kbd "<C-return>") 'skk-insert)
       )
     (add-hook 'skk-mode-hook 'my:skk-mode-setup)
-
 
     ;; skkの辞書ファイルはauto-saveの対象から除外する
     (push `(string-suffix-p . ".skk-jisyo") my:disable-auto-save-visited-mode-alist)
