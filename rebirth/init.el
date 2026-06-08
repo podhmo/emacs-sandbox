@@ -279,9 +279,18 @@
   (defun my:tab-line-tabs-window-buffers ()
     "fileを持つものだけを対象にしたbufferを集める"
     (sort
-     (seq-remove (lambda (b) (null (buffer-file-name b)))
-                 (buffer-list))
+     (seq-filter
+      (lambda (b) (buffer-file-name b))
+      (frame-parameter (selected-frame) 'buffer-list))
      (lambda (x y) (string< (buffer-name x) (buffer-name y)))))
+
+  (defun my:other-frame-with-clone-if-needed (arg)
+    (interactive "p")
+    (when (<= (length (seq-filter #'frame-visible-p (frame-list))) 1)
+      (clone-frame (selected-frame))
+      )
+    (other-frame arg)
+    )
 
   (defun my:tab-line-next-tab ()
     "tab-lineの表示にしたがった場合の次のタブに移動"
@@ -383,6 +392,9 @@
                                   (let ((file (concat my:emacs-home-directory "init.el")))
                                     (find-file file))
                                   ))
+  ;; other-frame
+  (global-set-key (kbd "M-o") 'my:other-frame-with-clone-if-needed)
+
   ;; find-file
   (global-set-key (kbd "C-x C-f") 'find-file-at-point)
   (global-set-key (kbd "C-x C-a") 'revert-buffer)
