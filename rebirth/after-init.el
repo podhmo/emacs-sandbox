@@ -7,10 +7,24 @@
 ;; (package-install 'ddskk-postframe);  skkの変換候補を良いかんじに表示してくる
 
 
+;; nixでインストールしたEmacsをFinderから起動した場合にPATHなどが引き継がれないので`executable-find'などが失敗する。 `open -a emacs`などで開けば解決するが不便。
+;; 動作確認 ↓ で C-x C-e
+;; (getenv "PATH")
+;; exec-path
+;; (executable-find "ghq")
+(use-package exec-path-from-shell
+  :ensure t
+  :if (memq window-system '(mac ns))
+  :config
+  ;; .zprofile や .zshrc から引き継ぎたい環境変数を指定
+  ;; NIX_SSL_CERT_FILE なども入れておくと、Emacs 内での HTTPS 通信エラーを防げます
+  (setq exec-path-from-shell-variables '("PATH" "MANPATH" "NIX_SSL_CERT_FILE"))
+  (exec-path-from-shell-initialize)
+  )
+
 
 (use-package writeroom-mode ; zen-mode in vscode
   :ensure t)
-
 
 
 (use-package markdown-mode
