@@ -67,6 +67,13 @@
   (transient-mark-mode t)
   ;; 画像ファイルを自動表示
   (auto-image-file-mode t)
+  ;; ' " ` などのペアを自動的に挿入する
+  (electric-pair-mode t)
+  (dolist (chr (mapcar #'string-to-char '("`" "'")))
+    (add-to-list 'electric-pair-pairs (cons chr chr))
+    )
+  (add-to-list 'electric-pair-pairs (cons (string-to-char "{") (string-to-char "}")))
+  (add-to-list 'electric-pair-pairs (cons (string-to-char "「") (string-to-char "」")))
 
   ;; --- Emacs Serverの設定 ---
   (condition-case err
@@ -203,7 +210,6 @@
 
   :hook
   ;; -hook サフィックスは自動補完されるため省略可能
-  (js-mode . electric-pair-mode)
   (js-json-mode . my:json-mode-setup)
   )
 
@@ -563,7 +569,6 @@
          (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))
     (and (file-exists-p memo-file) (find-file memo-file)))
   )
-
 
 ;; 手抜きで "*Compile-Log*" bufferを閉じる (delete-backward-charが使われてるらしい)
 (add-to-list 'display-buffer-alist
