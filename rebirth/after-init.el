@@ -60,7 +60,7 @@
   ;; よく使うカスタマイズ
   (setq markdown-asymmetric-header t)      ; # 見出しを非対称にする（GitHub風）
   (setq markdown-indent-on-enter 'indent-and-new-item)
-  (setq markdown-gfm-uppercase-checkbox t) ; [X] のチェックボックスを大文字に
+
   ;; 便利なフック
   (add-hook 'markdown-mode-hook #'visual-line-mode))
 
