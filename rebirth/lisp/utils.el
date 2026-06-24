@@ -53,4 +53,27 @@
         (message output-string)
         (kill-new output-string)))))
 
+
+(defun my:shell-with-current-directory ()
+  "現在のバッファのディレクトリで shell を起動/切り替え。
+shell が存在しなければ新しく起動し、存在すればその shell に移動して cd する。"
+  (interactive)
+  (let* ((dir (or (and (buffer-file-name)
+                       (file-name-directory (buffer-file-name)))
+                  default-directory
+                  "~/"))
+         (shell-buffer (get-buffer "*shell*")))
+
+    (cond ((and shell-buffer
+                (buffer-live-p shell-buffer)
+                (get-buffer-process shell-buffer))
+           (pop-to-buffer shell-buffer)
+           (goto-char (point-max))
+           (insert (format "cd %s" (shell-quote-argument (expand-file-name dir))))
+           (comint-send-input))
+          (t
+           (let ((default-directory dir))
+             (shell))))))
+
+
 (provide 'utils)

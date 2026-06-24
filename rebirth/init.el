@@ -431,7 +431,7 @@
 
     (define-key ctrl-j-map (kbd "C-j") 'dabbrev-expand)
 
-    (define-key ctrl-j-map (kbd "S") 'shell)
+    (define-key ctrl-j-map (kbd "S") 'my:shell-with-current-directory)
 
     ;; activate ctr-j map
     (global-set-key (kbd "C-j") ctrl-j-map)
