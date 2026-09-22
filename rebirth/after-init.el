@@ -69,6 +69,10 @@
   :mode (("\\.go$" . go-mode))
   )
 
+(unless (boundp 'treesit-language-source-alist)
+  (defvar treesit-language-source-alist nil)
+  )
+
 
 (use-package moonbit-mode
   :vc (:url "https://github.com/podhmo/moonbit-mode" :rev "856b781053212235280caef06a9f9abf387bc9b9")
