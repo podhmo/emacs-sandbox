@@ -29,7 +29,7 @@
 
 (use-package markdown-mode
   :ensure t
-  :mode (("\\.md\\'" . gfm-mode))
+  :mode (("\\.md\\'" . markdown-mode))
   :init
   (setq markdown-command "multimarkdown") ; または "pandoc --from=markdown --to=html5"
 
@@ -54,7 +54,8 @@
               ("C-c n" . markdown-forward-block)
               ("C-c p" . markdown-backward-block)
 
-              ("C-c c" . side-pocket:toggle-buffer))
+              ("C-c c" . side-pocket:toggle-buffer)
+              )
 
   :config
   ;; よく使うカスタマイズ
@@ -90,6 +91,11 @@
     (eldoc-mode t)
     )
   )
+
+
+(use-package yaml-ts-mode
+  :mode (("\\.ya?ml$" . yaml-ts-mode))
+)
 
 ;;----------------------------------------
 ;; TODO: tree-sitter
