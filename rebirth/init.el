@@ -453,6 +453,28 @@
               (t (call-interactively 'dired-display-file)))
         ))
 
+
+    (defun my:dired-beginning-of-buffer-or-other-window ()
+      (interactive)
+      (cond ((one-window-p)
+             (beginning-of-buffer)
+             (dired-next-line 1))
+            (t
+             (beginning-of-buffer-other-window 1)))
+      )
+
+    (defun my:dired-end-of-buffer-or-other-window ()
+      (interactive)
+      (cond ((one-window-p)
+             (end-of-buffer)
+             (dired-next-line -1)
+             )
+            (t
+             (end-of-buffer-other-window 1)
+             ))
+      )
+
+
     (defun my:dired-mode-setup ()
       ;; up/down
       (define-key dired-mode-map (kbd "[") 'dired-up-directory)
@@ -461,8 +483,8 @@
       ;; scroll-up/scroll-down other-window
       (define-key dired-mode-map (kbd "M-n") 'scroll-other-window)
       (define-key dired-mode-map (kbd "M-p") 'scroll-other-window-down)
-      (define-key dired-mode-map (kbd "M-<") 'beginning-of-buffer-other-window)
-      (define-key dired-mode-map (kbd "M->") 'end-of-buffer-other-window)
+      (define-key dired-mode-map (kbd "M-<") 'my:dired-beginning-of-buffer-or-other-window)
+      (define-key dired-mode-map (kbd "M->") 'my:dired-end-of-buffer-or-other-window)
       )
     (add-hook 'dired-mode-hook 'my:dired-mode-setup)
     )
@@ -484,7 +506,7 @@
 ;; after initialize
 (defun my:after-initialize--mac ()
   ;; remember
-  (eval-after-load 'remember (setq remember-data-file "~/vboxshare/memo/notes"))
+  (eval-after-load 'remember (setq remember-data-file "~//memo/notes"))
 
   ;; skk
   ;; need: install ddskk by melpa
