@@ -107,6 +107,29 @@
             pkgs.coreutils
             pkgs.git
           ];
+
+          # macOS (NS) resolves fonts through CoreText and ignores fontconfig /
+          # XDG_DATA_DIRS, so the fonts have to live in ~/Library/Fonts.
+          # Explicit opt-in command; CJK uses the system Hiragino Sans instead
+          # of the (huge) Noto CJK.
+          fancyMacFonts = [ pkgs.jetbrains-mono pkgs.nerd-fonts.symbols-only ];
+          fancyInstallFonts = pkgs.writeShellApplication {
+            name = "fancy-install-fonts";
+            text = ''
+              dest="$HOME/Library/Fonts/emacs-fancy"
+              if [ "''${1:-}" = "--uninstall" ]; then
+                rm -rf "$dest" && echo "removed $dest"
+                exit 0
+              fi
+              mkdir -p "$dest"
+              # copy, not symlink: store paths can be garbage collected
+              for d in ${pkgs.lib.concatStringsSep " " (map (f: "${f}/share/fonts") fancyMacFonts)}; do
+                find "$d" -type f -name '*.ttf' -exec cp -f {} "$dest/" \;
+              done
+              chmod u+w "$dest"/*
+              echo "installed into $dest (restart emacs to pick them up)"
+            '';
+          };
         in
         {
           emacs-gtk = emacsPkg;
@@ -130,9 +153,12 @@
                 runtimeInputs = [ emacsFancy pkgs.bash ] ++ fancyTools;
                 text = ''
                   ${fancyEnv}
+                  export FANCY_TOOLS=${./tools}
                   exec ${fancySrc}/bin/shot "$@"
                 '';
               })
+            ] ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
+              fancyInstallFonts
             ];
           };
         }

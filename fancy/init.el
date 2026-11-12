@@ -1,5 +1,5 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
-;;; init.el -- fancy: make emacs on WSLg look as good as possible
+;;; init.el -- fancy: make emacs on WSLg / macOS look as good as possible
 ;;;
 ;;; launch: emacs --init-dir=<this dir>
 
@@ -94,29 +94,36 @@ nix store and fancy:dir is read-only, so writable state goes elsewhere.")
   (add-hook 'dired-mode-hook #'hl-line-mode))
 
 ;;; font -----------------------------------------------------------------
-;; default: JetBrains Mono (downloaded to ~/.local/share/fonts)
-;; CJK:     Noto Sans CJK JP (system)
-;; symbols: Symbols Nerd Font Mono (~/.local/share/fonts), Noto Color Emoji
+;; default: JetBrains Mono
+;; CJK:     Noto Sans CJK JP (linux) / Hiragino Sans (macOS)
+;; symbols: Symbols Nerd Font Mono, emoji: Noto Color Emoji / Apple Color Emoji
+;; nix on linux feeds these through fontconfig (XDG_DATA_DIRS); macOS ignores
+;; fontconfig, so there run `fancy-install-fonts' once (~/Library/Fonts).
+(defun fancy:first-font (&rest families)
+  "First of FAMILIES that is installed, or nil."
+  (seq-find (lambda (f) (member f (font-family-list))) families))
+
 (defun fancy:setup-fonts ()
   (when (display-graphic-p)
-    (when (member "JetBrains Mono" (font-family-list))
-      (set-face-attribute 'default nil
-                          :family "JetBrains Mono"
-                          :height 130
-                          :weight 'regular)
-      (set-face-attribute 'fixed-pitch nil :family "JetBrains Mono" :height 1.0))
-    (when (member "Ubuntu Sans" (font-family-list))
-      (set-face-attribute 'variable-pitch nil :family "Ubuntu Sans" :height 1.05))
+    (when-let* ((mono (fancy:first-font "JetBrains Mono" "Menlo")))
+      (set-face-attribute 'default nil :family mono :height 130 :weight 'regular)
+      (set-face-attribute 'fixed-pitch nil :family mono :height 1.0))
+    (when-let* ((prop (fancy:first-font "Ubuntu Sans" "Helvetica Neue")))
+      (set-face-attribute 'variable-pitch nil :family prop :height 1.05))
     ;; CJK -- keep punctuation/full-width glyphs consistent with han/kana
-    (when (member "Noto Sans CJK JP" (font-family-list))
+    (when-let* ((cjk (fancy:first-font "Noto Sans CJK JP" "Hiragino Sans")))
       (dolist (cs '(han kana cjk-misc))
-        (set-fontset-font t cs "Noto Sans CJK JP" nil 'prepend))
-      (set-fontset-font t '(#x3000 . #x303f) "Noto Sans CJK JP" nil 'prepend))
+        (set-fontset-font t cs cjk nil 'prepend))
+      (set-fontset-font t '(#x3000 . #x303f) cjk nil 'prepend))
     ;; symbols -> nerd font, emoji -> color emoji
-    (when (member "Symbols Nerd Font Mono" (font-family-list))
-      (set-fontset-font t 'symbol "Symbols Nerd Font Mono" nil 'prepend))
-    (when (member "Noto Color Emoji" (font-family-list))
-      (set-fontset-font t 'emoji "Noto Color Emoji" nil 'prepend))))
+    (when-let* ((sym (fancy:first-font "Symbols Nerd Font Mono")))
+      (set-fontset-font t 'symbol sym nil 'prepend)
+      ;; nerd-icons live in the Private Use Area; without this a CJK font
+      ;; that happens to cover the PUA (Hiragino does) wins on macOS
+      (set-fontset-font t '(#xe000 . #xf8ff) sym nil 'prepend)
+      (set-fontset-font t '(#xf0000 . #xfffff) sym nil 'prepend))
+    (when-let* ((emoji (fancy:first-font "Noto Color Emoji" "Apple Color Emoji")))
+      (set-fontset-font t 'emoji emoji nil 'prepend))))
 
 (add-hook 'after-init-hook #'fancy:setup-fonts)
 
