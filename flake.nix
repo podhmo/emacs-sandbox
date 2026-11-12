@@ -66,6 +66,7 @@
               page-break-lines
               minions
               dashboard
+              zoom
             ]) ++ (with ep.elpaPackages; [
               spacious-padding
               vertico-posframe
