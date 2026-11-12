@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;;; 40-dired -- dired with nerd icons
 (dired (expand-file-name "samples" fancy:dir))
 (revert-buffer)

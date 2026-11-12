@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;;; 30-shell -- *shell* with colored ls output
 ;;; comint spawns the shell with TERM=dumb; pass TERM inline so GNU ls colorizes.
 (let ((process-environment (cons "GIT_PAGER=cat" (cons "PAGER=cat" process-environment))))

@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;;; 25-whichkey -- which-key-posframe popup over a dimmed frame
 ;;; simulate typing the C-x prefix; which-key pops up after its idle delay
 (setq unread-command-events (listify-key-sequence "\C-x"))

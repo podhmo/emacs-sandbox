@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;;; 20-minibuffer -- M-x with vertico-posframe + marginalia (needs 'window capture)
 ;;; NOTE: command-line -l/--eval runs outside the real command loop, so
 ;;; post-command-hook (vertico--exhibit) never fires on its own. Insert input
