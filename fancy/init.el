@@ -6,14 +6,26 @@
 (defvar fancy:dir (file-name-directory (or load-file-name default-directory))
   "Directory that contains this init file.")
 
-(setq custom-file (expand-file-name "custom.el" fancy:dir))
+(defvar fancy:nix-p (getenv "FANCY_NIX")
+  "Non-nil when launched via the nix wrapper: elisp deps come from the
+nix store and fancy:dir is read-only, so writable state goes elsewhere.")
+
+(defvar fancy:data-dir
+  (if fancy:nix-p
+      (expand-file-name "emacs-fancy"
+                        (or (getenv "XDG_DATA_HOME") "~/.local/share"))
+    fancy:dir)
+  "Writable directory for state files (custom.el, elpa when non-nix).")
+
+(setq custom-file (expand-file-name "custom.el" fancy:data-dir))
 
 ;;; packages -----------------------------------------------------------
 (require 'package)
-(setq package-user-dir (expand-file-name "elpa" fancy:dir))
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(setq package-user-dir (expand-file-name "elpa" fancy:data-dir))
+(unless fancy:nix-p
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
 (package-initialize)
-(unless package-archive-contents
+(unless (or fancy:nix-p package-archive-contents)
   (package-refresh-contents))
 
 ;; install everything up front so :ensure never has to guess
@@ -35,9 +47,11 @@
     mixed-pitch
     nerd-icons-dired))
 
-(dolist (pkg fancy:packages)
-  (unless (package-installed-p pkg)
-    (package-install pkg)))
+;; under nix every dep is already on load-path via emacsWithPackages
+(unless fancy:nix-p
+  (dolist (pkg fancy:packages)
+    (unless (package-installed-p pkg)
+      (package-install pkg))))
 
 ;;; basics -------------------------------------------------------------
 (use-package emacs

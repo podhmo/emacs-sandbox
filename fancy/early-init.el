@@ -1,6 +1,13 @@
 ;;; -*- coding: utf-8; lexical-binding: t -*-
 ;;; early-init.el -- fancy: suppress chrome before the first frame
 
+;; when launched from the nix wrapper the init dir lives in the read-only
+;; store; redirect the eln cache somewhere writable before native-comp runs
+(when (getenv "FANCY_NIX")
+  (startup-redirect-eln-cache
+   (expand-file-name "emacs-fancy/eln-cache"
+                     (or (getenv "XDG_CACHE_HOME") "~/.cache"))))
+
 (setq inhibit-startup-screen t
       inhibit-startup-echo-area-message t
       initial-scratch-message nil)
