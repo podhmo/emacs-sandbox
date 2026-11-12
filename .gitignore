@@ -18,3 +18,11 @@ eln-cache
 tree-sitter
 tramp
 projects
+fancy/bin/scrot
+fancy/custom.el
+fancy/shots/*.tmp
+fancy/bin/xwd
+fancy/bin/magick
+fancy/shots/*.log
+fancy/shots/*.failed.png
+fancy/shots/*.xwd

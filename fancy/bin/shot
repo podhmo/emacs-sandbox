@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# shot -- run a scene file under fancy/ init.el and take a screenshot
+#
+# usage: bin/shot <scene.el> <out.png> [timeout-seconds]
+#
+# success = OUT file exists and is non-empty.
+# failure = emacs died first, or TIMEOUT elapsed: capture the raw screen for
+#           diagnosis (OUT.failed.png) and exit non-zero.
+set -u
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+FANCY_DIR="$(cd "$HERE/.." && pwd)"
+SCENE="$(realpath "$1")"
+OUT="$(realpath -m "$2")"
+TIMEOUT="${3:-120}"
+
+if [ -z "${SCROT:-}" ] && [ -x "$HERE/scrot/bin/scrot" ]; then
+  SCROT="$HERE/scrot/bin/scrot"
+fi
+if [ -z "${XWD:-}" ] && [ -x "$HERE/xwd/bin/xwd" ]; then
+  XWD="$HERE/xwd/bin/xwd"
+fi
+if [ -z "${MAGICK:-}" ] && [ -x "$HERE/magick/bin/magick" ]; then
+  MAGICK="$HERE/magick/bin/magick"
+fi
+
+cd "$FANCY_DIR"
+export SCROT XWD MAGICK FANCY_OUT="$OUT"
+
+emacs --init-dir="$FANCY_DIR" \
+      -l "$FANCY_DIR/etc/shots.el" \
+      -l "$SCENE" \
+      --kill &
+pid=$!
+
+elapsed=0
+while [ ! -s "$OUT" ]; do
+  kill -0 "$pid" 2>/dev/null || break
+  [ "$elapsed" -ge "$TIMEOUT" ] && break
+  sleep 1
+  elapsed=$((elapsed + 1))
+done
+
+if [ -s "$OUT" ]; then
+  # give emacs a moment to exit on its own (--kill), then force it down so a
+  # lingering minibuffer or prompt can never block this script
+  for _ in 1 2 3 4 5; do
+    kill -0 "$pid" 2>/dev/null || break
+    sleep 1
+  done
+  kill -9 "$pid" 2>/dev/null
+  wait "$pid" 2>/dev/null
+  echo "OK: $OUT (${elapsed}s)"
+  exit 0
+fi
+
+echo "FAIL: $OUT not produced after ${elapsed}s" >&2
+if [ -n "${SCROT:-}" ] && [ -x "$SCROT" ]; then
+  "$SCROT" -z "$OUT.failed.png" 2>/dev/null && echo "screen -> $OUT.failed.png" >&2
+fi
+kill -9 "$pid" 2>/dev/null
+wait "$pid" 2>/dev/null
+exit 1
