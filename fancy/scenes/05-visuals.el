@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;;; 05-visuals -- ligatures + indent-bars + page-break-lines demo
 (let ((b (get-buffer-create "*visuals*")))
   (with-current-buffer b

@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;;; 15-dashboard -- startup dashboard
 (require 'dashboard)
 (dashboard-open)

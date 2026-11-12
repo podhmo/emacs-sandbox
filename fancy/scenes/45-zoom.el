@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;;; 45-zoom -- zoom-mode: focused window takes the golden share
 (let ((mk (lambda (name)
             (with-current-buffer (get-buffer-create name)

@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;;; 35-corfu -- in-buffer completion popup with kind-icon
 (let ((b (get-buffer-create "*corfu-demo*")))
   (switch-to-buffer b)
