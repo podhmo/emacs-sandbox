@@ -26,8 +26,9 @@
     {
       packages = forAllSystems (pkgs: system:
         let
+          # latest stable emacs (31.1) for all outputs
           emacsPkg = if pkgs.stdenv.hostPlatform.isDarwin then
-            pkgs.emacs30.override {
+            pkgs.emacs31.override {
               withNS = true;           # これが macOS の GUI
               withGTK3 = false;
               withPgtk = false;
@@ -35,29 +36,13 @@
             }
           else
             # Linux → GTK3 版（X11 / Wayland）
-            pkgs.emacs30.override {
-              withGTK3 = true;
-              withPgtk = false;        # pgtk を使いたい場合は true に
-              withTreeSitter = true;
-            };
-
-          # latest stable emacs (31.1) for the fancy package; emacs-gtk/default
-          # stay on 30.2
-          emacsLatest = if pkgs.stdenv.hostPlatform.isDarwin then
-            pkgs.emacs31.override {
-              withNS = true;           # macOS の GUI
-              withGTK3 = false;
-              withPgtk = false;
-              withTreeSitter = true;
-            }
-          else
             pkgs.emacs31.override {
               withGTK3 = true;
               withPgtk = false;        # pgtk を使いたい場合は true に
               withTreeSitter = true;
             };
 
-          epkgs = pkgs.emacsPackagesFor emacsLatest;
+          epkgs = pkgs.emacsPackagesFor emacsPkg;
 
           # all elisp deps of fancy/init.el, resolved on the nix side so the
           # init directory needs no elpa/ and no network access
