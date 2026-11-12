@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+# check -- launch GUI emacs with (a throwaway copy of) rebirth/ and record what happened  (macOS)
+#
+# usage: rebirth/bin/check [out-dir] [timeout-seconds]
+#   EMACS=/path/to/emacs   emacs binary (default: `emacs` in PATH)
+#                          e.g. EMACS=$(nix build .#default --print-out-paths)/bin/emacs
+#   INPLACE=1              use rebirth/ itself instead of a copy (history/recentf etc. get written)
+#
+# outputs (out-dir, default /tmp/rebirth-check):
+#   report.txt    status / version / theme / font / packages ...
+#   messages.log  *Messages* *Warnings* *Compile-Log* *Backtrace*
+#   shot.png      screenshot of the emacs window (needs Screen Recording permission
+#                 for the terminal app; skipped with a note otherwise)
+#
+# success = report.txt says "status: OK".  The exit code of emacs is never trusted:
+# an init error opens the debugger and emacs just waits, so we watch for the
+# report file (written by probe.el from a timer, which fires even in the debugger).
+set -u
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SRC="$(cd "$HERE/.." && pwd)"
+OUT="${1:-/tmp/rebirth-check}"
+TIMEOUT="${2:-90}"
+EMACS="${EMACS:-emacs}"
+
+mkdir -p "$OUT"
+OUT="$(cd "$OUT" && pwd)"
+rm -f "$OUT/report.txt" "$OUT/messages.log" "$OUT/shot.png" "$OUT/ready"
+
+if [ -n "${INPLACE:-}" ]; then
+  DIR="$SRC"
+  # no early-init edit here; -l runs after init.el
+  echo "warn: INPLACE=1 loads probe after init; a hanging init is only caught by the timeout" >&2
+  EXTRA=(-l "$HERE/probe.el")
+else
+  DIR="$(mktemp -d /tmp/rebirth-check-dir.XXXXXX)"
+  # eln-cache is per emacs version anyway; skip it to keep the copy cheap
+  rsync -a --exclude eln-cache --exclude auto-save-list "$SRC/" "$DIR/"
+  printf '\n(load "%s" nil t)\n' "$HERE/probe.el" >> "$DIR/early-init.el"
+  EXTRA=()
+fi
+
+export REBIRTH_CHECK_OUT="$OUT" REBIRTH_CHECK_LIMIT="$((TIMEOUT - 10))"
+# file shown in shot.png (init.el opens private ~/memo notes otherwise)
+export REBIRTH_CHECK_FILE="${REBIRTH_CHECK_FILE:-$SRC/README.md}"
+echo "emacs: $(command -v "$EMACS") ($("$EMACS" --version | head -1))"
+echo "init-dir: $DIR"
+
+"$EMACS" --init-dir="$DIR" ${EXTRA[@]+"${EXTRA[@]}"} >"$OUT/stdout.log" 2>&1 &
+pid=$!
+
+elapsed=0
+while [ ! -s "$OUT/ready" ]; do
+  kill -0 "$pid" 2>/dev/null || break
+  [ "$elapsed" -ge "$TIMEOUT" ] && break
+  sleep 1
+  elapsed=$((elapsed + 1))
+done
+
+if [ -s "$OUT/ready" ]; then
+  # bring the window to front, then capture it by CGWindowID
+  osascript -e "tell application \"System Events\" to set frontmost of (first process whose unix id is $pid) to true" >/dev/null 2>&1
+  sleep 1
+  wid="$(swift "$HERE/winid.swift" "$pid" 2>/dev/null)"
+  if [ -n "$wid" ] && screencapture -x -o -l "$wid" "$OUT/shot.png" 2>/dev/null && [ -s "$OUT/shot.png" ]; then
+    echo "shot: $OUT/shot.png"
+  else
+    rm -f "$OUT/shot.png"
+    echo "shot: skipped (window=${wid:-?}; grant Screen Recording to the terminal app to enable)"
+  fi
+fi
+
+kill -9 "$pid" 2>/dev/null
+wait "$pid" 2>/dev/null
+[ -z "${INPLACE:-}" ] && [ -z "${KEEP:-}" ] && rm -rf "$DIR"
+
+if [ ! -s "$OUT/report.txt" ]; then
+  echo "FAIL: no report after ${elapsed}s (emacs died or hung before early-init?) see $OUT/stdout.log" >&2
+  exit 1
+fi
+cat "$OUT/report.txt" | head -12
+grep -q '^status: OK' "$OUT/report.txt" || { echo "NG: see $OUT/messages.log" >&2; exit 1; }
+echo "OK: $OUT"
