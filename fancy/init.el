@@ -32,6 +32,7 @@
     hl-todo
     rainbow-delimiters
     markdown-mode
+    mixed-pitch
     nerd-icons-dired))
 
 (dolist (pkg fancy:packages)
@@ -176,7 +177,6 @@
   :init (vertico-posframe-mode 1)
   :custom
   (vertico-posframe-width 110)
-  (vertico-posframe-height 14)
   (vertico-posframe-border-width 2)
   (vertico-posframe-parameters
    '((left-fringe . 14)
@@ -198,6 +198,10 @@
   (markdown-header-scaling t)
   (markdown-hide-markup t)
   (markdown-list-item-bullets '("-")))
+
+;; prose in variable-pitch, code/tables stay monospace -- bear/typora feel
+(use-package mixed-pitch
+  :hook (markdown-mode . mixed-pitch-mode))
 
 ;;; misc ------------------------------------------------------------------------
 ;; shell colors
