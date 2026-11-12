@@ -23,6 +23,9 @@ if [ -z "${MAGICK:-}" ] && [ -x "$HERE/magick/bin/magick" ]; then
   MAGICK="$HERE/magick/bin/magick"
 fi
 
+# a stale OUT would make the wait loop succeed instantly -- always regenerate
+rm -f "$OUT"
+
 cd "$FANCY_DIR"
 export SCROT XWD MAGICK FANCY_OUT="$OUT"
 

@@ -54,7 +54,8 @@ nix store and fancy:dir is read-only, so writable state goes elsewhere.")
     indent-bars
     corfu
     kind-icon
-    dashboard))
+    dashboard
+    zoom))
 
 ;; under nix every dep is already on load-path via emacsWithPackages
 (unless fancy:nix-p
@@ -293,6 +294,14 @@ nix store and fancy:dir is read-only, so writable state goes elsewhere.")
   :config
   (recentf-mode 1)
   (dashboard-setup-startup-hook))
+
+;;; window sizing ---------------------------------------------------------------
+;; focused window takes the golden share of the frame
+(use-package zoom
+  :init (zoom-mode 1)
+  :custom
+  (zoom-size '(0.618 . 0.618))
+  (zoom-ignored-major-modes '(dired-mode dashboard-mode)))
 
 ;;; markdown -------------------------------------------------------------------
 (use-package markdown-mode
