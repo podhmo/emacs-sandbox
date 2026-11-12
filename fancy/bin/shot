@@ -25,6 +25,7 @@ fi
 
 # a stale OUT would make the wait loop succeed instantly -- always regenerate
 rm -f "$OUT"
+mkdir -p "$(dirname "$OUT")"
 
 cd "$FANCY_DIR"
 export SCROT XWD MAGICK FANCY_OUT="$OUT"
