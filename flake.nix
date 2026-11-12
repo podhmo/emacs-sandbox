@@ -61,9 +61,18 @@
               markdown-mode
               mixed-pitch
               nerd-icons-dired
+              which-key-posframe
+              ligature
+              page-break-lines
+              minions
+              dashboard
             ]) ++ (with ep.elpaPackages; [
               spacious-padding
               vertico-posframe
+              diff-hl
+              indent-bars
+              corfu
+              kind-icon
             ]));
 
           # init dir minus generated state; the store path is read-only so

@@ -45,7 +45,16 @@ nix store and fancy:dir is read-only, so writable state goes elsewhere.")
     rainbow-delimiters
     markdown-mode
     mixed-pitch
-    nerd-icons-dired))
+    nerd-icons-dired
+    which-key-posframe
+    ligature
+    diff-hl
+    page-break-lines
+    minions
+    indent-bars
+    corfu
+    kind-icon
+    dashboard))
 
 ;; under nix every dep is already on load-path via emacsWithPackages
 (unless fancy:nix-p
@@ -203,6 +212,87 @@ nix store and fancy:dir is read-only, so writable state goes elsewhere.")
 
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
+
+;; horizontal line for ^L instead of the literal formfeed glyph
+(use-package page-break-lines
+  :init (global-page-break-lines-mode 1))
+
+;;; which-key ----------------------------------------------------------------
+;; which-key is built into emacs 30; the melpa package only adds posframe
+(use-package which-key
+  :init (which-key-mode 1)
+  :custom
+  (which-key-idle-delay 0.4)
+  (which-key-sort-order 'which-key-key-order-alpha))
+
+(use-package which-key-posframe
+  :after which-key
+  :init (which-key-posframe-mode 1)
+  :custom
+  (which-key-posframe-poshandler #'posframe-poshandler-frame-center))
+
+;;; ligatures -----------------------------------------------------------------
+;; JetBrains Mono ships these glyphs; harmless on fonts that lack them
+(use-package ligature
+  :config
+  (ligature-set-ligatures
+   'prog-mode
+   '("==" "!=" "!==" "===" "==>" "=>>" "=<<" "=/=" "->>" "->"
+     "-->" "<--" "<->" "<-<" "<<-" "<==" "<=>" "=>" ">=" ">>="
+     ">->" "<~>" "<~~" "~~>" "~>" "~=" "/=" "/==" "//" "///"
+     "/*" "*/" "**" "***" "+++" "&&&" "|||" "||=" "|>" "|-" "{|"
+     "[|" "]#" "::" ":=" ":>" ":<" "?=" "?." "??" ";;" "__" "~~"
+     "(*" "*)" "www" "%%" ".=" ".." ".-"))
+  (global-ligature-mode 1))
+
+;;; modeline declutter ----------------------------------------------------------
+;; fold minor-mode lighters into a menu; doom-modeline must opt in to show it
+(use-package minions
+  :init (minions-mode 1)
+  :custom
+  (doom-modeline-minor-modes t))
+
+;;; VCS diff in fringe ----------------------------------------------------------
+(use-package diff-hl
+  :init (global-diff-hl-mode 1)
+  :hook (dired-mode . diff-hl-dired-mode))
+
+;;; indent guides ---------------------------------------------------------------
+(use-package indent-bars
+  :hook (prog-mode . indent-bars-mode))
+
+;;; in-buffer completion --------------------------------------------------------
+(use-package corfu
+  :init (global-corfu-mode 1)
+  :custom
+  (corfu-auto t)
+  (corfu-auto-delay 0.25)
+  (corfu-auto-prefix 2)
+  (corfu-cycle t)
+  (corfu-preselect 'prompt))
+
+(use-package kind-icon
+  :after corfu
+  :custom
+  (kind-icon-default-face 'corfu-default)
+  ;; svg-lib caches rendered icons under user-emacs-directory by default,
+  ;; which is read-only in the nix store -- keep it under fancy:data-dir
+  (svg-lib-icons-dir (expand-file-name ".cache/svg-lib/" fancy:data-dir))
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
+;;; dashboard -------------------------------------------------------------------
+(use-package dashboard
+  :custom
+  (dashboard-startup-banner 'logo)
+  (dashboard-items '((recents . 5) (projects . 5)))
+  (dashboard-center-content t)
+  (dashboard-icon-type 'nerd-icons)
+  (dashboard-set-heading-icons t)
+  (dashboard-set-file-icons t)
+  :config
+  (recentf-mode 1)
+  (dashboard-setup-startup-hook))
 
 ;;; markdown -------------------------------------------------------------------
 (use-package markdown-mode

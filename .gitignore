@@ -27,3 +27,4 @@ fancy/shots/*.log
 fancy/shots/*.failed.png
 fancy/shots/*.xwd
 result*
+fancy/.cache/
