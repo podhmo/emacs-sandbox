@@ -28,6 +28,11 @@
 (push '(height . 36) default-frame-alist)
 (push '(internal-border-width . 20) default-frame-alist)
 
+;; macOS: blend the title bar into the (dark) theme
+(when (eq system-type 'darwin)
+  (push '(ns-transparent-titlebar . t) default-frame-alist)
+  (push '(ns-appearance . dark) default-frame-alist))
+
 ;; avoid flicker on resize
 (setq frame-inhibit-implied-resize t
       frame-resize-pixelwise t)

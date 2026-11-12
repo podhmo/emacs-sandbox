@@ -9,9 +9,13 @@
 set -u
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FANCY_DIR="$(cd "$HERE/.." && pwd)"
-SCENE="$(realpath "$1")"
-OUT="$(realpath -m "$2")"
+SCENE="$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
+# realpath -m is GNU only; macOS realpath needs an existing path
+mkdir -p "$(dirname "$2")"
+OUT="$(cd "$(dirname "$2")" && pwd)/$(basename "$2")"
 TIMEOUT="${3:-120}"
+# repo-level helpers (tools/mac-shot); the nix wrapper points this at the store
+TOOLS="${FANCY_TOOLS:-$FANCY_DIR/../tools}"
 
 if [ -z "${SCROT:-}" ] && [ -x "$HERE/scrot/bin/scrot" ]; then
   SCROT="$HERE/scrot/bin/scrot"
@@ -25,7 +29,14 @@ fi
 
 # a stale OUT would make the wait loop succeed instantly -- always regenerate
 rm -f "$OUT"
-mkdir -p "$(dirname "$OUT")"
+
+# macOS: without Screen Recording permission screencapture "succeeds" with
+# wallpaper only -- refuse up front instead of producing a misleading png
+if [ "$(uname)" = Darwin ] && \
+   ! swift -e 'import CoreGraphics; exit(CGPreflightScreenCaptureAccess() ? 0 : 1)' 2>/dev/null; then
+  echo "FAIL: no Screen Recording permission (grant it to the app that launched this shell)" >&2
+  exit 3
+fi
 
 cd "$FANCY_DIR"
 export SCROT XWD MAGICK FANCY_OUT="$OUT"
@@ -58,7 +69,9 @@ if [ -s "$OUT" ]; then
 fi
 
 echo "FAIL: $OUT not produced after ${elapsed}s" >&2
-if [ -n "${SCROT:-}" ] && [ -x "$SCROT" ]; then
+if [ "$(uname)" = Darwin ]; then
+  "$TOOLS/mac-shot" "$pid" "$OUT.failed.png" 2>/dev/null && echo "window -> $OUT.failed.png" >&2
+elif [ -n "${SCROT:-}" ] && [ -x "$SCROT" ]; then
   "$SCROT" -z "$OUT.failed.png" 2>/dev/null && echo "screen -> $OUT.failed.png" >&2
 fi
 kill -9 "$pid" 2>/dev/null

@@ -1,6 +1,6 @@
 # fancy
 
-WSLg 上の GUI Emacs を「できるだけキレイに」を目指した init directory。
+WSLg / macOS 上の GUI Emacs を「できるだけキレイに」を目指した init directory。
 `rebirth` とは独立しており、日々の環境を壊さずに見た目の実験ができる。
 
 ## 起動
@@ -20,7 +20,13 @@ $ nix build .#fancy      # result/bin/emacs-fancy + result/bin/fancy-shot
 $ nix run .#fancy        # GUI Emacs 起動
 ```
 
-- Emacs 31.1 (GTK3) + 依存 elisp パッケージ + フォント（JetBrains Mono / Noto CJK / Nerd Font Symbols）をすべて nix 側で解決
+- Emacs 31.1 (Linux: GTK3 / macOS: NS) + 依存 elisp パッケージ + フォント（JetBrains Mono / Noto CJK / Nerd Font Symbols）をすべて nix 側で解決
+- macOS は fontconfig を使わない（CoreText）ので、初回だけフォントを入れる。CJK は標準の Hiragino Sans を使う
+
+  ```console
+  $ result/bin/fancy-install-fonts               # ~/Library/Fonts/emacs-fancy/ に JetBrains Mono + Symbols Nerd Font をコピー
+  $ result/bin/fancy-install-fonts --uninstall   # 削除
+  ```
 - `FANCY_NIX` が立つと `package-install` をスキップし、書き込み先を `$XDG_DATA_HOME/emacs-fancy` / `$XDG_CACHE_HOME/emacs-fancy` に逃がす（nix store は read-only）
 
 ## スクリーンショット
@@ -51,7 +57,7 @@ $ result/bin/fancy-shot <scene.el> <out.png>   # nix 版
 Emacs は初期化エラーで debugger が開き入力待ちになることがあるので、
 `etc/shots.el` 側で `debug-on-error` を切り、`kill-emacs-hook` で
 `*Messages*` / `*Warnings*` / `*Compile-Log*` / `*Backtrace*` を `out.log` にダンプする。
-タイムアウト時は scrot で `out.failed.png` を撮ってから終了。
+タイムアウト時は `out.failed.png`（Linux: scrot で全画面 / macOS: `tools/mac-shot` で Emacs の窓）を撮ってから終了。
 
 ## WSLg 特有の知見
 
@@ -61,6 +67,15 @@ Emacs は初期化エラーで debugger が開き入力待ちになることが�
 - comint は子プロセスに `TERM=dumb` を強制する → `TERM=xterm-256color ls --color=always` のようにコマンド内で指定
 - `emacs -l scene.el` で開いた minibuffer は `post-command-hook` が走らず vertico が候補を計算しない → `(run-hooks 'post-command-hook)` を手動発火
 - solaire-mode の暗転時に行番号 gutter だけ明るい帯が残る → line-number をファイルバッファのみに限定
+
+## macOS 特有の知見
+
+- NS ビルドには `x-export-frames` が無い → `screencapture -R` でフレームの矩形（`frame-edges` の outer-edges、座標系は一致）を撮る。posframe（子フレーム = 別 NSWindow）も写る。`frame` / `window` の区別は無視
+- 「画面収録」権限が必要。無いと壁紙しか写らないので、`bin/shot` は最初に権限を確認して exit 3 で止まる（詳細は [`tools/README.md`](../tools/README.md)）
+- フォントは CoreText 経由。nix の `XDG_DATA_DIRS` は効かない → `fancy-install-fonts`
+  - Symbols Nerd Font が無いと nerd-icons の Private Use Area を Hiragino が拾い、アイコンが漢字に化ける。PUA を明示的に Nerd Font に割り当てている
+- `ns-transparent-titlebar` + `ns-appearance dark` でタイトルバーをテーマに馴染ませる
+- 30-shell は rc を読まない bash を samples/ で起動する（ユーザーの shell rc だとホスト名やホームの一覧が写り込む）
 
 ## nix 特有の知見
 
