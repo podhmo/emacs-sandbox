@@ -7,7 +7,7 @@
 
 (defun my:delete-something () (interactive)
        (cl-dolist (thing '(symbol word whitespace))
-	     (when-let ((found (thing-at-point thing)))
+	     (when-let* ((found (thing-at-point thing)))
 	       (cl-return (delete-region (beginning-of-thing thing)  (end-of-thing thing ))))))
 
 (defun my:enclose-quote (beg end)
