@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# mac-shot -- capture the main window of a running GUI process (macOS)
+#
+# usage: tools/mac-shot <pid> <out.png>
+# exit:  0 captured / 1 window not found or capture failed / 3 no Screen Recording permission
+#
+# The permission is granted per *responsible app* (the app that started the
+# process tree: iTerm2, or a resident multiplexer like herdr), not per shell.
+set -u
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+pid="$1"
+out="$2"
+
+# bring the window to front so the capture isn't a stale/occluded buffer
+osascript -e "tell application \"System Events\" to set frontmost of (first process whose unix id is $pid) to true" >/dev/null 2>&1
+sleep 1
+
+wid="$(swift "$HERE/winid.swift" "$pid" 2>/dev/null)"
+case $? in
+  0) ;;
+  3) echo "mac-shot: no Screen Recording permission (grant it to the app that launched this shell)" >&2; exit 3 ;;
+  *) echo "mac-shot: no on-screen window for pid $pid" >&2; exit 1 ;;
+esac
+
+rm -f "$out"
+screencapture -x -o -l "$wid" "$out" && [ -s "$out" ] || { echo "mac-shot: screencapture failed (window=$wid)" >&2; exit 1; }
