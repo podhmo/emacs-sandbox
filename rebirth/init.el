@@ -188,7 +188,7 @@
           (setq beg (point))
           (end-of-line)
           (setq end (point))
-          (when (interactive-p)
+          (when (called-interactively-p 'interactive)
             (message "first chars is %s beg=%s end=%s" (- end beg) beg end))
           (- end beg)))))
 
@@ -238,19 +238,19 @@
          (setq n (or n 1))
          (if (use-region-p)
              (indent-rigidly
-              (save-excursion (goto-char (region-beginning)) (point-at-bol))
-              (save-excursion (goto-char (region-end)) (point-at-eol))
+              (save-excursion (goto-char (region-beginning)) (line-beginning-position))
+              (save-excursion (goto-char (region-end)) (line-end-position))
               (* n  4))
-           (indent-rigidly (point-at-bol) (point-at-eol) (* n  4))))
+           (indent-rigidly (line-beginning-position) (line-end-position) (* n  4))))
 
   (defun my:unindent-rigitly (n) (interactive "p")
          (setq n (or n 1))
          (if (use-region-p)
              (indent-rigidly
-              (save-excursion (goto-char (region-beginning)) (point-at-bol))
-              (save-excursion (goto-char (region-end)) (point-at-eol))
+              (save-excursion (goto-char (region-beginning)) (line-beginning-position))
+              (save-excursion (goto-char (region-end)) (line-end-position))
               (* n  -4))
-           (indent-rigidly (point-at-bol) (point-at-eol) (* n  -4))))
+           (indent-rigidly (line-beginning-position) (line-end-position) (* n  -4))))
 
   :bind (:map text-mode-map
               ("C-M-i" . dabbrev-expand)

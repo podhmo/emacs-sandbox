@@ -80,7 +80,7 @@
     (cond ((not (null (member marker parts))) (concat (file-name-directory fname) new-name)) ;; e.g. foo.txt -> foo.tmp.txt
           (t (concat (file-name-directory fname)  (file-name-sans-extension new-name) "." marker "."  (file-name-extension new-name)))))) ;; e.g. foo.tmp.txt -> foo.txt
 (defun side-pocket:toggle-buffer () (interactive)
-       (when-let ((fname (buffer-file-name)))
+       (when-let* ((fname (buffer-file-name)))
          (find-file  (side-pocket:toggle-filename fname :marker "tmp"))))
 
 
