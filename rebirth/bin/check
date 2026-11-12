@@ -16,7 +16,7 @@
 # an init error opens the debugger and emacs just waits, so we watch for the
 # report file (written by probe.el from a timer, which fires even in the debugger).
 set -u
-HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"  # -P: ~/.emacs.d is a symlink; ../tools must resolve in the repo
 SRC="$(cd "$HERE/.." && pwd)"
 OUT="${1:-/tmp/rebirth-check}"
 TIMEOUT="${2:-90}"
@@ -57,15 +57,10 @@ while [ ! -s "$OUT/ready" ]; do
 done
 
 if [ -s "$OUT/ready" ]; then
-  # bring the window to front, then capture it by CGWindowID
-  osascript -e "tell application \"System Events\" to set frontmost of (first process whose unix id is $pid) to true" >/dev/null 2>&1
-  sleep 1
-  wid="$(swift "$HERE/winid.swift" "$pid" 2>/dev/null)"
-  if [ -n "$wid" ] && screencapture -x -o -l "$wid" "$OUT/shot.png" 2>/dev/null && [ -s "$OUT/shot.png" ]; then
+  if "$SRC/../tools/mac-shot" "$pid" "$OUT/shot.png"; then
     echo "shot: $OUT/shot.png"
   else
-    rm -f "$OUT/shot.png"
-    echo "shot: skipped (window=${wid:-?}; grant Screen Recording to the terminal app to enable)"
+    echo "shot: skipped (see message above)"
   fi
 fi
 

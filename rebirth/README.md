@@ -30,7 +30,7 @@ $ EMACS=$(nix build .#default --print-out-paths)/bin/emacs rebirth/bin/check /tm
 - 成否は emacs の終了コードではなく `report.txt` の `status: OK` で判定する
   - `bin/probe.el` をコピー側の `early-init.el` 末尾で読み込み、タイマーでレポートを書く。init.el がエラーで debugger に入っていてもタイマーは動くので必ず NG として記録される
   - probe は `server-name` を差し替えるので、日常の emacs server とは衝突しない
-- スクリーンショットは `screencapture -l <CGWindowID>`。NS の frame parameter からは CGWindowID が取れないので `bin/winid.swift` で PID から引く
+- スクリーンショットは `screencapture -l <CGWindowID>`。NS の frame parameter からは CGWindowID が取れないので `tools/mac-shot`（`tools/winid.swift`）で PID から引く
   - 「画面収録」権限が必要。無いと壁紙しか写らないので skip する。`swift -e 'import CoreGraphics; print(CGPreflightScreenCaptureAccess())'` で確認できる
   - 権限は「大元の起動アプリ」単位。herdr 等の常駐プロセス配下で動かす場合は iTerm2 ではなく herdr のバイナリ (`~/.local/bin/herdr`) を許可する。付与後はアプリの再起動が必要
 - init.el は起動時に `~/memo/memo*.md`（私的メモ）を開くので、撮影前に `REBIRTH_CHECK_FILE`（既定: `rebirth/README.md`）だけを表示し、他のファイルバッファは閉じる
