@@ -4,8 +4,6 @@
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
 
-;; (package-install 'ddskk-postframe);  skkの変換候補を良いかんじに表示してくる
-
 
 ;; nixでインストールしたEmacsをFinderから起動した場合にPATHなどが引き継がれないので`executable-find'などが失敗する。 `open -a emacs`などで開けば解決するが不便。
 ;; 動作確認 ↓ で C-x C-e
@@ -43,7 +41,7 @@
               ("S-TAB" . my:unindent-rigitly)
               ("<backtab>" . my:unindent-rigitly)
               ("S-<tab>" . my:unindent-rigitly)
-              ("<S-iso-lefttab>" . my:unindent-rigitly) ;; for skk
+              ("<S-iso-lefttab>" . my:unindent-rigitly)
 
               ;; 移動はここでも有効になってほしい
               ("C-c <muhenkan>" . my:tab-line-prev-tab)

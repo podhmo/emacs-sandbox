@@ -10,6 +10,10 @@ coding agentが優勢になってきたのでvscodeを捨てるつもりで新�
 
 サードパーティパッケージに依存しない設定。プロジェクト横断でview onlyで確認する用途のサブエディタとして使っていた。
 
+- mozc-only
+
+mozc.el による日本語入力だけを試すための最小設定。`emacs --init-dir=<repo>/mozc-only` で起動する。
+
 - tiny
 
 古くなった者たち

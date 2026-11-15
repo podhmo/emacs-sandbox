@@ -59,7 +59,7 @@ future work (TODO)
 
 前回からの引き継ぎ
 
-- WSLから利用を主目的にする。日本語の入力はSKKを使う。
+- WSLから利用を主目的にする。日本語の入力はMozcを使う (後述)。
 - org-modeとか複雑なアプリには手を出さない
 - format buffer的なものを機能させる
 - `C-j` + 何か で移動させるという機能 (これを手軽に設定しまくれるようにしたい)
@@ -67,9 +67,28 @@ future work (TODO)
 
 細々とした不備
 
-- skk-modeで無効にした `C-j` の影響でタブ移動が失敗することがある
 - kill-ringの選択が手軽にできない
 - backupファイルがまだ同一ディレクトリ内に作られてしまう
+
+
+## 日本語入力 (Mozc)
+
+`mozc.el` 経由で mozc_server に直接接続する経路 (fcitx5 は介さない)。
+`C-\` (`toggle-input-method`) で有効化すると `japanese-mozc` が使われる。
+
+必要なもの (WSL/Ubuntu。セットアップは `tools/mozc-el-setup` が行う):
+
+- `mozc_emacs_helper` (`sudo apt install emacs-mozc-bin`)
+- `mozc.el`: `emacs-mozc` の deb を展開して `~/.local/share/emacs/site-lisp/mozc` に置いたもの
+  (`emacs-mozc` パッケージ自体は依存で apt 版 emacs を引き込むので入れない)
+
+mozc.el が見つからない環境では何もしないので、未導入の環境でもそのまま動く。
+
+別経路として XIM 経由 (起動時に `XMODIFIERS=@im=fcitx`) でも入力できるが、
+こちらは環境変数だけなので init 側の設定は不要。
+
+mozc だけを試したい場合はリポジトリ直下の `mozc-only/` init ディレクトリを使う
+(`emacs --init-dir=<repo>/mozc-only`)。
 
 
 ---
