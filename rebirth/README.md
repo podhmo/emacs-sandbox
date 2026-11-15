@@ -87,8 +87,8 @@ mozc.el が見つからない環境では何もしないので、未導入の環
 別経路として XIM 経由 (起動時に `XMODIFIERS=@im=fcitx`) でも入力できるが、
 こちらは環境変数だけなので init 側の設定は不要。
 
-mozc だけを試したい場合はリポジトリ直下の `mozc/` init ディレクトリを使う
-(`emacs --init-dir=<repo>/mozc`)。
+mozc だけを試したい場合はリポジトリ直下の `mozc-only/` init ディレクトリを使う
+(`emacs --init-dir=<repo>/mozc-only`)。
 
 
 ---

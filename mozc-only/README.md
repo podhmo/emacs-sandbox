@@ -1,4 +1,4 @@
-# mozc
+# mozc-only
 
 mozc.el による日本語入力だけを試すための最小 init ディレクトリ。
 rebirth の mozc 設定と同じ内容を、`emacs --init-dir` で単体起動できる。
@@ -6,7 +6,7 @@ rebirth の mozc 設定と同じ内容を、`emacs --init-dir` で単体起動�
 ## 使い方
 
 ```sh
-emacs --init-dir=<repo>/mozc /tmp/test.txt &
+emacs --init-dir=<repo>/mozc-only /tmp/test.txt &
 # C-\ (toggle-input-method) で japanese-mozc を有効化 → 読み入力 → Enter 確定
 ```
 
@@ -27,7 +27,7 @@ mozc.el を使わず、fcitx5 経由で入力する方法。環境変数だけ�
 
 ```sh
 fcitx5 -d --disable=wayland   # WSLg では --disable=wayland が必須
-XMODIFIERS=@im=fcitx GTK_IM_MODULE=fcitx emacs --init-dir=<repo>/mozc /tmp/test.txt &
+XMODIFIERS=@im=fcitx GTK_IM_MODULE=fcitx emacs --init-dir=<repo>/mozc-only /tmp/test.txt &
 # C-Space (fcitx5 トリガー) で mozc 活性化
 ```
 
@@ -41,7 +41,7 @@ init.el は `mozc-<pid>` という名前で server を立てるので、emacscli
 バッファ内容を読める:
 
 ```sh
-emacs --init-dir=<repo>/mozc /tmp/test.txt &
+emacs --init-dir=<repo>/mozc-only /tmp/test.txt &
 wid=$(xdotool search --sync --name test.txt | tail -1)
 pid=$(xdotool getwindowpid "$wid")     # $! ではなく窓の pid (nix ラッパー対策)
 xdotool windowactivate --sync "$wid"
