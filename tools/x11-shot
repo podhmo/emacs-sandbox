@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# x11-shot -- capture the main X11 window of a running GUI process
+#
+# usage: tools/x11-shot <pid> <out.png>
+# exit:  0 captured / 1 window not found or capture failed / 2 missing tool/usage
+#
+# tools/mac-shot の Linux(X11/XWayland) 版。
+# X11 クライアント (GDK_BACKEND=x11 の GTK アプリや XIM emacs) 用。
+# wayland ネイティブの窓は xdotool に見えないので撮れない。
+#
+# 必要なもの: xdotool, maim  (sudo apt install xdotool maim)
+set -u
+[ $# -eq 2 ] || { echo "usage: x11-shot <pid> <out.png>" >&2; exit 2; }
+pid="$1"
+out="$2"
+
+command -v xdotool >/dev/null || { echo "x11-shot: xdotool not found" >&2; exit 2; }
+command -v maim    >/dev/null || { echo "x11-shot: maim not found" >&2; exit 2; }
+
+# その pid の一番大きい可視ウィンドウを探す
+wid=""
+best=0
+for w in $(xdotool search --onlyvisible --pid "$pid" 2>/dev/null); do
+    WIDTH=0; HEIGHT=0
+    eval "$(xdotool getwindowgeometry --shell "$w" 2>/dev/null)" || continue
+    area=$((WIDTH * HEIGHT))
+    if [ "$area" -gt "$best" ]; then best=$area; wid=$w; fi
+done
+[ -n "$wid" ] || { echo "x11-shot: no on-screen window for pid $pid" >&2; exit 1; }
+
+# 最前面に出してから撮る (隠れていると古い/欠けた画像になるので)
+xdotool windowactivate --sync "$wid" >/dev/null 2>&1
+sleep 1
+rm -f "$out"
+maim -i "$wid" "$out" && [ -s "$out" ] || { echo "x11-shot: maim failed (window=$wid)" >&2; exit 1; }

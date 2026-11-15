@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# mozc-el-setup -- mozc.el を apt 版 emacs を引き込まずにインストールする (Ubuntu/Debian)
+#
+# usage: tools/mozc-el-setup
+#
+# emacs-mozc パッケージは依存で apt 版 emacs 本体を引き込むため入れず、
+#   emacs-mozc-bin  -> mozc_emacs_helper (要 sudo apt install)
+#   emacs-mozc の deb -> mozc.el だけを取り出す (sudo 不要)
+# という組み合わせにする。
+set -eu
+
+DEST="${XDG_DATA_HOME:-$HOME/.local/share}/emacs/site-lisp/mozc"
+
+if ! command -v mozc_emacs_helper >/dev/null 2>&1; then
+    echo "mozc_emacs_helper not found. install it first:" >&2
+    echo "  sudo apt install emacs-mozc-bin" >&2
+    exit 1
+fi
+
+if [ -f "$DEST/mozc.el" ]; then
+    echo "already installed: $DEST/mozc.el"
+    exit 0
+fi
+
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+(cd "$tmp" && apt download emacs-mozc && dpkg -x emacs-mozc_*.deb x)
+mkdir -p "$DEST"
+cp -r "$tmp"/x/usr/share/emacs/site-lisp/emacs-mozc/. "$DEST/"
+echo "installed: $DEST"

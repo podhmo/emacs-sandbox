@@ -258,7 +258,7 @@
               ("<tab>" . my:indent-rigitly)
               ("S-TAB" . my:unindent-rigitly)
               ("<backtab>" . my:unindent-rigitly)
-              ("<S-iso-lefttab>" . my:unindent-rigitly)) ;; for skk
+              ("<S-iso-lefttab>" . my:unindent-rigitly))
   :hook (text-mode . (lambda ()
                        (setq-local line-spacing 0.05) ;; ちょっと行間を拡げる
                        ))
@@ -496,52 +496,31 @@
   )
 
 
-(defun my:skk-previous-candidate-around-advice (fn &rest args)
-  "読み取り専用バッファで C-p が SKK の候補選択ではなくカーソル移動になるようにする設定, :aroundで利用する"
-  (interactive)
-  (if buffer-read-only
-      (call-interactively 'previous-line)
-    (apply fn args)))
+(defun my:setup-mozc ()
+  "mozc.el があれば japanese-mozc を既定の input method にする。なければ何もしない。
+need: mozc_emacs_helper (emacs-mozc-bin) と deb から取り出した mozc.el。
+      emacs-mozc パッケージ自体は apt 版 emacs を依存で引き込むため入れない。
+      取り出しは tools/mozc-el-setup が行う。"
+  (dolist (dir '("~/.local/share/emacs/site-lisp/mozc"
+                 "/usr/share/emacs/site-lisp/mozc"))
+    (when (file-directory-p dir)
+      (add-to-list 'load-path dir)))
+  (when (locate-library "mozc")
+    (require 'mozc)
+    (setq default-input-method "japanese-mozc") ; C-\ でトグル
+    ;; 候補表示: 'echo-area (既定) / 'overlay / 'popup
+    ;; (setq mozc-candidate-style 'overlay)
+    ;; minibuffer では input method を無効にしておく
+    (add-hook 'minibuffer-setup-hook 'deactivate-input-method)
+    t))
 
 ;; after initialize
 (defun my:after-initialize--mac ()
   ;; remember
   (eval-after-load 'remember (setq remember-data-file "~//memo/notes"))
 
-  ;; skk
-  ;; need: install ddskk by melpa
-  (when (fboundp 'skk-mode)
-    (advice-add 'skk-previous-candidate :around #'my:skk-previous-candidate-around-advice) ; read only bufferでカーソル移動をするために
-
-    (setq skk-jisyo-code "utf-8") ; jisyoのエンコーディングをutf-8にする
-    (setq skk-sticky-key ";") ; sticky-shiftを使ってshiftキーの節約する
-    (setq skk-egg-like-newline t) ; <enter>で改行を入力しない
-    (setq skk-auto-insert-paren t)
-    (setq default-input-method "japanese-skk") ; C-\
-
-    (global-set-key (kbd "C-x j") 'skk-mode) ;; disable skk-auto-fill-mode
-    (global-set-key (kbd "C-x C-j") 'skk-mode)
-    ;; (global-set-key (kbd "<zenkaku-hankaku>")  'toggle-input-methodl) ;; TODO: fix
-
-    ;; text-modeのときにははじめからskk-modeを有効にしておく
-    (add-hook 'text-mode-hook 'skk-mode)
-
-    ;; mini-bufferはskkを無効にしたい
-    (defun my:skk-force-latin-mode ()
-      (when skk-mode (skk-latin-mode-on)))
-    (add-hook 'minibuffer-setup-hook 'deactivate-input-method)
-    (add-hook 'isearch-mode-hook 'my:skk-force-latin-mode)
-
-    ;; skkの辞書ファイルはauto-saveの対象から除外する
-    (push `(string-suffix-p . ".skk-jisyo") my:disable-auto-save-visited-mode-alist)
-
-    ;; skk-insertを潰す (代替はC-enter)
-    (defun my:skk-mode-setup ()
-      (define-key skk-j-mode-map (kbd "C-j") ctrl-j-map)
-      (define-key skk-j-mode-map (kbd "<C-return>") 'skk-insert)
-      )
-    (add-hook 'skk-mode-hook 'my:skk-mode-setup)
-    )
+  ;; mozc
+  (my:setup-mozc)
 
   ;; open memo*.md
   (let* ((cmd "ls -t ~/memo/memo*.md | head -n 1")
@@ -554,50 +533,13 @@
   ;; remember
   (eval-after-load 'remember (setq remember-data-file "~/memo/notes"))
 
-  ;; skk
-  ;; need: M-x list-packages でddskkをインストール。その後 M-x skk-get で辞書をインストール。
-  (when (fboundp 'skk-mode)
-    (advice-add 'skk-previous-candidate :around #'my:skk-previous-candidate-around-advice) ; read only bufferでカーソル移動をするために
+  ;; mozc
+  (my:setup-mozc)
 
-    (setq skk-jisyo-code "utf-8") ; jisyoのエンコーディングをutf-8にする
-    (setq skk-sticky-key ";") ; sticky-shiftを使ってshiftキーの節約する
-    (setq skk-egg-like-newline t) ; <enter>で改行を入力しない
-    (setq skk-auto-insert-paren t)
-    (setq default-input-method "japanese-skk") ; C-\
+  ;; key binding (JISキーボードの無変換/変換キー)
+  (global-set-key (kbd "<muhenkan>") 'delete-backward-char)
+  (global-set-key (kbd "<henkan>")  'newline)
 
-    ;; skk-serverを立ちあげるのは面倒なのでそのままjisyoファイルを読み込むことにする。 https://ddskk.readthedocs.io/ja/latest/04_settings.html#id14
-    ;; M-x skk-get で生成されたファイルを指定する。 cdbのものののほうが軽い気がするが使っていない。
-    (when (file-exists-p "~/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
-      (setq skk-large-jisyo "~/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
-      ;; ドキュメントの内容とは異なりskk-large-jisyoを書くだけではskk-serverへのアクセスを止めない場合がある。
-      ;; serverにアクセスしようとしたときをかなり長めに待つことににある。その場合は `skk-server-host' をCustomizeでnilにする必要がある。
-      )
-
-    (global-set-key (kbd "C-x j") 'skk-mode) ;; disable skk-auto-fill-mode
-    (global-set-key (kbd "C-x C-j") 'skk-mode)
-    ;; (global-set-key (kbd "<zenkaku-hankaku>")  'toggle-input-methodl) ;; TODO: fix
-
-    ;; mini-bufferはskkを無効にしたい
-    (defun my:skk-force-latin-mode ()
-      (when skk-mode (skk-latin-mode-on)))
-    (add-hook 'minibuffer-setup-hook 'deactivate-input-method)
-    (add-hook 'isearch-mode-hook 'my:skk-force-latin-mode)
-
-    ;; skk-insertを潰す (代替はC-enter)
-    (defun my:skk-mode-setup ()
-      (define-key skk-j-mode-map (kbd "C-j") ctrl-j-map)
-      (define-key skk-j-mode-map (kbd "<C-return>") 'skk-insert)
-      )
-    (add-hook 'skk-mode-hook 'my:skk-mode-setup)
-
-    ;; skkの辞書ファイルはauto-saveの対象から除外する
-    (push `(string-suffix-p . ".skk-jisyo") my:disable-auto-save-visited-mode-alist)
-
-    ;; key binding
-    (global-set-key (kbd "<muhenkan>") 'delete-backward-char)      ;; TODO: with skk
-    (global-set-key (kbd "<henkan>")  'newline)
-
-    )
   ;; open memo*.txt
   (let* ((cmd "ls -t ~/memo/memo*.md | head -n 1")
          (memo-file (replace-regexp-in-string "\n" ""  (shell-command-to-string cmd))))

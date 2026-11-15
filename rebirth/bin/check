@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check -- launch GUI emacs with (a throwaway copy of) rebirth/ and record what happened  (macOS)
+# check -- launch GUI emacs with (a throwaway copy of) rebirth/ and record what happened  (macOS / Linux X11)
 #
 # usage: rebirth/bin/check [out-dir] [timeout-seconds]
 #   EMACS=/path/to/emacs   emacs binary (default: `emacs` in PATH)
@@ -57,7 +57,9 @@ while [ ! -s "$OUT/ready" ]; do
 done
 
 if [ -s "$OUT/ready" ]; then
-  if "$SRC/../tools/mac-shot" "$pid" "$OUT/shot.png"; then
+  SHOT="$SRC/../tools/mac-shot"
+  [ "$(uname -s)" = "Linux" ] && SHOT="$SRC/../tools/x11-shot"
+  if "$SHOT" "$pid" "$OUT/shot.png"; then
     echo "shot: $OUT/shot.png"
   else
     echo "shot: skipped (see message above)"
