@@ -26,3 +26,7 @@ fancy/shots/
 result*
 fancy/.cache/
 fancy/recentf*
+rebirth/bookmarks
+rebirth/history
+rebirth/multisession/
+rebirth/transient/
