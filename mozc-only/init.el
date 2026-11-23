@@ -22,8 +22,15 @@
 (when (locate-library "mozc")
   (require 'mozc)
   (setq default-input-method "japanese-mozc")
-  ;; 候補表示: 'echo-area (既定) / 'overlay / 'popup
+  ;; 候補表示: 'echo-area (既定) / 'overlay / 'popup / 'posframe
+  ;; posframe は derui/mozc-posframe (site-lisp に配置) + posframe.el が必要。
+  ;; GUI 専用なので display-graphic-p を確認してから有効化する。
   ;; (setq mozc-candidate-style 'overlay)
+  (when (and (display-graphic-p)
+             (locate-library "posframe")
+             (require 'mozc-posframe nil t))
+    (mozc-posframe-initialize) ; dispatch-table に 'posframe を登録 (GUI のみ)
+    (setq mozc-candidate-style 'posframe))
   ;; minibuffer では input method を無効にしておく
   (add-hook 'minibuffer-setup-hook 'deactivate-input-method))
 
