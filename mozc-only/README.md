@@ -21,6 +21,18 @@ emacs --init-dir=<repo>/mozc-only /tmp/test.txt &
 `emacs-mozc` パッケージ自体は依存で apt 版 emacs 本体を引き込むので入れない。
 上記の取り出し作業は `tools/mozc-el-setup` が行う。
 
+## 候補表示を posframe にする
+
+GUI 起動時は変換候補がカーソル位置の posframe (子フレーム) に表示される。
+以下を同じ site-lisp ディレクトリに置けば自動で有効になる:
+
+- `posframe.el` — MELPA の posframe (単一ファイル。elpa ディレクトリからコピー可)
+- `mozc-posframe.el` — https://github.com/derui/mozc-posframe
+  (Mozc 本家の `mozc-cand-posframe.el` は現行リポジトリから削除済みのためフォークを使用)
+
+`mozc-posframe-initialize` は `posframe-workable-p` を見るため、
+CUI 起動や posframe 不在時は既定の echo-area 表示にフォールバックする。
+
 ## 別経路: XIM 経由
 
 mozc.el を使わず、fcitx5 経由で入力する方法。環境変数だけでよい (init 側の設定は不要):
