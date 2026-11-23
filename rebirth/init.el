@@ -519,7 +519,32 @@ need: mozc_emacs_helper (emacs-mozc-bin) と deb から取り出した mozc.el�
       (setq mozc-candidate-style 'posframe))
     ;; minibuffer では input method を無効にしておく
     (add-hook 'minibuffer-setup-hook 'deactivate-input-method)
+    ;; desync 対策:
+    ;; mode-line の [Mozc] は current-input-method 側の表示。トグルの取りこぼし等で
+    ;; mozc-mode だけが ON に残ると「見た目は OFF なのに全角入力される」状態になる。
+    ;; input-method が OFF になったら mozc-mode も確実に OFF にする。
+    (advice-add 'deactivate-input-method :after
+                (lambda () (when (bound-and-true-p mozc-mode) (mozc-mode nil))))
     t))
+
+(defun my:mozc-reset ()
+  "mozc の desync から復帰する緊急リセット。
+mozc-mode はバッファローカルなので、全バッファを走査して強制 OFF にする。
+session を掃除し、helper プロセスも殺す (次回入力時に自動再起動される)。
+
+desync 中は M-x すら mozc に吸われて入力できないので、外部からは
+  emacsclient --eval '(my:mozc-reset)'
+として呼ぶ。"
+  (interactive)
+  (dolist (buf (buffer-list))
+    (with-current-buffer buf
+      (when (bound-and-true-p mozc-mode) (mozc-abort))
+      (when (fboundp 'mozc-clean-up-changes-on-buffer)
+        (ignore-errors (mozc-clean-up-changes-on-buffer)))))
+  (when (boundp 'mozc-helper-process)
+    (let ((proc mozc-helper-process))
+      (when (processp proc) (kill-process proc))))
+  (message "mozc reset"))
 
 ;; after initialize
 (defun my:after-initialize--mac ()
